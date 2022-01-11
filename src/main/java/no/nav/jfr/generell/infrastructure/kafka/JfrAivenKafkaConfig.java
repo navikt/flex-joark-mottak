@@ -36,7 +36,7 @@ public class JfrAivenKafkaConfig {
         kafkaProperties.put(CommonClientConfigs.RECONNECT_BACKOFF_MS_CONFIG, 5000);
         kafkaProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
         kafkaProperties.put(StreamsConfig.NUM_STREAM_THREADS_CONFIG, 1);
-        kafkaProperties.put(StreamsConfig.APPLICATION_ID_CONFIG, Environment.getApplicationName());
+        kafkaProperties.put(StreamsConfig.APPLICATION_ID_CONFIG, Environment.getApplicationId());
         kafkaProperties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, Environment.getBootstrapServersUrl());
         kafkaProperties.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         kafkaProperties.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());

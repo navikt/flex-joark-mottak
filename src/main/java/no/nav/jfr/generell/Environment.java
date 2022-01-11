@@ -22,14 +22,13 @@ public class Environment {
     private static final String KAFKA_SCHEMA_REGISTRY = "KAFKA_SCHEMA_REGISTRY";
     private static final String KAFKA_SCHEMA_REGISTRY_USER = "KAFKA_SCHEMA_REGISTRY_USER";
     private static final String KAFKA_SCHEMA_REGISTRY_PASSWORD = "KAFKA_SCHEMA_REGISTRY_PASSWORD";
+    private static final String KAFKA_STREAMS_APPLICATION_ID = "KAFKA_STREAMS_APPLICATION_ID";
     private static final String AIVEN_DOKUMENT_TOPIC = "AIVEN_DOKUMENT_TOPIC";
     private static final String AIVEN_TO_MANUELL_TOPIC = "AIVEN_TO_MANUELL_TOPIC";
     private static final String STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING = "STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING";
     private static final String AZURE_APP_CLIENT_ID = "AZURE_APP_CLIENT_ID";
     private static final String AZURE_APP_CLIENT_SECRET = "AZURE_APP_CLIENT_SECRET";
     private static final String AZURE_APP_WELL_KNOWN_URL = "AZURE_APP_WELL_KNOWN_URL";
-    private static final String NAIS_APP_NAME = "NAIS_APP_NAME";
-    private static final String NAIS_NAMESPACE = "NAIS_NAMESPACE";
     private static final String ENVIRONMENT_NAME = "NAIS_CLUSTER_NAME";
 
     private static final String SAF_CLIENT_ID = "SAF_CLIENT_ID";
@@ -97,8 +96,8 @@ public class Environment {
         return getEnvVar(ENVIRONMENT_NAME).equals("prod-gcp");
     }
 
-    public static String getApplicationName() {
-        return  getEnvVar(NAIS_NAMESPACE)+"."+getEnvVar(NAIS_APP_NAME);
+    public static String getApplicationId() {
+        return  getEnvVar(KAFKA_STREAMS_APPLICATION_ID);
     }
 
     public static String getSafUrl() {

@@ -29,6 +29,7 @@ spec:
       memory: 256Mi
   kafka:
     pool: nav-dev
+    streams: true
   webproxy: true
   azure:
     application:
