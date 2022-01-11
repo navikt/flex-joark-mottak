@@ -42,8 +42,6 @@ spec:
       value: flex.flex-joark-manuell
     - name: STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING
       value: automatiskSkjema.json
-    - name: ENVIRONMENT_NAME
-      value: q2
     # SAF
     - name: SAF_CLIENT_ID
       value: c7adbfbb-1b1e-41f6-9b7a-af9627c04998

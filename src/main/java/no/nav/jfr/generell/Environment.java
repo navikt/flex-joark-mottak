@@ -30,7 +30,7 @@ public class Environment {
     private static final String AZURE_APP_WELL_KNOWN_URL = "AZURE_APP_WELL_KNOWN_URL";
     private static final String NAIS_APP_NAME = "NAIS_APP_NAME";
     private static final String NAIS_NAMESPACE = "NAIS_NAMESPACE";
-    private static final String ENVIRONMENT_NAME = "ENVIRONMENT_NAME";
+    private static final String ENVIRONMENT_NAME = "NAIS_CLUSTER_NAME";
 
     private static final String SAF_CLIENT_ID = "SAF_CLIENT_ID";
     private static final String SAF_URL = "SAF_URL";
@@ -94,7 +94,7 @@ public class Environment {
     }
 
     public static boolean erProd() {
-        return getEnvVar(ENVIRONMENT_NAME).equals("p");
+        return getEnvVar(ENVIRONMENT_NAME).equals("prod-gcp");
     }
 
     public static String getApplicationName() {
