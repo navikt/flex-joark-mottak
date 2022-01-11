@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds">
+    <appender name="STDOUT_JSON" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+    </appender>
+
+    <appender name="METRICS" class="io.prometheus.client.logback.InstrumentedAppender" />
+
+    <logger name="no.nav" level="INFO" additivity="false">
+        <appender-ref ref="STDOUT_JSON"/>
+        <appender-ref ref="METRICS"/>
+    </logger>
+
+<!--    Kafka Stream logs - OFF (too much Spam) -->
+    <logger name="org.apache.kafka.clients.consumer.internals.SubscriptionState" level="OFF"/>
+    <logger name="org.apache.kafka.clients.consumer.internals.SubscriptionState" level="OFF"/>
+    <logger name="org.apache.kafka.clients.consumer.internals.ConsumerCoordinator" level="OFF"/>
+    <logger name="org.apache.kafka.streams.processor.internals.StreamThread" level="OFF"/>
+    <logger name="org.apache.kafka.streams.processor.internals.RecordCollectorImpl" level="OFF"/>
+    <logger name="org.apache.kafka.streams.processor.internals.StoreChangelogReader" level="OFF"/>
+    <logger name="org.apache.kafka.streams.processor.internals.ProcessorStateManager" level="OFF"/>
+    <logger name="org.apache.kafka.streams.processor.internals.StreamsPartitionAssignor" level="OFF"/>
+    <logger name="org.apache.kafka.common.metrics.Metrics" level="OFF"/>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT_JSON"/>
+        <appender-ref ref="METRICS"/>
+    </root>
+
+</configuration>

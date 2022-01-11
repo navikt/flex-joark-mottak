@@ -1,0 +1,74 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: jfr-generell
+  namespace: isa
+  labels:
+    team: isa
+spec:
+  image: {{ image }}
+  port: 8080
+  liveness:
+    path: internal/alive
+    initialDelay: 20
+  readiness:
+    path: internal/ready
+    initialDelay: 20
+  replicas:
+    min: 1
+    max: 1
+  prometheus:
+    enabled: true
+    path: internal/metrics
+  ingresses:
+    - "https://jfr-generell.intern.nav.no"
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  kafka:
+    pool: nav-prod
+  webproxy: true
+  azure:
+    application:
+      enabled: true
+      tenant: nav.no
+  env:
+    - name: ENVIRONMENT_NAME
+      value: p
+    - name: KAFKA_BOOTSTRAP_SERVERS_URL
+      value: a01apvl00145.adeo.no:8443,a01apvl00146.adeo.no:8443,a01apvl00147.adeo.no:8443,a01apvl00149.adeo.no:8443
+    - name: AIVEN_DOKUMENT_TOPIC
+      value: teamdokumenthandtering.aapen-dok-journalfoering
+    - name: AIVEN_TO_MANUELL_TOPIC
+      value: isa.jfr-to-manuell-p
+    - name: STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING
+      value: automatiskSkjema.json
+    # SAF
+    - name: SAF_CLIENT_ID
+      value: feb9588b-a3d6-4d2f-8809-97284046ae72
+    - name: SAF_URL
+      value: https://saf.intern.nav.no/graphql
+    # Dokarkiv / JournlapostAPI
+    - name: DOKARKIV_CLIENT_ID
+      value: 162b3255-2f72-4399-8f7a-244add9ffaac
+    - name: JOURNALPOSTAPI_URL
+      value: https://dokarkiv.intern.nav.no/rest/journalpostapi/v1/journalpost
+    # PDL
+    - name: PDL_CLIENT_ID
+      value: 5f3603e0-a590-4778-9d92-3ee220d95830
+    - name: PDL_URL
+      value: https://pdl-api.nais.adeo.no/graphql
+    # Oppgave
+    - name: OPPGAVE_CLIENT_ID
+      value: 50346823-61a0-49e7-ad89-ea2b1a0e90f8
+    - name: OPPGAVE_URL
+      value: http://oppgave.oppgavehandtering.svc.nais.local
+    # Andre
+    - name: NORG2_URL
+      value: https://app.adeo.no/norg2/api/v1/
+    - name: FKV_URL
+      value: https://kodeverk.nais.adeo.no/api/v1/kodeverk/Krutkoder/koder/betydninger?spraak=nb

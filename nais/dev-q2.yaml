@@ -1,0 +1,74 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: jfr-generell-q2
+  namespace: isa
+  labels:
+    team: isa
+spec:
+  image: {{ image }}
+  port: 8080
+  liveness:
+    path: internal/alive
+    initialDelay: 20
+  readiness:
+    path: internal/ready
+    initialDelay: 20
+  replicas:
+    min: 1
+    max: 1
+  prometheus:
+    enabled: true
+    path: internal/metrics
+  ingresses:
+    - "https://jfr-generell-q2.dev.intern.nav.no"
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  kafka:
+    pool: nav-dev
+  webproxy: true
+  azure:
+    application:
+      enabled: true
+      tenant: trygdeetaten.no
+  env:
+    - name: KAFKA_BOOTSTRAP_SERVERS_URL
+      value: b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443
+    - name: AIVEN_DOKUMENT_TOPIC
+      value: teamdokumenthandtering.aapen-dok-journalfoering
+    - name: AIVEN_TO_MANUELL_TOPIC
+      value: isa.jfr-to-manuell-q2
+    - name: STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING
+      value: automatiskSkjema.json
+    - name: ENVIRONMENT_NAME
+      value: q2
+    # SAF
+    - name: SAF_CLIENT_ID
+      value: c7adbfbb-1b1e-41f6-9b7a-af9627c04998
+    - name: SAF_URL
+      value: http://saf.teamdokumenthandtering.svc.nais.local/graphql
+    # Dokarkiv / JournlapostAPI
+    - name: DOKARKIV_CLIENT_ID
+      value: 972814f3-8bdf-44f8-a191-c2ed00020b54
+    - name: JOURNALPOSTAPI_URL
+      value: http://dokarkiv.teamdokumenthandtering.svc.nais.local/rest/journalpostapi/v1/journalpost
+    # PDL
+    - name: PDL_CLIENT_ID
+      value: 30df8ce8-6433-41fa-8cd5-163180420682
+    - name: PDL_URL
+      value: http://pdl-api.pdl.svc.nais.local/graphql
+    # Oppgave
+    - name: OPPGAVE_CLIENT_ID
+      value: 41ca50ba-e44f-4bc8-9e31-b745a0041926
+    - name: OPPGAVE_URL
+      value: http://oppgave.oppgavehandtering.svc.nais.local
+    # Andre
+    - name: NORG2_URL
+      value: https://app-q2.adeo.no/norg2/api/v1/
+    - name: FKV_URL
+      value: https://kodeverk.dev.adeo.no/api/v1/kodeverk/Krutkoder/koder/betydninger?spraak=nb
