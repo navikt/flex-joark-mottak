@@ -1,0 +1,35 @@
+logging.config: "classpath:logback-local.xml"
+
+spring:
+  profiles:
+    active: test
+  flyway:
+    enabled: true
+  datasource:
+    hikari:
+      minimum-idle: 1
+      maximum-pool-size: 3
+
+aiven-kafka:
+  auto-offset-reset: earliest
+  security-protocol: PLAINTEXT
+
+
+no.nav.security.jwt:
+  issuer:
+    azureator:
+      discoveryurl: http://localhost:${mock-oauth2-server.port}/azureator/.well-known/openid-configuration
+      accepted_audience: flex-joark-mottak-client-id
+
+management:
+  endpoint.prometheus.enabled: true
+  endpoints.web:
+    base-path: /internal
+    exposure.include: prometheus
+    path-mapping.prometheus: /prometheus
+
+nais.cluster: test
+KAFKA_TRUSTSTORE_PATH: /
+KAFKA_CREDSTORE_PASSWORD: /
+KAFKA_KEYSTORE_PATH: /
+
