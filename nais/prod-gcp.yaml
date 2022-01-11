@@ -1,10 +1,10 @@
 apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
-  name: jfr-generell
-  namespace: isa
+  name: flex-joark-mottak
+  namespace: flex
   labels:
-    team: isa
+    team: flex
 spec:
   image: {{ image }}
   port: 8080
@@ -20,8 +20,6 @@ spec:
   prometheus:
     enabled: true
     path: internal/metrics
-  ingresses:
-    - "https://jfr-generell.intern.nav.no"
   resources:
     limits:
       cpu: 500m
@@ -35,7 +33,6 @@ spec:
   azure:
     application:
       enabled: true
-      tenant: nav.no
   env:
     - name: ENVIRONMENT_NAME
       value: p
@@ -44,7 +41,7 @@ spec:
     - name: AIVEN_DOKUMENT_TOPIC
       value: teamdokumenthandtering.aapen-dok-journalfoering
     - name: AIVEN_TO_MANUELL_TOPIC
-      value: isa.jfr-to-manuell-p
+      value: flex.flex-joark-manuell
     - name: STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING
       value: automatiskSkjema.json
     # SAF

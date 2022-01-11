@@ -1,10 +1,10 @@
 apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
-  name: jfr-generell-q2
-  namespace: isa
+  name: flex-joark-mottak
+  namespace: flex
   labels:
-    team: isa
+    team: flex
 spec:
   image: {{ image }}
   port: 8080
@@ -20,8 +20,6 @@ spec:
   prometheus:
     enabled: true
     path: internal/metrics
-  ingresses:
-    - "https://jfr-generell-q2.dev.intern.nav.no"
   resources:
     limits:
       cpu: 500m
@@ -35,14 +33,13 @@ spec:
   azure:
     application:
       enabled: true
-      tenant: trygdeetaten.no
   env:
     - name: KAFKA_BOOTSTRAP_SERVERS_URL
       value: b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443
     - name: AIVEN_DOKUMENT_TOPIC
       value: teamdokumenthandtering.aapen-dok-journalfoering
     - name: AIVEN_TO_MANUELL_TOPIC
-      value: isa.jfr-to-manuell-q2
+      value: flex.flex-joark-manuell
     - name: STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING
       value: automatiskSkjema.json
     - name: ENVIRONMENT_NAME
