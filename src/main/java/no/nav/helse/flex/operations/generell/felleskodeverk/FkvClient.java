@@ -31,12 +31,13 @@ public class FkvClient {
         this.gson = new Gson();
     }
 
+    // TODO: Gå gjennon flex-fss-proxy
     public FkvKrutkoder fetchKrutKoder() throws Exception {
         try {
             final HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(fellesKodeverkUrl))
-                    .header(CORRELATION_HEADER, "jfr-manuell-oppretter-oppstart")
-                    .header(NAV_CONSUMER_ID, "srvJfr-manuell-opp")
+                    .header(CORRELATION_HEADER, "flex-joark-mottak")
+                    .header(NAV_CONSUMER_ID, "flex-joark-mottak")
                     .GET()
                     .build();
             final HttpResponse<String> response = resilience.execute(request);
