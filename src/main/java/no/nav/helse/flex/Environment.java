@@ -29,7 +29,6 @@ public class Environment {
     private static final String AZURE_APP_CLIENT_ID = "AZURE_APP_CLIENT_ID";
     private static final String AZURE_APP_CLIENT_SECRET = "AZURE_APP_CLIENT_SECRET";
     private static final String AZURE_APP_WELL_KNOWN_URL = "AZURE_APP_WELL_KNOWN_URL";
-    private static final String NAIS_CLUSTER_NAME = "NAIS_CLUSTER_NAME";
 
     private static final String SAF_CLIENT_ID = "SAF_CLIENT_ID";
     private static final String SAF_URL = "SAF_URL";
@@ -64,9 +63,7 @@ public class Environment {
         return envVar;
     }
 
-    public static String getBootstrapServersUrl() {
-        return getEnvVar(KAFKA_BOOTSTRAP_SERVERS);
-    }
+    public static String getBootstrapServersUrl() { return getEnvVar(KAFKA_BOOTSTRAP_SERVERS); }
 
     private static void setupConfigFile() {
         compositeConfiguration.addConfiguration(new EnvironmentConfiguration());
@@ -91,10 +88,6 @@ public class Environment {
         return null;
     }
 
-    public static boolean erProd() {
-        return getEnvVar(NAIS_CLUSTER_NAME).equals("prod-gcp");
-    }
-
     public static String getApplicationId() {
         return  getEnvVar(KAFKA_STREAMS_APPLICATION_ID);
     }
@@ -115,17 +108,13 @@ public class Environment {
         return getEnvVar(PDL_CLIENT_ID);
     }
 
-    public static String getOppgaveUrl() {
-        return getEnvVar(OPPGAVE_URL);
-    }
+    public static String getOppgaveUrl() { return getEnvVar(OPPGAVE_URL); }
 
     public static String getFkvUrl() {
         return getEnvVar(FKV_URL);
     }
 
-    public static String azureAppClientSecret() {
-        return getEnvVar(AZURE_APP_CLIENT_SECRET);
-    }
+    public static String azureAppClientSecret() { return getEnvVar(AZURE_APP_CLIENT_SECRET); }
 
     public static String azureAppURL() {
         return getEnvVar(AZURE_APP_WELL_KNOWN_URL);
@@ -142,17 +131,6 @@ public class Environment {
     public static String getJournalpostApiUrl() { return getEnvVar(JOURNALPOSTAPI_URL); }
 
     public static String getDokarkivClientId() { return getEnvVar(DOKARKIV_CLIENT_ID); }
-
-    //Understands valid formats of username and password strings and objects
-//    private static class Credentials {
-//        static String kafkaSaslAuthentication(final String username, final String password) {
-//            return String.format("username=%s password=%s", username, password);
-//        }
-//
-//        static UsernamePasswordCredentials stsOicdCredentials(final String username, final String password) {
-//            return new UsernamePasswordCredentials(username, password);
-//        }
-//    }
 
     public static String getSkjemaerJson() {
         return readSupportedTemaerOgSkjemaerFromFile(getEnvVar(STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING));
