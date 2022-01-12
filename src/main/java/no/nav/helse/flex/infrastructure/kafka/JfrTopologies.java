@@ -94,7 +94,7 @@ public class JfrTopologies {
     private KStream<String, GenericRecord> filterGenerelleEvent(final KStream<String, GenericRecord> inputStream) {
         return inputStream
                 .filter((key, genericRecord) ->
-                        skjemaMetadata.inTemaList(genericRecord.get("temaNytt").toString())
+                        genericRecord.get("temaNytt").toString().equals("SYK")
                         && eventType.contains(genericRecord.get("hendelsesType").toString()));
     }
 

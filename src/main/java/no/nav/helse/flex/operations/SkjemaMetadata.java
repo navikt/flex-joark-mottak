@@ -17,12 +17,6 @@ public class SkjemaMetadata {
         this.temaMap = gson.fromJson(jsonString, new TypeToken<HashMap<String, TemaKodeverk>>(){}.getType());
     }
 
-    public boolean inTemaList(String tema){
-        //TODO:Fjern når YRK tar over i produksjon
-        if(!Environment.erProd() && tema.contains("YRK")) return false;
-        return temaMap.containsKey(tema);
-    }
-
     public boolean inAutoList(String tema, String skjema){
         if(temaMap.containsKey(tema)){
             return temaMap.get(tema).hasSkjema(skjema);
