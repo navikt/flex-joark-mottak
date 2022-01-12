@@ -14,37 +14,37 @@ public class Metrics {
     private static final String AUTO = "Automatisk journalforing";
 
     private static final Counter jfrProcessCounter = Counter.build(
-            "jfr_generell_process_counter",
+            "flex_joark_mottak_process_counter",
             "Teller antall journalposter som behandles av jfr-generell. Setter på labels på om det burde blitt behandlet maskinelt/manuelt og om den blir behandlet maskinelt/manuelt")
             .labelNames("result", "desired", "tema", "kanal", "skjema")
             .register();
 
     private static final Counter feilregOppgaverCounter = Counter.build(
-            "jfr_generell_feilregistrerte_oppgaver_counter",
+            "flex_joark_mottak_feilregistrerte_oppgaver_counter",
             "Teller antall ganger vi må avbryte autoatiske prosess på en slik måte at en oppgave må feilregistreres")
             .labelNames("ableToFeilreg", "tema", "kanal", "skjema")
             .register();
 
     private static final Counter functionalReqFailCounter = Counter.build(
-            "jfr_generell_functional_req_fail_counter",
+            "flex_joark_mottak_functional_req_fail_counter",
             "Teller funksjonelle hindringer for automatisk journalforing")
             .labelNames("reason", "tema", "kanal", "skjema")
             .register();
 
     private static final Counter invalidJournalpostStatusCounter = Counter.build(
-            "jfr_generell_invalid_journalpost_status_counter",
+            "flex_joark_mottak_invalid_journalpost_status_counter",
             "Teller journalposter fra SAF med ugyldig status")
             .labelNames("status", "tema", "kanal", "skjema")
             .register();
 
     private static final Counter retryCounter = Counter.build(
-            "jfr_generell_retry_counter",
+            "flex_joark_mottak_retry_counter",
             "Teller antall journalposter hver gang vi vil prøve på nytt senere")
             .labelNames("transformer", "numErrors", "tema", "kanal", "skjema")
             .register();
 
     private static final Gauge retrystoreGauge = Gauge.build(
-            "jfr_generell_retry_gauge",
+            "flex_joark_mottak_retry_gauge",
             "Viser hvor mange JP som ligger på retrystore")
             .labelNames("transformer")
             .register();
