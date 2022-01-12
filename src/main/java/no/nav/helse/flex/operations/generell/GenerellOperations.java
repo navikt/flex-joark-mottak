@@ -52,9 +52,12 @@ public class GenerellOperations {
             if(journalpost.getJournalforendeEnhet() != null && !journalpost.getJournalforendeEnhet().isBlank()){
                 requestData.setTildeltEnhetsnr(journalpost.getJournalforendeEnhet());
             }
-            final Oppgave oppgave = oppgaveClient.createOppgave(requestData);
-            enrichedKafkaEvent.setOppgave(oppgave);
-            log.info("Opprettet oppgave: {} for journalpost: {}", oppgave.getId(), enrichedKafkaEvent.getJournalpostId());
+
+            // TODO: Slå på når vi skal behandle
+            //final Oppgave oppgave = oppgaveClient.createOppgave(requestData);
+            //enrichedKafkaEvent.setOppgave(oppgave);
+
+            log.info("Opprettet oppgave: {} for journalpost: {}", "id", enrichedKafkaEvent.getJournalpostId());
         }
     }
 

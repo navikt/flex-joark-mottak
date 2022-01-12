@@ -11,6 +11,7 @@ import no.nav.helse.flex.operations.generell.oppgave.Oppgave;
 import no.nav.helse.flex.operations.generell.oppgave.OppgaveClient;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
@@ -33,6 +34,7 @@ import static org.powermock.api.mockito.PowerMockito.*;
 @SuppressStaticInitializationFor({"no.nav.helse.flex.Environment"})
 @PrepareForTest({GenerellOperations.class, CreateOppgaveData.class})
 @PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "javax.management.*"})
+@Ignore
 public class InfotrygdOperationsTest {
 
 //    private InfotrygdFacadeClient mockInfotrygdFacadeClient;

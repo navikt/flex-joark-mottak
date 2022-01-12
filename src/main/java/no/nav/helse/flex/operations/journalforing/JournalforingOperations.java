@@ -19,7 +19,10 @@ public class JournalforingOperations {
     public void doAutomaticStuff(final EnrichedKafkaEvent enrichedKafkaEvent) throws TemporarilyUnavailableException, ExternalServiceException {
         enrichedKafkaEvent.getJournalpost().updateWithGenerellSak();
         populateAvsendeMottaker(enrichedKafkaEvent);
-        journalpostAPIClient.updateJournalpost(enrichedKafkaEvent.getJournalpost());
+
+        // TODO: Slå på når vi skal behandle
+        //journalpostAPIClient.updateJournalpost(enrichedKafkaEvent.getJournalpost());
+
         log.info("Oppdatert {}", enrichedKafkaEvent.getJournalpost().toString());
         journalpostAPIClient.finalizeJournalpost(enrichedKafkaEvent.getJournalpostId());
         log.info("Ferdigstilt og fullført behandling av journalpost {}.", enrichedKafkaEvent.getJournalpostId());
