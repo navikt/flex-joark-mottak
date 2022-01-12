@@ -143,15 +143,6 @@ public class Journalpost {
         this.relevanteDatoer = relevanteDatoer;
     }
 
-    public String getMottatDato(){
-        for (RelevanteDatoer relevantDato : relevanteDatoer) {
-            if (relevantDato.getDatotype().equalsIgnoreCase("DATO_REGISTRERT")) {
-                return relevantDato.getDato();
-            }
-        }
-        return "";
-    }
-
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Bruker {
         private static final String AKTOERID = "AKTOERID";
@@ -196,14 +187,6 @@ public class Journalpost {
         public RelevanteDatoer(String dato, String datotype) {
             this.dato = dato;
             this.datotype = datotype;
-        }
-
-        public String getDato() {
-            return dato;
-        }
-
-        public String getDatotype() {
-            return datotype;
         }
     }
 

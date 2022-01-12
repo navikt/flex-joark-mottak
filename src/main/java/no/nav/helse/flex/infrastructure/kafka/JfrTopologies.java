@@ -141,12 +141,6 @@ public class JfrTopologies {
                 .to(manuellTopic, Produced.with(Serdes.String(), enhancedKafkaEventSerde));
     }
 
-    private void logOldEventWithCorrelationId(final KafkaEvent kafkaEvent, final String s, final String... args) {
-        MDC.put("CORRELATION_ID", kafkaEvent.getHendelsesId());
-        log.info(s, (Object[]) args);
-        MDC.clear();
-    }
-
     private void logWithCorrelationId(EnrichedKafkaEvent enrichedKafkaEvent, String s, String... args) {
         MDC.put("CORRELATION_ID", enrichedKafkaEvent.getCorrelationId());
         log.info(s, (Object[]) args);

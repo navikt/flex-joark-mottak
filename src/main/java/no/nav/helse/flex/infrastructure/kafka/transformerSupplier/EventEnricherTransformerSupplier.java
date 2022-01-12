@@ -35,18 +35,15 @@ public class EventEnricherTransformerSupplier implements TransformerSupplier<Str
     @Override
     public Transformer<String, KafkaEvent, KeyValue<String, EnrichedKafkaEvent>> get() {
         return new Transformer<>() {
-//            private KeyValueStore<String, KafkaEvent> stateStore;
             private KeyValueStore<String, EnrichedKafkaEvent> stateStore;
 
             @SuppressWarnings("unchecked")
             @Override
             public void init(final ProcessorContext context) {
-//                this.stateStore = (KeyValueStore<String, KafkaEvent>)context.getStateStore(stateStoreName);
                 this.stateStore = (KeyValueStore<String, EnrichedKafkaEvent>)context.getStateStore(stateStoreName);
 
                 context.schedule(Duration.ofMinutes(30), PunctuationType.WALL_CLOCK_TIME, timestamp -> {
                     stateStore.all().forEachRemaining(keyValue -> {
-//                        KafkaEvent kafkaEvent = keyValue.value;
                         EnrichedKafkaEvent enrichedKafkaEvent = keyValue.value;
                         String id = keyValue.key;
                         boolean completeSendToStream = doOperations(enrichedKafkaEvent);

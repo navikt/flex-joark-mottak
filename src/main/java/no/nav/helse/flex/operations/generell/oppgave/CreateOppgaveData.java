@@ -44,15 +44,11 @@ public class CreateOppgaveData {
     }
 
     private String nextValidFrist(int frist){
-        //ToDo: gir ikke dette mening? (selv om det ikke er eksakt slikg det er i dag)
-        // Før kl. 12: setter vi frist til om x antall dager
-        // Etter kl. 12: setter vi frist til om x dager + 1 arbeidsdag
-        // På en måte det vi gjør med JFR oppgave hvor "x dager" er 0.
         LocalTime cutoffTime = LocalTime.of(12,0, 0);
         LocalTime now = LocalTime.now();
         Date oppgaveFrist = new Date();
         if(now.isAfter(cutoffTime)){
-            oppgaveFrist = NorwegianDateUtil.addWorkingDaysToDate(oppgaveFrist, frist+1);
+            oppgaveFrist = NorwegianDateUtil.addWorkingDaysToDate(oppgaveFrist, frist + 1);
         }else{
             oppgaveFrist = NorwegianDateUtil.addWorkingDaysToDate(oppgaveFrist, frist);
         }

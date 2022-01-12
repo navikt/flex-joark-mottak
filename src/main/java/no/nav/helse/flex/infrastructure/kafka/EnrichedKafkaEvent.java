@@ -121,14 +121,6 @@ public class EnrichedKafkaEvent {
         this.oppgave = oppgave;
     }
 
-    public String getSaksId() {
-        return saksId;
-    }
-
-    public void setSaksId(String saksId) {
-        this.saksId = saksId;
-    }
-
     public boolean hasOppgave() {
         return oppgave != null;
     }
@@ -147,10 +139,6 @@ public class EnrichedKafkaEvent {
 
     public void setIdenter(List<Ident> identer) {
         this.identer = identer;
-    }
-
-    public boolean isToFordeling() {
-        return toFordeling;
     }
 
     public void setToFordeling(boolean toFordeling) {

@@ -39,8 +39,4 @@ public class KafkaEvent {
         return mottaksKanal;
     }
 
-    public String getHendelsesId() {
-        return hendelsesId;
-    }
-
 }

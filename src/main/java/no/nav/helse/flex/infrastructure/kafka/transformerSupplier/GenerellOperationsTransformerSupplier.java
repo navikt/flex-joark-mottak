@@ -25,7 +25,7 @@ public class GenerellOperationsTransformerSupplier implements TransformerSupplie
     private final static Logger log = LoggerFactory.getLogger(GenerellOperationsTransformerSupplier.class);
     private final static int MAX_NUM_RETRY = 5;
 
-    public GenerellOperationsTransformerSupplier(String statestoreName) throws Exception{
+    public GenerellOperationsTransformerSupplier(String statestoreName) {
         this.stateStoreName = statestoreName;
         this.generellOperations = new GenerellOperations();
     }
@@ -33,18 +33,15 @@ public class GenerellOperationsTransformerSupplier implements TransformerSupplie
     @Override
     public Transformer<String, EnrichedKafkaEvent, KeyValue<String, EnrichedKafkaEvent>> get() {
         return new Transformer<>() {
-//            private KeyValueStore<String, KafkaEvent> stateStore;
             private KeyValueStore<String, EnrichedKafkaEvent> stateStore;
 
             @SuppressWarnings("unchecked")
             @Override
             public void init(final ProcessorContext context) {
-//                this.stateStore = (KeyValueStore<String, KafkaEvent>)context.getStateStore(stateStoreName);
-                this.stateStore = (KeyValueStore<String, EnrichedKafkaEvent>)context.getStateStore(stateStoreName);
+                this.stateStore = context.getStateStore(stateStoreName);
 
                 context.schedule(Duration.ofMinutes(30), PunctuationType.WALL_CLOCK_TIME, timestamp -> {
                     stateStore.all().forEachRemaining(keyValue -> {
-//                        KafkaEvent kafkaEvent = keyValue.value;
                         EnrichedKafkaEvent enrichedKafkaEvent = keyValue.value;
                         String id = keyValue.key;
                         boolean completeSendToStream = doOperations(enrichedKafkaEvent);
