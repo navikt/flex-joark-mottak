@@ -64,7 +64,5 @@ spec:
     - name: OPPGAVE_URL
       value: http://oppgave.oppgavehandtering.svc.nais.local
     # Andre
-    - name: NORG2_URL
-      value: https://app-q2.adeo.no/norg2/api/v1/
     - name: FKV_URL
       value: https://kodeverk.dev.adeo.no/api/v1/kodeverk/Krutkoder/koder/betydninger?spraak=nb

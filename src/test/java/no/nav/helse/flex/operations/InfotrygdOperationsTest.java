@@ -6,7 +6,6 @@ import no.nav.helse.flex.operations.eventenricher.pdl.PdlClient;
 import no.nav.helse.flex.operations.generell.GenerellOperations;
 import no.nav.helse.flex.operations.generell.felleskodeverk.FkvClient;
 import no.nav.helse.flex.operations.generell.felleskodeverk.FkvKrutkoder;
-import no.nav.helse.flex.operations.generell.norg.Norg2Client;
 import no.nav.helse.flex.operations.generell.oppgave.CreateOppgaveData;
 import no.nav.helse.flex.operations.generell.oppgave.Oppgave;
 import no.nav.helse.flex.operations.generell.oppgave.OppgaveClient;
@@ -39,7 +38,6 @@ public class InfotrygdOperationsTest {
 //    private InfotrygdFacadeClient mockInfotrygdFacadeClient;
     private GenerellOperations generellOperations;
     private OppgaveClient mockOppgaveClient;
-    private Norg2Client mockNorg2Client;
     private FkvClient mockFkvClient;
     private FkvKrutkoder mockFkvKrutkoder;
     private PdlClient mockPdlClient;

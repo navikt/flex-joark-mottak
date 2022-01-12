@@ -8,7 +8,6 @@ import no.nav.helse.flex.operations.eventenricher.pdl.PdlClient;
 import no.nav.helse.flex.operations.generell.GenerellOperations;
 import no.nav.helse.flex.operations.generell.felleskodeverk.FkvClient;
 import no.nav.helse.flex.operations.generell.felleskodeverk.FkvKrutkoder;
-import no.nav.helse.flex.operations.generell.norg.Norg2Client;
 import no.nav.helse.flex.operations.generell.oppgave.OppgaveClient;
 import org.junit.Assert;
 import org.junit.Before;
@@ -35,7 +34,6 @@ public class FunctionalRequirementsTest {
 
     private GenerellOperations generellOperations;
     private OppgaveClient mockOppgaveClient;
-    private Norg2Client mockNorg2Client;
     private FkvClient mockFkvClient;
     private FkvKrutkoder mockFkvKrutkoder;
     private PdlClient mockPdlClient;
@@ -43,12 +41,10 @@ public class FunctionalRequirementsTest {
     @Before
     public void setup() throws Exception {
         mockOppgaveClient = mock(OppgaveClient.class);
-        mockNorg2Client = mock(Norg2Client.class);
         mockFkvClient = mock(FkvClient.class);
         mockFkvKrutkoder = mock(FkvKrutkoder.class);
         mockPdlClient = mock(PdlClient.class);
         PowerMockito.whenNew(OppgaveClient.class).withNoArguments().thenReturn(mockOppgaveClient);
-        PowerMockito.whenNew(Norg2Client.class).withNoArguments().thenReturn(mockNorg2Client);
         PowerMockito.whenNew(FkvClient.class).withNoArguments().thenReturn(mockFkvClient);
         PowerMockito.whenNew(PdlClient.class).withNoArguments().thenReturn(mockPdlClient);
         PowerMockito.when(mockFkvClient.fetchKrutKoder()).thenReturn(mockFkvKrutkoder);

@@ -40,7 +40,6 @@ public class Environment {
     private final static String OPPGAVE_CLIENT_ID = "OPPGAVE_CLIENT_ID";
     private static final String OPPGAVE_URL = "OPPGAVE_URL";
     private static final String FKV_URL = "FKV_URL";
-    private static final String NORG2_URL = "NORG2_URL";
 
 
     static {
@@ -138,10 +137,6 @@ public class Environment {
 
     public static String getPersondataUrl() {
         return getEnvVar(PDL_URL);
-    }
-
-    public static String getNorg2Url(){
-        return getEnvVar(NORG2_URL);
     }
 
     public static String getJournalpostApiUrl() { return getEnvVar(JOURNALPOSTAPI_URL); }
