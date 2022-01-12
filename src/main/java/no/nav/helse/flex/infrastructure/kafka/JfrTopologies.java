@@ -95,7 +95,6 @@ public class JfrTopologies {
         return inputStream
                 .filter((key, genericRecord) ->
                         skjemaMetadata.inTemaList(genericRecord.get("temaNytt").toString())
-                        && skjemaMetadata.acceptedKanal(genericRecord.get("temaNytt").toString(), genericRecord.get("mottaksKanal").toString())
                         && eventType.contains(genericRecord.get("hendelsesType").toString()));
     }
 

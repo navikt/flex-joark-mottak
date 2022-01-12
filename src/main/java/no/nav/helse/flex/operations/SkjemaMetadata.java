@@ -4,7 +4,6 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import no.nav.helse.flex.Environment;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -22,12 +21,6 @@ public class SkjemaMetadata {
         //TODO:Fjern når YRK tar over i produksjon
         if(!Environment.erProd() && tema.contains("YRK")) return false;
         return temaMap.containsKey(tema);
-    }
-
-    public boolean acceptedKanal(String tema, String kanal){
-        List<String> ignoreKanal = temaMap.get(tema).getIgnoreKanal();
-        ignoreKanal.add("EESSI");
-        return !(ignoreKanal.contains(kanal));
     }
 
     public boolean inAutoList(String tema, String skjema){
@@ -53,7 +46,6 @@ public class SkjemaMetadata {
 
     private class TemaKodeverk {
         private HashMap<String, SkjemaKodeverk> skjemaer;
-        private List<String> ignoreKanal;
         private List<String> ignoreSkjema;
 
         public boolean hasSkjema(final String skjema) {
@@ -68,13 +60,6 @@ public class SkjemaMetadata {
                 return false;
             }
             return ignoreSkjema.contains(skjema);
-        }
-
-        public List<String> getIgnoreKanal(){
-            if(ignoreKanal != null){
-                return ignoreKanal;
-            }
-            return new ArrayList<String>();
         }
 
         public int getFristFromSkjema(String skjema){
