@@ -21,15 +21,6 @@ public class FkvKrutkoder {
         init();
     }
 
-    public Map<String, List<Betydning>> getTemaSkjemaer() {
-        return betydninger;
-    }
-
-    public void setTemaSkjemaer(final Map<String, List<Betydning>> betydninger) {
-        this.betydninger = betydninger;
-    }
-
-
     public void init() {
         final Set<String> betydningNokkler = betydninger.keySet();
         for (final String key : betydningNokkler) {
@@ -42,15 +33,6 @@ public class FkvKrutkoder {
             }
         }
     }
-
-//    public TemaSkjemaData hentTemaSkjemadata(final String tema, final String skjema) throws IllegalArgumentException {
-//        try {
-//            return hentTemaSkjema(lagTemaSkjemaNokkel(tema, skjema));
-//        } catch (final IllegalArgumentException e) {
-//            log.info("{} : {} finnes ikke i Krutkoder-kodeverket", tema, skjema);
-//            throw new IllegalArgumentException(e.getMessage());
-//        }
-//    }
 
     private TemaSkjemaData getTemaSkjema(final String temaSkjema) throws IllegalArgumentException {
         if (temaSkjemaDataMap.containsKey(temaSkjema.trim())) {
