@@ -74,12 +74,12 @@ public class EventEnricherTest {
 
     @Test
     public void test_data_on_event() throws Exception {
-        final Journalpost journalpost = mockJournalpost("123456789", "NAV 06-04.04", "M", "GEN");
+        final Journalpost journalpost = mockJournalpost("123456789", "NAV 08-07.04 D", "M", "SYK");
         PowerMockito.when(mockSafClient.retriveJournalpost(Mockito.anyString()))
                 .thenReturn(journalpost);
         PowerMockito.when(mockPdlClient.retrieveIdenterFromPDL(Mockito.anyString(),Mockito.anyString(), Mockito.anyString()))
                 .thenReturn(Collections.singletonList(new Ident("1234567891113", false, "AKTORID")));
-        final KafkaEvent event = new KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 123456789, "GEN", "NAV_NO");
+        final KafkaEvent event = new KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 123456789, "SYK", "NAV_NO");
         final EnrichedKafkaEvent enrichedKafkaEvent = new EnrichedKafkaEvent(event);
         eventEnricher.createEnrichedKafkaEvent(enrichedKafkaEvent);
 
@@ -90,12 +90,12 @@ public class EventEnricherTest {
 
     @Test (expected = InvalidJournalpostStatusException.class)
     public void test_brevkode_null() throws Exception {
-        final Journalpost journalpost = mockJournalpost("123456789", null, "J", "GRU");
+        final Journalpost journalpost = mockJournalpost("123456789", null, "J", "SYK");
         PowerMockito.when(mockSafClient.retriveJournalpost(Mockito.anyString()))
                 .thenReturn(journalpost);
         PowerMockito.when(mockPdlClient.retrieveIdenterFromPDL(Mockito.anyString(),Mockito.anyString(), Mockito.anyString()))
                 .thenReturn(Collections.singletonList(new Ident("1234567891113", false, "AKTORID")));
-        final KafkaEvent event = new KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 123456789, "GRU", "NAV_NO");
+        final KafkaEvent event = new KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 123456789, "SYK", "NAV_NO");
         final EnrichedKafkaEvent enrichedKafkaEvent = new EnrichedKafkaEvent(event);
         eventEnricher.createEnrichedKafkaEvent(enrichedKafkaEvent);
     }
