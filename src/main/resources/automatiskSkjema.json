@@ -1,77 +1,8 @@
 {
-  "AAR": {
-    },
-  "AGR": {
-    },
-  "BIL": {
-    },
-  "ERS": {
-    },
-  "FEI": {
-    },
-  "FUL": {
-    },
-  "GEN": {
-    },
-  "GRA": {
-    },
-  "HJE": {
-    },
-  "IAR": {
-    },
-  "KTR": {
-    },
-  "MED": {
-    },
-  "MOB": {
-    },
-  "OPA": {
-    },
-  "PER": {
-    },
-  "REH": {
-    },
-  "REK": {
-    },
-  "RPO": {
-    },
-  "RVE": {
-    },
-  "SAK": {
-    },
-  "SAP": {
-    },
-  "SER": {
-    },
-  "STO": {
-    },
-  "SUP": {
-    "ignoreKanal": ["INNSENDT_NAV_ANSATT", "INNSENDT_AV_NAV_ANSATT"]
-    },
   "SYK": {
     "ignoreSkjema": ["4936", "krav_om_fritak_fra_agp_gravid", "krav_om_fritak_fra_agp_kronisk", "soeknad_om_fritak_fra_agp_kronisk", "refusjonskrav_arbeidsgiverperiode_korona", "soeknad_om_fritak_fra_agp_gravid", "refusjonskrav_utestengt_arbeider_korona", "annuller_refusjonskrav_utestengt_arbeider_korona"],
     "skjemaer": {
       "NAV 08-07.04D": {"oppgavetype": "SOK", "frist": 3},
       "NAV 08-07.04 D": {"oppgavetype": "SOK", "frist": 3}
-    }},
-  "TIL": {
-    "ignoreSkjema": ["tiltak-midl-lønnst", "tiltak-varig-lønnst", "tiltak-arbtren", "tiltak-sommerjobb"],
-    "ignoreKanal": ["ALTINN"]
-    },
-  "TRY": {
-    },
-  "TRK": {
-    },
-  "UFM": {
-    },
-  "UFO": {
-    },
-  "UKJ": {
-    },
-  "VEN": {
-    },
-  "YRA": {
-    },
-  "YRK": {
-    }
+    }}
 }
