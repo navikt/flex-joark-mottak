@@ -3,6 +3,22 @@
 Applikasjonen tar over for [jfr-generell](https://github.com/navikt/jfr-generell) på journalposter med tema SYK. 
 Beriker metadata og sender enten videre til manuell-oppretter eller forsøker automatisk journalføring.
 
+## Testing i dev
+Her kan man opprette journalpost [testdata](https://testdata-frontend.dev.intern.nav.no/?), logg inn med felles syfo Z992389 bruker, eller opprett egen i [IDA](https://confluence.adeo.no/display/ATOM/IDA).
+> Bruk denne testdataen:
+>
+> `Personnummer: FNR` 
+> 
+> `Tema: SYK`
+> 
+> `Skjema: NAV 08-07.04D` = automatisk
+>
+> `Skjema: NAV 08-14.01` = manuell
+
+Hent journalpost id i fra `Historikk` eller [loggene](https://logs.adeo.no/goto/885fa64a4bdb44ba12e67a7346a479f7)
+
+Resultatet av behandlet journalpost finner man [her](https://gosys.dev.intern.nav.no/gosys/dokument/sokjournalpost.jsf) og inne på J.post finner man tilhørende oppgave
+
 ## Endre offsett :exclamation: ikke testet :exclamation:
 Kafka må være innstalert på maskinen: `brew install kafka`. Kan verifiseres med å kjøre kommando: `kafka-consumer-group`.
 
