@@ -30,7 +30,6 @@ spec:
   kafka:
     pool: nav-prod
     streams: true
-  webproxy: true
   azure:
     application:
       enabled: true
