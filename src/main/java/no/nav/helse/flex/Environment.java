@@ -39,6 +39,7 @@ public class Environment {
     private final static String OPPGAVE_CLIENT_ID = "OPPGAVE_CLIENT_ID";
     private static final String OPPGAVE_URL = "OPPGAVE_URL";
     private static final String FKV_URL = "FKV_URL";
+    private static final String FLEX_FSS_PROXY_CLIENT_ID = "FLEX_FSS_PROXY_CLIENT_ID";
 
 
     static {
@@ -112,6 +113,10 @@ public class Environment {
 
     public static String getFkvUrl() {
         return getEnvVar(FKV_URL);
+    }
+
+    public static String getProxyClientid() {
+        return getEnvVar(FLEX_FSS_PROXY_CLIENT_ID);
     }
 
     public static String azureAppClientSecret() { return getEnvVar(AZURE_APP_CLIENT_SECRET); }
