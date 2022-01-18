@@ -11,7 +11,7 @@ import org.slf4j.MDC;
 public class Feilregistrer {
     private static final Logger log = LoggerFactory.getLogger(Feilregistrer.class);
     private static final String STATUS_FEILREG = "FEILREGISTRERT";
-    private static final String BESKRIVELSE = "Oppgave feilregistrert automatisk av jfr-generell.";
+    private static final String BESKRIVELSE = "Oppgave feilregistrert automatisk av flex-joark-mottak.";
     private final OppgaveClient oppgaveClient;
 
     public Feilregistrer() {

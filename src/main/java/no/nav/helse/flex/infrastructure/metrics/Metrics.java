@@ -15,7 +15,7 @@ public class Metrics {
 
     private static final Counter jfrProcessCounter = Counter.build(
             "flex_joark_mottak_process_counter",
-            "Teller antall journalposter som behandles av jfr-generell. Setter på labels på om det burde blitt behandlet maskinelt/manuelt og om den blir behandlet maskinelt/manuelt")
+            "Teller antall journalposter som behandles. Setter på labels på om det burde blitt behandlet maskinelt/manuelt og om den blir behandlet maskinelt/manuelt")
             .labelNames("result", "desired", "tema", "kanal", "skjema")
             .register();
 
