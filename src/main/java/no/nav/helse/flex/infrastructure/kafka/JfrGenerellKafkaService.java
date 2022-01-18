@@ -18,7 +18,7 @@ public class JfrGenerellKafkaService {
         try {
             startKafkaStream();
         } catch (final Exception e) {
-            log.error("Det oppstod en feil under oppstart av jfr-generell", e);
+            log.error("Det oppstod en feil under oppstart av flex-joark-mottak", e);
             throw e;
         }
     }
@@ -29,7 +29,7 @@ public class JfrGenerellKafkaService {
         try {
             startKafkaStream();
         } catch (final Exception e) {
-            log.error("Det oppstod en feil under restart av jfr-generell", e);
+            log.error("Det oppstod en feil under restart av flex-joark-mottak", e);
             restartKafkaStream();
         }
     }
