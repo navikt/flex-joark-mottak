@@ -35,7 +35,6 @@ public class PdlClient {
 
     private final String query = "{\"query\":\"query($ident: ID!, $grupper: [IdentGruppe!], $historikk:Boolean = false){ hentIdenter(ident: $ident, grupper:$grupper, historikk:$historikk){ identer{ident, historisk,gruppe}}}\"," +
             "\"variables\": {\"ident\":\"%s\",\"historikk\": false}}";
-    private final String geoQuery = "{\"query\":\"query($ident: ID!){ hentGeografiskTilknytning(ident: $ident) {gtKommune gtBydel gtLand gtType} }\", \"variables\": {\"ident\":\"%s\"}}";
 
     public PdlClient() {
         persondataUrl = Environment.getPersondataUrl();
@@ -75,41 +74,6 @@ public class PdlClient {
         }else {
             final String errorMessage = gson.fromJson(response.body(), PdlErrorResponse.class).getErrors().get(0).getMessage();
             log.error("Feil ved kall mot PDL på journalpost {}. Status: {} og feilmelding {}",journalpostId, response.statusCode(), errorMessage);
-            throw new ExternalServiceException(TJENESTE_PDL, errorMessage, response.statusCode());
-        }
-    }
-
-    public String hentGt(String fnr, String tema, String journalpostId) throws TemporarilyUnavailableException, ExternalServiceException {
-        String correlationId = MDC.get(MDCConstants.CORRELATION_ID);
-        final HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(persondataUrl))
-                .header(CONTENT_TYPE_HEADER, "application/json")
-                .header(AUTHORIZATION_HEADER, azureAdClient.getToken())
-                .header(CORRELATION_HEADER, correlationId)
-                .header(TEMA_HEADER, tema)
-                .POST(HttpRequest.BodyPublishers.ofString(persondataBody(geoQuery,fnr)))
-                .build();
-        final HttpResponse<String> response = resilience.execute(request);
-
-        if (response.statusCode() == STATUS_OK) {
-            try {
-                PdlResponse persondataResponse = gson.fromJson(response.body(), PdlResponse.class);
-                if (persondataResponse.getGT() != null){
-                    return persondataResponse.getGT();
-                }else {
-                    log.warn("Ingen data fra PDL ved henting av GT til journalpost {}", journalpostId);
-                    throw new ExternalServiceException(TJENESTE_PDL, "Ingen data fra PDL ved henting av GT", response.statusCode());
-                }
-            } catch (final NullPointerException | IndexOutOfBoundsException e) {
-                log.error("Klarer ikke hente ut GT fra PDL til journalpost {}: {} - {}", journalpostId, response.body(), e.getMessage());
-                throw new ExternalServiceException(TJENESTE_PDL, "Klarer ikke hente ut GT fra PDL", response.statusCode());
-            }
-        }else if(response.statusCode() == 503 || response.statusCode() == 404){
-            log.error("Klarte ikke hente GT, PDL kan være nede. Til journalpost {}", journalpostId);
-            throw new TemporarilyUnavailableException();
-        } else {
-            final String errorMessage = gson.fromJson(response.body(), PdlErrorResponse.class).getErrors().get(0).getMessage();
-            log.error("Feil ved kall mot PDL ved henting av GT til journalpost: {}", journalpostId, errorMessage);
             throw new ExternalServiceException(TJENESTE_PDL, errorMessage, response.statusCode());
         }
     }

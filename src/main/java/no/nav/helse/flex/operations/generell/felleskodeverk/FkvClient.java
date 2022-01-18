@@ -6,6 +6,7 @@ import io.vavr.CheckedFunction1;
 import no.nav.helse.flex.Environment;
 import no.nav.helse.flex.infrastructure.exceptions.TemporarilyUnavailableException;
 import no.nav.helse.flex.infrastructure.resilience.Resilience;
+import no.nav.helse.flex.infrastructure.security.AzureAdClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,25 +20,28 @@ public class FkvClient {
     private final Logger log = LoggerFactory.getLogger(FkvClient.class);
     private static final String CORRELATION_HEADER = "Nav-Call-Id";
     private static final String NAV_CONSUMER_ID = "Nav-Consumer-Id";
+    private static final String AUTHORIZATION_HEADER = "Authorization";
     private final String fellesKodeverkUrl;
     private final Gson gson;
     private final HttpClient client = HttpClient.newHttpClient();
     private final Resilience<HttpRequest, HttpResponse<String>> resilience;
+    private final AzureAdClient azureAdClient;
 
     public FkvClient() {
         this.fellesKodeverkUrl = Environment.getFkvUrl();
-        final CheckedFunction1<HttpRequest, HttpResponse<String>> pdlClientFunction = this::excecute;
-        this.resilience = new Resilience<>(pdlClientFunction);
+        final CheckedFunction1<HttpRequest, HttpResponse<String>> fkvClientFunction = this::excecute;
+        this.resilience = new Resilience<>(fkvClientFunction);
+        azureAdClient = new AzureAdClient(Environment.getPdlClientid());
         this.gson = new Gson();
     }
 
-    // TODO: Gå gjennon flex-fss-proxy
     public FkvKrutkoder fetchKrutKoder() throws Exception {
         try {
             final HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(fellesKodeverkUrl))
                     .header(CORRELATION_HEADER, "flex-joark-mottak")
                     .header(NAV_CONSUMER_ID, "flex-joark-mottak")
+                    .header(AUTHORIZATION_HEADER, azureAdClient.getToken())
                     .GET()
                     .build();
             final HttpResponse<String> response = resilience.execute(request);

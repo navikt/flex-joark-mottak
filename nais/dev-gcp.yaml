@@ -64,4 +64,4 @@ spec:
       value: http://oppgave.oppgavehandtering.svc.nais.local
     # Andre
     - name: FKV_URL
-      value: https://kodeverk.dev.adeo.no/api/v1/kodeverk/Krutkoder/koder/betydninger?spraak=nb
+      value: https://flex-fss-proxy.dev-fss-pub.nais.io/api/v1/kodeverk/Krutkoder/koder/betydninger
