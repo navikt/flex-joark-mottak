@@ -69,3 +69,5 @@ spec:
     # Andre
     - name: FKV_URL
       value: https://flex-fss-proxy.dev-fss-pub.nais.io/api/v1/kodeverk/Krutkoder/koder/betydninger
+    - name: FLEX_FSS_PROXY_CLIENT_ID
+      value: dev-fss.flex.flex-fss-proxy

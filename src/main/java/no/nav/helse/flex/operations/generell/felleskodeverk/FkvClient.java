@@ -31,7 +31,7 @@ public class FkvClient {
         this.fellesKodeverkUrl = Environment.getFkvUrl();
         final CheckedFunction1<HttpRequest, HttpResponse<String>> fkvClientFunction = this::excecute;
         this.resilience = new Resilience<>(fkvClientFunction);
-        azureAdClient = new AzureAdClient(Environment.getPdlClientid());
+        azureAdClient = new AzureAdClient(Environment.getProxyClientid());
         this.gson = new Gson();
     }
 
