@@ -34,7 +34,6 @@ public class JournalOperationsTransformerSupplier implements TransformerSupplier
         return new Transformer<>() {
             private KeyValueStore<String, EnrichedKafkaEvent> stateStore;
 
-            @SuppressWarnings("unchecked")
             @Override
             public void init(final ProcessorContext context) {
                 this.stateStore = context.getStateStore(stateStoreName);

@@ -37,10 +37,9 @@ public class EventEnricherTransformerSupplier implements TransformerSupplier<Str
         return new Transformer<>() {
             private KeyValueStore<String, EnrichedKafkaEvent> stateStore;
 
-            @SuppressWarnings("unchecked")
             @Override
             public void init(final ProcessorContext context) {
-                this.stateStore = (KeyValueStore<String, EnrichedKafkaEvent>)context.getStateStore(stateStoreName);
+                this.stateStore = context.getStateStore(stateStoreName);
 
                 context.schedule(Duration.ofMinutes(30), PunctuationType.WALL_CLOCK_TIME, timestamp -> {
                     stateStore.all().forEachRemaining(keyValue -> {
