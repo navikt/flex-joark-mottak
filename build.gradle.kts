@@ -66,8 +66,6 @@ dependencies {
     testImplementation("org.apache.kafka:kafka-streams-test-utils:$kafkaVersion")
     testImplementation("org.powermock:powermock-module-junit4:$powermockVersion")
     testImplementation("org.powermock:powermock-api-mockito2:$powermockVersion")
-    testImplementation("org.mockito:mockito-inline:4.2.0")
-    testImplementation("org.assertj:assertj-core:3.22.0")
 
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.8.2")
 }
