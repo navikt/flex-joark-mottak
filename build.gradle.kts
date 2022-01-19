@@ -36,6 +36,7 @@ val prometheusVersion = "0.12.0"
 val resilience4jVersion = "1.6.1"
 val gsonVersion = "2.8.9"
 val apacheCommonsVersion = "2.7"
+val logbackVersion = "1.2.10"
 
 val junitVersion = "4.13.2"
 val powermockVersion = "2.0.9"
@@ -61,6 +62,9 @@ dependencies {
     implementation("io.github.resilience4j:resilience4j-circuitbreaker:$resilience4jVersion")
     implementation("com.google.code.gson:gson:$gsonVersion")
     implementation("org.apache.commons:commons-configuration2:$apacheCommonsVersion")
+    implementation("ch.qos.logback:logback-core:$logbackVersion")
+    implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    implementation("net.logstash.logback:logstash-logback-encoder:7.0.1")
 
     testImplementation("junit:junit:$junitVersion")
     testImplementation("org.apache.kafka:kafka-streams-test-utils:$kafkaVersion")
