@@ -33,6 +33,14 @@ spec:
   azure:
     application:
       enabled: true
+  accessPolicy:
+    outbound:
+      external:
+        - host: "saf.prod-fss-pub.nais.io"
+        - host: "dokarkiv.prod-fss-pub.nais.io"
+        - host: "pdl-api.prod-fss-pub.nais.io"
+        - host: "oppgave.prod-fss-pub.nais.io"
+        - host: "flex-fss-proxy.prod-fss-pub.nais.io"
   env:
     - name: KAFKA_BOOTSTRAP_SERVERS_URL
       value: a01apvl00145.adeo.no:8443,a01apvl00146.adeo.no:8443,a01apvl00147.adeo.no:8443,a01apvl00149.adeo.no:8443
@@ -46,22 +54,24 @@ spec:
     - name: SAF_CLIENT_ID
       value: feb9588b-a3d6-4d2f-8809-97284046ae72
     - name: SAF_URL
-      value: https://saf.intern.nav.no/graphql
+      value: https://saf.prod-fss-pub.nais.io/graphql
     # Dokarkiv / JournlapostAPI
     - name: DOKARKIV_CLIENT_ID
       value: 162b3255-2f72-4399-8f7a-244add9ffaac
     - name: JOURNALPOSTAPI_URL
-      value: https://dokarkiv.intern.nav.no/rest/journalpostapi/v1/journalpost
+      value: https://dokarkiv.prod-fss-pub.nais.io/rest/journalpostapi/v1/journalpost
     # PDL
     - name: PDL_CLIENT_ID
       value: 5f3603e0-a590-4778-9d92-3ee220d95830
     - name: PDL_URL
-      value: https://pdl-api.nais.adeo.no/graphql
+      value: https://pdl-api.prod-fss-pub.nais.io/graphql
     # Oppgave
     - name: OPPGAVE_CLIENT_ID
       value: 50346823-61a0-49e7-ad89-ea2b1a0e90f8
     - name: OPPGAVE_URL
-      value: http://oppgave.oppgavehandtering.svc.nais.local
-    # Andre
+      value: https://oppgave.prod-fss-pub.nais.io
+    # Felleskodeverk
+    - name: FLEX_FSS_PROXY_CLIENT_ID
+      value: prod-fss.flex.flex-fss-proxy
     - name: FKV_URL
-      value: https://kodeverk.nais.adeo.no/api/v1/kodeverk/Krutkoder/koder/betydninger?spraak=nb
+      value: https://flex-fss-proxy.prod-fss-pub.nais.io/api/v1/kodeverk/Krutkoder/koder/betydninger?spraak=nb

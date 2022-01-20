@@ -36,6 +36,10 @@ spec:
   accessPolicy:
     outbound:
       external:
+        - host: "saf.dev-fss-pub.nais.io"
+        - host: "dokarkiv.dev-fss-pub.nais.io"
+        - host: "pdl-api.dev-fss-pub.nais.io"
+        - host: "oppgave.dev-fss-pub.nais.io"
         - host: "flex-fss-proxy.dev-fss-pub.nais.io"
   env:
     - name: KAFKA_BOOTSTRAP_SERVERS_URL
@@ -50,24 +54,24 @@ spec:
     - name: SAF_CLIENT_ID
       value: c7adbfbb-1b1e-41f6-9b7a-af9627c04998
     - name: SAF_URL
-      value: http://saf.teamdokumenthandtering.svc.nais.local/graphql
+      value: https://saf.dev-fss-pub.nais.io/graphql
     # Dokarkiv / JournlapostAPI
     - name: DOKARKIV_CLIENT_ID
       value: 972814f3-8bdf-44f8-a191-c2ed00020b54
     - name: JOURNALPOSTAPI_URL
-      value: http://dokarkiv.teamdokumenthandtering.svc.nais.local/rest/journalpostapi/v1/journalpost
+      value: https://dokarkiv.dev-fss-pub.nais.io/rest/journalpostapi/v1/journalpost
     # PDL
     - name: PDL_CLIENT_ID
       value: 30df8ce8-6433-41fa-8cd5-163180420682
     - name: PDL_URL
-      value: http://pdl-api.pdl.svc.nais.local/graphql
+      value: https://pdl-api.dev-fss-pub.nais.io/graphql
     # Oppgave
     - name: OPPGAVE_CLIENT_ID
       value: 41ca50ba-e44f-4bc8-9e31-b745a0041926
     - name: OPPGAVE_URL
-      value: http://oppgave.oppgavehandtering.svc.nais.local
-    # Andre
-    - name: FKV_URL
-      value: https://flex-fss-proxy.dev-fss-pub.nais.io/api/v1/kodeverk/Krutkoder/koder/betydninger
+      value: https://oppgave.dev-fss-pub.nais.io
+    # Felleskodeverk
     - name: FLEX_FSS_PROXY_CLIENT_ID
       value: dev-fss.flex.flex-fss-proxy
+    - name: FKV_URL
+      value: https://flex-fss-proxy.dev-fss-pub.nais.io/api/v1/kodeverk/Krutkoder/koder/betydninger
