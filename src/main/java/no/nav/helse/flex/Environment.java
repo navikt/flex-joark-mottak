@@ -1,7 +1,7 @@
 package no.nav.helse.flex;
 
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig;
-import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
+import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import org.apache.commons.configuration2.BaseConfiguration;
 import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.configuration2.Configuration;
@@ -55,7 +55,6 @@ public class Environment {
     }
 
     public static String getEnvVar(final String varName) throws IllegalArgumentException {
-        if(compositeConfiguration==null) return "";
         final String envVar = compositeConfiguration.getString(varName);
         if (envVar == null || envVar.isEmpty()) {
             log.warn("Missing environment variable for " + varName + " and default value is null");
@@ -173,7 +172,7 @@ public class Environment {
     }
 
     public static Map<String, String> getKafkaSerdeConfig() {
-        return Map.of(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, getKafkaSchemaRegistryUrl(),
+        return Map.of(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, getKafkaSchemaRegistryUrl(),
                 SchemaRegistryClientConfig.USER_INFO_CONFIG, Environment.getKafkaUserInfoConfig(),
                 SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
     }

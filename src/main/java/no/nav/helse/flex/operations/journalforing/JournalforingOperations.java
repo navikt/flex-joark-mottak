@@ -21,7 +21,7 @@ public class JournalforingOperations {
         populateAvsendeMottaker(enrichedKafkaEvent);
 
         // TODO: Slå på når vi skal behandle
-        //journalpostAPIClient.updateJournalpost(enrichedKafkaEvent.getJournalpost());
+        journalpostAPIClient.updateJournalpost(enrichedKafkaEvent.getJournalpost());
 
         log.info("Oppdatert {}", enrichedKafkaEvent.getJournalpost().toString());
         journalpostAPIClient.finalizeJournalpost(enrichedKafkaEvent.getJournalpostId());

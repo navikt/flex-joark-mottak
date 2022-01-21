@@ -18,9 +18,7 @@ public class GenerellOperations {
 
     private static final Logger log = LoggerFactory.getLogger(GenerellOperations.class);
     private final OppgaveClient oppgaveClient;
-    private SkjemaMetadata skjemaMetadata;
-
-
+    private final SkjemaMetadata skjemaMetadata;
 
     public GenerellOperations() {
         this.oppgaveClient = new OppgaveClient();
@@ -35,7 +33,7 @@ public class GenerellOperations {
         }
     }
 
-    private Boolean checkFunctionalRequirements(final EnrichedKafkaEvent enrichedKafkaEvent) throws ExternalServiceException, TemporarilyUnavailableException {
+    private Boolean checkFunctionalRequirements(final EnrichedKafkaEvent enrichedKafkaEvent) {
         return hasValidDokumentTitler(enrichedKafkaEvent);
     }
 
@@ -53,9 +51,8 @@ public class GenerellOperations {
                 requestData.setTildeltEnhetsnr(journalpost.getJournalforendeEnhet());
             }
 
-            // TODO: Slå på når vi skal behandle
-            //final Oppgave oppgave = oppgaveClient.createOppgave(requestData);
-            //enrichedKafkaEvent.setOppgave(oppgave);
+            final Oppgave oppgave = oppgaveClient.createOppgave(requestData);
+            enrichedKafkaEvent.setOppgave(oppgave);
 
             log.info("Opprettet oppgave: {} for journalpost: {}", "id", enrichedKafkaEvent.getJournalpostId());
         }

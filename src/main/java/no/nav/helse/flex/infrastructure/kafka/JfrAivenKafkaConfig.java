@@ -1,7 +1,7 @@
 package no.nav.helse.flex.infrastructure.kafka;
 
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig;
-import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
+import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import no.nav.helse.flex.infrastructure.kafka.exceptionHandler.CustomDeserializationExceptionHandler;
 import no.nav.helse.flex.infrastructure.kafka.exceptionHandler.CustomProductionExceptionHandler;
 import no.nav.helse.flex.Environment;
@@ -42,7 +42,7 @@ public class JfrAivenKafkaConfig {
         kafkaProperties.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         kafkaProperties.put(StreamsConfig.DEFAULT_DESERIALIZATION_EXCEPTION_HANDLER_CLASS_CONFIG, CustomDeserializationExceptionHandler.class);
         kafkaProperties.put(StreamsConfig.DEFAULT_PRODUCTION_EXCEPTION_HANDLER_CLASS_CONFIG, CustomProductionExceptionHandler.class);
-        kafkaProperties.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, Environment.getEnvVar(KAFKA_SCHEMA_REGISTRY));
+        kafkaProperties.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, Environment.getEnvVar(KAFKA_SCHEMA_REGISTRY));
         kafkaProperties.put(SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE, USER_INFO);
         kafkaProperties.put(SchemaRegistryClientConfig.USER_INFO_CONFIG, Environment.getKafkaUserInfoConfig());
 

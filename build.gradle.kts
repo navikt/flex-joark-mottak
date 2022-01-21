@@ -40,7 +40,7 @@ val logbackVersion = "1.2.10"
 
 val junitVersion = "4.13.2"
 val powermockVersion = "2.0.9"
-val spekVersion = "2.0.17"
+val mockitoKotlinVersion = "2.2.0"
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -70,6 +70,7 @@ dependencies {
     testImplementation("org.apache.kafka:kafka-streams-test-utils:$kafkaVersion")
     testImplementation("org.powermock:powermock-module-junit4:$powermockVersion")
     testImplementation("org.powermock:powermock-api-mockito2:$powermockVersion")
+    testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlinVersion")
 
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.8.2")
 }

@@ -1,182 +1,188 @@
-package no.nav.helse.flex.infrastructure.kafka.TransformerSupplier;
+package transformSupplier
 
-import no.nav.helse.flex.infrastructure.kafka.*;
-import no.nav.helse.flex.infrastructure.kafka.transformerSupplier.GenerellOperationsTransformerSupplier;
-import no.nav.helse.flex.operations.eventenricher.journalpost.Dokument;
-import no.nav.helse.flex.operations.eventenricher.journalpost.Journalpost;
-import no.nav.helse.flex.operations.eventenricher.pdl.Ident;
-import no.nav.helse.flex.operations.generell.GenerellOperations;
-import org.apache.kafka.common.serialization.Serde;
-import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
-import org.apache.kafka.streams.*;
-import org.apache.kafka.streams.kstream.Consumed;
-import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.Produced;
-import org.apache.kafka.streams.state.KeyValueStore;
-import org.apache.kafka.streams.state.StoreBuilder;
-import org.apache.kafka.streams.state.Stores;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertNull
+import no.nav.helse.flex.infrastructure.exceptions.TemporarilyUnavailableException
+import no.nav.helse.flex.infrastructure.kafka.EnrichedKafkaEvent
+import no.nav.helse.flex.infrastructure.kafka.JfrKafkaDeserializer
+import no.nav.helse.flex.infrastructure.kafka.JfrKafkaSerializer
+import no.nav.helse.flex.infrastructure.kafka.JfrTopologies
+import no.nav.helse.flex.infrastructure.kafka.KafkaEvent
+import no.nav.helse.flex.infrastructure.kafka.transformerSupplier.GenerellOperationsTransformerSupplier
+import no.nav.helse.flex.operations.eventenricher.journalpost.Dokument
+import no.nav.helse.flex.operations.eventenricher.journalpost.Journalpost
+import no.nav.helse.flex.operations.eventenricher.journalpost.Journalpost.Bruker
+import no.nav.helse.flex.operations.eventenricher.pdl.Ident
+import no.nav.helse.flex.operations.generell.GenerellOperations
+import org.apache.kafka.common.serialization.Serdes
+import org.apache.kafka.common.serialization.StringDeserializer
+import org.apache.kafka.common.serialization.StringSerializer
+import org.apache.kafka.streams.KeyValue
+import org.apache.kafka.streams.StreamsBuilder
+import org.apache.kafka.streams.StreamsConfig
+import org.apache.kafka.streams.TestInputTopic
+import org.apache.kafka.streams.TestOutputTopic
+import org.apache.kafka.streams.Topology
+import org.apache.kafka.streams.TopologyTestDriver
+import org.apache.kafka.streams.kstream.Consumed
+import org.apache.kafka.streams.kstream.Produced
+import org.apache.kafka.streams.state.KeyValueStore
+import org.apache.kafka.streams.state.Stores
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers
+import org.powermock.api.mockito.PowerMockito
+import org.powermock.core.classloader.annotations.PowerMockIgnore
+import org.powermock.core.classloader.annotations.PrepareForTest
+import org.powermock.modules.junit4.PowerMockRunner
+import java.time.Duration
+import java.util.*
 
-import java.time.Duration;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
-import java.util.UUID;
-
-import static junit.framework.TestCase.*;
-import static no.nav.helse.flex.operations.TestUtils.InfotrygdClosed;
-import static org.mockito.ArgumentMatchers.any;
-import static org.powermock.api.mockito.PowerMockito.mock;
-
-@Ignore
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({JfrTopologies.class, GenerellOperationsTransformerSupplier.class, GenerellOperations.class})
-@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "javax.management.*"})
-public class GenerellOperationTransformerSupplierTest {
-    private final String INPUT_TOPIC = "source-topic";
-    private final String OUTPUT_TOPIC = "output-topic";
-
-    private TopologyTestDriver testDriver;
-    private TestInputTopic<String, KafkaEvent> inputTopic;
-    private TestOutputTopic<String, KafkaEvent> jfr_manuell_outputTopic;
-    private GenerellOperations infotrygdOperations;
-    private final String INFOTRYGD_OPERATION_STORE = "infotrygdoperations";
-    private final Serde<EnrichedKafkaEvent> enhancedKafkaEventSerde = Serdes.serdeFrom(new JfrKafkaSerializer<>(), new JfrKafkaDeserializer<>(EnrichedKafkaEvent.class));
-    private final Serde<KafkaEvent> kafkaEventSerde = Serdes.serdeFrom(new JfrKafkaSerializer<>(), new JfrKafkaDeserializer<>(KafkaEvent.class));
-    private final static int MAX_RETRY = 5;
-    KeyValueStore<String, EnrichedKafkaEvent> infotrygdOperationsKVStore;
+@RunWith(PowerMockRunner::class)
+@PrepareForTest(JfrTopologies::class, GenerellOperationsTransformerSupplier::class, GenerellOperations::class)
+@PowerMockIgnore("com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "javax.management.*")
+class GenerellOperationTransformerSupplierTest {
+    private val MAX_RETRY = 5
+    private val INPUT_TOPIC = "source-topic"
+    private val OUTPUT_TOPIC = "output-topic"
+    private lateinit var testDriver: TopologyTestDriver
+    private lateinit var inputTopic: TestInputTopic<String, KafkaEvent>
+    private lateinit var outputTopic: TestOutputTopic<String, KafkaEvent>
+    private lateinit var generellOperations: GenerellOperations
+    private lateinit var generellOperationsKVStore: KeyValueStore<String, EnrichedKafkaEvent>
+    private val GENERELL_OPERATION_STORE = "generelloperations"
+    private val enhancedKafkaEventSerde = Serdes.serdeFrom(
+        JfrKafkaSerializer(),
+        JfrKafkaDeserializer(
+            EnrichedKafkaEvent::class.java
+        )
+    )
+    private val kafkaEventSerde = Serdes.serdeFrom(
+        JfrKafkaSerializer(),
+        JfrKafkaDeserializer(
+            KafkaEvent::class.java
+        )
+    )
 
     @Before
-    public void setup() throws Exception {
-        final Properties props = new Properties();
-        props.put(StreamsConfig.APPLICATION_ID_CONFIG, "mapping-stream-app");
-        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-
-        infotrygdOperations = mock(GenerellOperations.class);
-        PowerMockito.whenNew(GenerellOperations.class).withNoArguments().thenReturn(infotrygdOperations);
-
-        testDriver = new TopologyTestDriver(testInfotrygdTopology(), props);
-        inputTopic = testDriver.createInputTopic(INPUT_TOPIC, new StringSerializer(), new JfrKafkaSerializer<>());
-        jfr_manuell_outputTopic = testDriver.createOutputTopic(OUTPUT_TOPIC, new StringDeserializer(), new JfrKafkaDeserializer<>(KafkaEvent.class));
-        this.infotrygdOperationsKVStore = testDriver.getKeyValueStore(INFOTRYGD_OPERATION_STORE);
+    fun setup() {
+        val props = Properties()
+        props[StreamsConfig.APPLICATION_ID_CONFIG] = "mapping-stream-app"
+        props[StreamsConfig.BOOTSTRAP_SERVERS_CONFIG] = "localhost:9092"
+        generellOperations = PowerMockito.mock(GenerellOperations::class.java)
+        PowerMockito.whenNew(GenerellOperations::class.java).withNoArguments().thenReturn(generellOperations)
+        testDriver = TopologyTestDriver(testTopology(), props)
+        inputTopic = testDriver.createInputTopic(INPUT_TOPIC, StringSerializer(), JfrKafkaSerializer())
+        outputTopic = testDriver.createOutputTopic(
+            OUTPUT_TOPIC, StringDeserializer(),
+            JfrKafkaDeserializer(
+                KafkaEvent::class.java
+            )
+        )
+        generellOperationsKVStore = testDriver.getKeyValueStore(GENERELL_OPERATION_STORE)
     }
 
-    private Topology testInfotrygdTopology() throws Exception {
-        StoreBuilder<KeyValueStore<String, EnrichedKafkaEvent>> infotrygdOperationSupplier = Stores.keyValueStoreBuilder(
-                Stores.inMemoryKeyValueStore(INFOTRYGD_OPERATION_STORE),
-                Serdes.String(),
-                enhancedKafkaEventSerde);
-        GenerellOperationsTransformerSupplier generellOperationsTransformerSupplier = new GenerellOperationsTransformerSupplier(INFOTRYGD_OPERATION_STORE);
-
-        final StreamsBuilder streamsBuilder = new StreamsBuilder();
-        streamsBuilder.addStateStore(infotrygdOperationSupplier);
-        final KStream<String, KafkaEvent> inputStream = streamsBuilder.stream(INPUT_TOPIC, Consumed.with(Serdes.String(), kafkaEventSerde));
-        final KStream<String, EnrichedKafkaEvent> enrichedKafkaEvent = inputStream.mapValues(this::getEntrichKafkaEvent);
-        final KStream<String, EnrichedKafkaEvent> postInfotrygdOperationKafkaEvent = enrichedKafkaEvent.transform(generellOperationsTransformerSupplier, INFOTRYGD_OPERATION_STORE);
-        postInfotrygdOperationKafkaEvent
-                .filter((k, enrichedEvent) -> enrichedEvent.isToManuell())
-                .map((k, infotrygdJournalpostData) -> KeyValue.pair(k, infotrygdJournalpostData.getKafkaEvent()))
-                .to(OUTPUT_TOPIC, Produced.with(Serdes.String(), kafkaEventSerde));
-        return streamsBuilder.build();
+    private fun testTopology(): Topology {
+        val generellOperationSupplier = Stores.keyValueStoreBuilder(
+            Stores.inMemoryKeyValueStore(GENERELL_OPERATION_STORE),
+            Serdes.String(),
+            enhancedKafkaEventSerde
+        )
+        val generellOperationsTransformerSupplier = GenerellOperationsTransformerSupplier(GENERELL_OPERATION_STORE)
+        val streamsBuilder = StreamsBuilder()
+        streamsBuilder.addStateStore(generellOperationSupplier)
+        val inputStream = streamsBuilder.stream(INPUT_TOPIC, Consumed.with(Serdes.String(), kafkaEventSerde))
+        val enrichedKafkaEvent = inputStream.mapValues { event: KafkaEvent -> getEntrichKafkaEvent(event) }
+        enrichedKafkaEvent
+            .transform(generellOperationsTransformerSupplier, GENERELL_OPERATION_STORE)
+            .filter { _, enrichedEvent: EnrichedKafkaEvent -> enrichedEvent.isToManuell }
+            .map { k: String, journalpostData: EnrichedKafkaEvent ->
+                KeyValue.pair(k, journalpostData.kafkaEvent)
+            }
+            .to(OUTPUT_TOPIC, Produced.with(Serdes.String(), kafkaEventSerde))
+        return streamsBuilder.build()
     }
 
-    private Journalpost mockJournalpost(KafkaEvent event){
-        Journalpost.Bruker mockBruker;
-        mockBruker = new Journalpost.Bruker("1234", "FNR");
-        Journalpost mockJournalpost = new Journalpost();
-        mockJournalpost.setTittel("Test Journalpost");
-        mockJournalpost.setJournalpostId(event.getJournalpostId());
-        mockJournalpost.setJournalforendeEnhet("1111");
-        mockJournalpost.setDokumenter(Collections.singletonList(new Dokument("NAV 08-36.05", "DokTittel", "123")));
-        mockJournalpost.setBruker(mockBruker);
-        mockJournalpost.setJournalstatus(event.getJournalpostStatus());
-        mockJournalpost.setTema(event.getTemaNytt());
-        return mockJournalpost;
+    private fun mockJournalpost(event: KafkaEvent): Journalpost {
+        val mockBruker: Bruker
+        mockBruker = Bruker("1234", "FNR")
+        val mockJournalpost = Journalpost()
+        mockJournalpost.setTittel("Test Journalpost")
+        mockJournalpost.journalpostId = event.journalpostId
+        mockJournalpost.journalforendeEnhet = "1111"
+        mockJournalpost.dokumenter = listOf(Dokument("NAV 08-36.05", "DokTittel", "123"))
+        mockJournalpost.bruker = mockBruker
+        mockJournalpost.journalstatus = event.journalpostStatus
+        mockJournalpost.tema = event.temaNytt
+        return mockJournalpost
     }
 
-    private KafkaEvent getTestEvent(){
-        return new KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 123456789, "GRU", "NAV_NO");
-    }
+    private val testEvent: KafkaEvent
+        get() = KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 123456789, "SYK", "NAV_NO")
 
-    private EnrichedKafkaEvent getEntrichKafkaEvent(KafkaEvent event){
-        EnrichedKafkaEvent enrichedKafkaEvent = new EnrichedKafkaEvent(event);
-        enrichedKafkaEvent.setJournalpost(mockJournalpost(event));
-        enrichedKafkaEvent.setIdenter(List.of(new Ident("1122334455", false, "AKTORID")));
-        return enrichedKafkaEvent;
+    private fun getEntrichKafkaEvent(event: KafkaEvent): EnrichedKafkaEvent {
+        val enrichedKafkaEvent = EnrichedKafkaEvent(event)
+        enrichedKafkaEvent.journalpost = mockJournalpost(event)
+        enrichedKafkaEvent.setIdenter(listOf(Ident("1122334455", false, "AKTORID")))
+        return enrichedKafkaEvent
     }
 
     @Test
-    public void test_journalpost_infotrygd_fail_send_to_keyValueStore() throws Exception {
-        KafkaEvent event = getTestEvent();
-//        doThrow(new TemporarilyUnavailableException()).when(infotrygdOperations).executeInfotrygdProcess(any());
-        inputTopic.pipeInput("Test123", event);
-        EnrichedKafkaEvent kafkaEvent = infotrygdOperationsKVStore.get("Test123");
-        assertEquals(kafkaEvent.getJournalpostId(), "123456789");
+    fun test_journalpost_fail_send_to_keyValueStore() {
+        val event = testEvent
+        PowerMockito.doThrow(TemporarilyUnavailableException()).`when`(generellOperations)
+            .executeProcess(ArgumentMatchers.any())
+        inputTopic.pipeInput("Test123", event)
+        val kafkaEvent = generellOperationsKVStore["Test123"]
+        assertEquals(kafkaEvent.journalpostId, "123456789")
     }
 
+    @Test
+    fun test_catch_unknownException_send_to_manuell() {
+        val event = testEvent
+        PowerMockito.doThrow(Exception("Unknown Exception")).`when`(generellOperations)
+            .executeProcess(ArgumentMatchers.any())
+        inputTopic.pipeInput("Test123", event)
+        val kafkaEvent = generellOperationsKVStore["Test123"]
+        assertNull(kafkaEvent)
+        assertEquals("123456789", outputTopic.readValue().journalpostId)
+    }
 
     @Test
-    public void test_when_infotrygOp_catch_unknownException_send_to_manuell() throws Exception {
-        KafkaEvent event = getTestEvent();
-//        doThrow(new Exception("Unknown Exception")).when(infotrygdOperations).executeInfotrygdProcess(any());
-
-        inputTopic.pipeInput("Test123", event);
-        EnrichedKafkaEvent kafkaEvent = infotrygdOperationsKVStore.get("Test123");
-        if(InfotrygdClosed()){
-            assertNotNull(kafkaEvent);
-        } else {
-            assertNull(kafkaEvent);
-            assertEquals("123456789", jfr_manuell_outputTopic.readValue().getJournalpostId());
+    fun test_journalpost_fail_multiple_time_send_to_manuell() {
+        val event = testEvent
+        val enrichedKafkaEvent = EnrichedKafkaEvent(event)
+        enrichedKafkaEvent.journalpost = mockJournalpost(event)
+        enrichedKafkaEvent.setIdenter(listOf(Ident("1122334455", false, "AKTORID")))
+        PowerMockito.doThrow(TemporarilyUnavailableException()).`when`(generellOperations)
+            .executeProcess(ArgumentMatchers.any())
+        inputTopic.pipeInput("Test123", event)
+        for (i in 1 until MAX_RETRY) {
+            val kafkaEvent = generellOperationsKVStore["Test123"]
+            assertEquals(kafkaEvent.journalpostId, "123456789")
+            testDriver.advanceWallClockTime(Duration.ofMinutes(30))
         }
+        assertNull(generellOperationsKVStore["Test123"])
+        assertEquals("123456789", outputTopic.readValue().journalpostId)
     }
 
     @Test
-    public void test_journalpost_infotrygd_fail_multiple_time_send_to_manuell() throws Exception {
-        KafkaEvent event = getTestEvent();
-        EnrichedKafkaEvent enrichedKafkaEvent = new EnrichedKafkaEvent(event);
-        enrichedKafkaEvent.setJournalpost(mockJournalpost(event));
-        enrichedKafkaEvent.setIdenter(List.of(new Ident("1122334455", false, "AKTORID")));
-//        doThrow(new TemporarilyUnavailableException()).when(infotrygdOperations).executeInfotrygdProcess(any());
-        inputTopic.pipeInput("Test123", event);
-        for (int i = 1; i < MAX_RETRY; i++) {
-            EnrichedKafkaEvent kafkaEvent = infotrygdOperationsKVStore.get("Test123");
-            assertEquals(kafkaEvent.getJournalpostId(), "123456789");
-            testDriver.advanceWallClockTime(Duration.ofMinutes(30));
-        }
-        if(InfotrygdClosed()){
-            assertNotNull(infotrygdOperationsKVStore.get("Test123"));
-        } else {
-            assertEquals(null, infotrygdOperationsKVStore.get("Test123"));
-            assert (jfr_manuell_outputTopic.readValue().getJournalpostId().equals("123456789"));
-        }
-    }
+    fun test_journalpost_fail_then_unknown_exception_send_to_manuell() {
+        val event = testEvent
+        PowerMockito.doThrow(TemporarilyUnavailableException()).`when`(generellOperations)
+            .executeProcess(ArgumentMatchers.any())
+        inputTopic.pipeInput("Test123", event)
 
-    @Test
-    public void test_journalpost_infotrygdOp_fail_TUE_then_unknown_exception_send_to_manuell() throws Exception {
-        KafkaEvent event = getTestEvent();
-//        doThrow(new TemporarilyUnavailableException()).when(infotrygdOperations).executeInfotrygdProcess(any());
-        inputTopic.pipeInput("Test123", event);
         // check store have journalpost stored after SUE
-        EnrichedKafkaEvent kafkaEvent = infotrygdOperationsKVStore.get("Test123");
-        assertEquals(kafkaEvent.getJournalpostId(), "123456789");
+        var kafkaEvent = generellOperationsKVStore["Test123"]
+        assertEquals(kafkaEvent.journalpostId, "123456789")
+
         // after 30 min schedule retry - and throws UE Journlapost should send to manuell and store empty
-//        doThrow(new Exception("Ukjent feil")).when(infotrygdOperations).executeInfotrygdProcess(any());
-        testDriver.advanceWallClockTime(Duration.ofMinutes(30));
-        kafkaEvent = infotrygdOperationsKVStore.get("Test123");
-        if(InfotrygdClosed()){
-            assertNotNull(kafkaEvent);
-        } else {
-            assertNull(kafkaEvent);
-            assertEquals("123456789", jfr_manuell_outputTopic.readValue().getJournalpostId());
-        }
+        PowerMockito.doThrow(Exception("Ukjent feil")).`when`(generellOperations).executeProcess(ArgumentMatchers.any())
+        testDriver.advanceWallClockTime(Duration.ofMinutes(30))
+        kafkaEvent = generellOperationsKVStore["Test123"]
+        assertNull(kafkaEvent)
+        assertEquals("123456789", outputTopic.readValue().journalpostId)
     }
 }

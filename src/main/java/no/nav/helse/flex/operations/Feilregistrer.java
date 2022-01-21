@@ -23,12 +23,11 @@ public class Feilregistrer {
             try{
                 MDC.put("CORRELATION_ID", enrichedKafkaEvent.getCorrelationId());
 
-                // TODO: Slå på når vi skal behandle
-                // Oppgave oppgave = enrichedKafkaEvent.getOppgave();
-                // oppgave.setBeskrivelse(BESKRIVELSE);
-                // oppgave.setStatus(STATUS_FEILREG);
-                // enrichedKafkaEvent.setOppgave(oppgave);
-                // oppgaveClient.updateOppgave(enrichedKafkaEvent);
+                Oppgave oppgave = enrichedKafkaEvent.getOppgave();
+                oppgave.setBeskrivelse(BESKRIVELSE);
+                oppgave.setStatus(STATUS_FEILREG);
+                enrichedKafkaEvent.setOppgave(oppgave);
+                oppgaveClient.updateOppgave(enrichedKafkaEvent);
 
                 log.info("Feilregistrerte oppgave: {} for journalpost: {}", enrichedKafkaEvent.getOppgaveId(), enrichedKafkaEvent.getJournalpostId());
                 Metrics.incFeilregCounter(enrichedKafkaEvent, true);

@@ -1,102 +1,109 @@
-package no.nav.helse.flex.operations;
+import junit.framework.TestCase
+import no.nav.helse.flex.Environment
+import no.nav.helse.flex.infrastructure.exceptions.InvalidJournalpostStatusException
+import no.nav.helse.flex.infrastructure.kafka.EnrichedKafkaEvent
+import no.nav.helse.flex.infrastructure.kafka.KafkaEvent
+import no.nav.helse.flex.operations.eventenricher.EventEnricher
+import no.nav.helse.flex.operations.eventenricher.journalpost.Dokument
+import no.nav.helse.flex.operations.eventenricher.journalpost.Journalpost
+import no.nav.helse.flex.operations.eventenricher.journalpost.Journalpost.Bruker
+import no.nav.helse.flex.operations.eventenricher.pdl.Ident
+import no.nav.helse.flex.operations.eventenricher.pdl.PdlClient
+import no.nav.helse.flex.operations.eventenricher.saf.SafClient
+import no.nav.helse.flex.operations.generell.felleskodeverk.FkvClient
+import no.nav.helse.flex.operations.generell.felleskodeverk.FkvKrutkoder
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.Mockito
+import org.powermock.api.mockito.PowerMockito
+import org.powermock.core.classloader.annotations.PowerMockIgnore
+import org.powermock.core.classloader.annotations.PrepareForTest
+import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor
+import org.powermock.modules.junit4.PowerMockRunner
+import java.util.*
 
-import no.nav.helse.flex.Environment;
-import no.nav.helse.flex.infrastructure.exceptions.InvalidJournalpostStatusException;
-import no.nav.helse.flex.infrastructure.kafka.EnrichedKafkaEvent;
-import no.nav.helse.flex.infrastructure.kafka.KafkaEvent;
-import no.nav.helse.flex.operations.generell.felleskodeverk.FkvClient;
-import no.nav.helse.flex.operations.generell.felleskodeverk.FkvKrutkoder;
-import no.nav.helse.flex.operations.eventenricher.pdl.Ident;
-import no.nav.helse.flex.operations.eventenricher.EventEnricher;
-import no.nav.helse.flex.operations.eventenricher.pdl.PdlClient;
-import no.nav.helse.flex.operations.eventenricher.saf.SafClient;
-import no.nav.helse.flex.operations.eventenricher.journalpost.Dokument;
-import no.nav.helse.flex.operations.eventenricher.journalpost.Journalpost;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
-import org.powermock.modules.junit4.PowerMockRunner;
-
-import java.util.*;
-
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertEquals;
-import static org.powermock.api.mockito.PowerMockito.*;
-
-@RunWith(PowerMockRunner.class)
-@SuppressStaticInitializationFor({"no.nav.helse.flex.Environment"})
-@PrepareForTest({EventEnricher.class})
-@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "javax.management.*"})
-public class EventEnricherTest {
-
-    private SafClient mockSafClient;
-    private PdlClient mockPdlClient;
-    private FkvClient mockFkvClient;
-    private EventEnricher eventEnricher;
-    private FkvKrutkoder fkvKrutkoder;
+@RunWith(PowerMockRunner::class)
+@SuppressStaticInitializationFor("no.nav.helse.flex.Environment")
+@PrepareForTest(EventEnricher::class)
+@PowerMockIgnore("com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "javax.management.*")
+class EventEnricherTest {
+    private lateinit var mockSafClient: SafClient
+    private lateinit var mockPdlClient: PdlClient
+    private lateinit var mockFkvClient: FkvClient
+    private lateinit var eventEnricher: EventEnricher
+    private lateinit var fkvKrutkoder: FkvKrutkoder
 
     @Before
-    public void setup() throws Exception {
-        mockSafClient = mock(SafClient.class);
-        mockPdlClient = mock(PdlClient.class);
-        mockFkvClient = mock(FkvClient.class);
-        fkvKrutkoder = mock(FkvKrutkoder.class);
-        PowerMockito.whenNew(SafClient.class).withNoArguments().thenReturn(mockSafClient);
-        PowerMockito.whenNew(PdlClient.class).withNoArguments().thenReturn(mockPdlClient);
-        PowerMockito.whenNew(FkvClient.class).withNoArguments().thenReturn(mockFkvClient);
-        PowerMockito.when(mockFkvClient.fetchKrutKoder()).thenReturn(fkvKrutkoder);
-        spy(Environment.class);
-        doReturn("automatiskSkjema.json").when(Environment.class, "getEnvVar", "STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING");
-        eventEnricher = new EventEnricher();
+    fun setup() {
+        mockSafClient = PowerMockito.mock(SafClient::class.java)
+        mockPdlClient = PowerMockito.mock(PdlClient::class.java)
+        mockFkvClient = PowerMockito.mock(FkvClient::class.java)
+        fkvKrutkoder = PowerMockito.mock(FkvKrutkoder::class.java)
+        PowerMockito.whenNew(SafClient::class.java).withNoArguments().thenReturn(mockSafClient)
+        PowerMockito.whenNew(PdlClient::class.java).withNoArguments().thenReturn(mockPdlClient)
+        PowerMockito.whenNew(FkvClient::class.java).withNoArguments().thenReturn(mockFkvClient)
+        PowerMockito.`when`(mockFkvClient.fetchKrutKoder()).thenReturn(fkvKrutkoder)
+        PowerMockito.spy(Environment::class.java)
+        PowerMockito.doReturn("automatiskSkjema.json")
+            .`when`(Environment::class.java, "getEnvVar", "STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING")
+        eventEnricher = EventEnricher()
     }
 
-    private Journalpost mockJournalpost(String journalpostId, String brevkode, String journalpostStatus, String tema){
-        Journalpost.Bruker mockBruker;
-
-        mockBruker = new Journalpost.Bruker("1234", "FNR");
-
-        Journalpost mockJournalpost = new Journalpost();
-        mockJournalpost.setTittel("Test Journalpost");
-        mockJournalpost.setJournalpostId(journalpostId);
-        mockJournalpost.setJournalforendeEnhet("1111");
-        mockJournalpost.setDokumenter(Collections.singletonList(new Dokument(brevkode, "dokTittel", "123")));
-        mockJournalpost.setBruker(mockBruker);
-        mockJournalpost.setJournalstatus(journalpostStatus);
-        mockJournalpost.setTema(tema);
-
-        return mockJournalpost;
+    private fun mockJournalpost(
+        journalpostId: String,
+        brevkode: String?,
+        journalpostStatus: String,
+        tema: String
+    ): Journalpost {
+        val mockBruker = Bruker("1234", "FNR")
+        val mockJournalpost = Journalpost()
+        mockJournalpost.setTittel("Test Journalpost")
+        mockJournalpost.journalpostId = journalpostId
+        mockJournalpost.journalforendeEnhet = "1111"
+        mockJournalpost.dokumenter = listOf(Dokument(brevkode, "dokTittel", "123"))
+        mockJournalpost.bruker = mockBruker
+        mockJournalpost.journalstatus = journalpostStatus
+        mockJournalpost.tema = tema
+        return mockJournalpost
     }
 
     @Test
-    public void test_data_on_event() throws Exception {
-        final Journalpost journalpost = mockJournalpost("123456789", "NAV 08-07.04 D", "M", "SYK");
-        PowerMockito.when(mockSafClient.retriveJournalpost(Mockito.anyString()))
-                .thenReturn(journalpost);
-        PowerMockito.when(mockPdlClient.retrieveIdenterFromPDL(Mockito.anyString(),Mockito.anyString(), Mockito.anyString()))
-                .thenReturn(Collections.singletonList(new Ident("1234567891113", false, "AKTORID")));
-        final KafkaEvent event = new KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 123456789, "SYK", "NAV_NO");
-        final EnrichedKafkaEvent enrichedKafkaEvent = new EnrichedKafkaEvent(event);
-        eventEnricher.createEnrichedKafkaEvent(enrichedKafkaEvent);
-
-        assertEquals(journalpost, enrichedKafkaEvent.getJournalpost());
-        assertEquals("1234567891113", enrichedKafkaEvent.getAktoerId());
-        assertFalse(enrichedKafkaEvent.isToManuell());
+    fun test_data_on_event() {
+        val journalpost = mockJournalpost("123456789", "NAV 08-07.04 D", "M", "SYK")
+        PowerMockito.`when`(mockSafClient.retriveJournalpost(Mockito.anyString()))
+            .thenReturn(journalpost)
+        PowerMockito.`when`(
+            mockPdlClient.retrieveIdenterFromPDL(
+                Mockito.anyString(),
+                Mockito.anyString(),
+                Mockito.anyString()
+            )
+        )
+            .thenReturn(listOf(Ident("1234567891113", false, "AKTORID")))
+        val event = KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 123456789, "SYK", "NAV_NO")
+        val enrichedKafkaEvent = EnrichedKafkaEvent(event)
+        eventEnricher.createEnrichedKafkaEvent(enrichedKafkaEvent)
+        TestCase.assertEquals(journalpost, enrichedKafkaEvent.journalpost)
+        TestCase.assertEquals("1234567891113", enrichedKafkaEvent.aktoerId)
+        TestCase.assertFalse(enrichedKafkaEvent.isToManuell)
     }
 
-    @Test (expected = InvalidJournalpostStatusException.class)
-    public void test_brevkode_null() throws Exception {
-        final Journalpost journalpost = mockJournalpost("123456789", null, "J", "SYK");
-        PowerMockito.when(mockSafClient.retriveJournalpost(Mockito.anyString()))
-                .thenReturn(journalpost);
-        PowerMockito.when(mockPdlClient.retrieveIdenterFromPDL(Mockito.anyString(),Mockito.anyString(), Mockito.anyString()))
-                .thenReturn(Collections.singletonList(new Ident("1234567891113", false, "AKTORID")));
-        final KafkaEvent event = new KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 123456789, "SYK", "NAV_NO");
-        final EnrichedKafkaEvent enrichedKafkaEvent = new EnrichedKafkaEvent(event);
-        eventEnricher.createEnrichedKafkaEvent(enrichedKafkaEvent);
+    @Test(expected = InvalidJournalpostStatusException::class)
+    fun test_brevkode_null() {
+        val journalpost = mockJournalpost("123456789", null, "J", "SYK")
+        PowerMockito.`when`(mockSafClient.retriveJournalpost(Mockito.anyString()))
+            .thenReturn(journalpost)
+        PowerMockito.`when`(
+            mockPdlClient.retrieveIdenterFromPDL(
+                Mockito.anyString(),
+                Mockito.anyString(),
+                Mockito.anyString()
+            )
+        )
+            .thenReturn(listOf(Ident("1234567891113", false, "AKTORID")))
+        val event = KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 123456789, "SYK", "NAV_NO")
+        val enrichedKafkaEvent = EnrichedKafkaEvent(event)
+        eventEnricher.createEnrichedKafkaEvent(enrichedKafkaEvent)
     }
 }

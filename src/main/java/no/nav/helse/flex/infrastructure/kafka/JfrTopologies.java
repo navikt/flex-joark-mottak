@@ -99,8 +99,7 @@ public class JfrTopologies {
     }
 
     private KStream<String, KafkaEvent> convertGenericRecordToKafkaEvent(final KStream<String, GenericRecord> genericRecordString) {
-        final KStream<String, KafkaEvent> kafkaEventKStream = genericRecordString.mapValues((genericRecord -> new Gson().fromJson(genericRecord.toString(), KafkaEvent.class)));
-        return kafkaEventKStream;
+        return genericRecordString.mapValues((genericRecord -> new Gson().fromJson(genericRecord.toString(), KafkaEvent.class)));
     }
 
     private KStream<String, EnrichedKafkaEvent> enrichKafkaEvent(final KStream<String, KafkaEvent> kafkaEventKStream) {
@@ -137,9 +136,8 @@ public class JfrTopologies {
     private void sendToJfrManuellOppretter(final KStream<String, EnrichedKafkaEvent> manuelle) {
         manuelle.foreach(feilregistrer::feilregistrerOppgave);
         manuelle.peek((s, enrichedKafkaEvent) -> Metrics.incJfrManuallProcess(enrichedKafkaEvent, skjemaMetadata.inAutoList(enrichedKafkaEvent.getTema(), enrichedKafkaEvent.getSkjema())));
-        manuelle.peek((k, enrichKafkaEvent) -> logWithCorrelationId(enrichKafkaEvent, "Journalposten: {} sendes til manuell-oppretter", enrichKafkaEvent.getJournalpostId()));
-                // TODO: Slå på når topic og app er opprettet
-                // .to(manuellTopic, Produced.with(Serdes.String(), enhancedKafkaEventSerde));
+        manuelle.peek((k, enrichKafkaEvent) -> logWithCorrelationId(enrichKafkaEvent, "Journalposten: {} sendes til manuell-oppretter", enrichKafkaEvent.getJournalpostId()))
+                .to(manuellTopic, Produced.with(Serdes.String(), enhancedKafkaEventSerde));
     }
 
     private void logWithCorrelationId(EnrichedKafkaEvent enrichedKafkaEvent, String s, String... args) {

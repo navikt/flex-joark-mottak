@@ -3,11 +3,14 @@ package no.nav.helse.flex.infrastructure.kafka;
 import no.nav.helse.flex.Environment;
 import org.apache.kafka.common.errors.AuthorizationException;
 import org.apache.kafka.streams.KafkaStreams;
+import org.apache.kafka.streams.errors.StreamsUncaughtExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+
+import static org.apache.kafka.streams.errors.StreamsUncaughtExceptionHandler.StreamThreadExceptionResponse.SHUTDOWN_CLIENT;
 
 public class JfrGenerellKafkaService {
     private static final Logger log = LoggerFactory.getLogger(JfrGenerellKafkaService.class);
@@ -52,20 +55,21 @@ public class JfrGenerellKafkaService {
         }));
     }
 
-    class CustomUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler{
+    class CustomUncaughtExceptionHandler implements StreamsUncaughtExceptionHandler {
         @Override
-        public void uncaughtException(Thread thread, Throwable throwable) {
-            if(throwable instanceof AuthorizationException){
-                log.warn("Authorisation failed, most likely because of credential rotation", throwable);
+        public StreamThreadExceptionResponse handle(Throwable exception) {
+            if(exception instanceof AuthorizationException){
+                log.warn("Authorisation failed, most likely because of credential rotation", exception);
                 try{
                     TimeUnit.MINUTES.sleep(1); //wait 10 second for certification to update in drive.
                 }catch (InterruptedException ie){
                     //do nothing
                 }
             }else{
-                log.error("Uncaught exception in Kafka Stream!", throwable);
+                log.error("Uncaught exception in Kafka Stream!", exception);
             }
             restartKafkaStream();
+            return SHUTDOWN_CLIENT;
         }
     }
 }
