@@ -60,8 +60,12 @@ class FkvClient {
 
     private fun mapFKVStringToObject(fellesKodeverkJson: String): FkvKrutkoder {
         try {
-            log.info(fellesKodeverkJson)
-            return objectMapper.readValue(fellesKodeverkJson)
+            return objectMapper.run {
+                val message = readTree(fellesKodeverkJson)
+                    .get("message")
+                    .textValue()
+                readValue(message)
+            }
         } catch (e: JsonParseException) {
             throw ServiceUnavailableException("Feil under dekoding av melding fra felles kodeverk: $fellesKodeverkJson")
         }
