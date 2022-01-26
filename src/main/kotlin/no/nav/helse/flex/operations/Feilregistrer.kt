@@ -1,43 +1,41 @@
-package no.nav.helse.flex.operations;
+package no.nav.helse.flex.operations
 
-import no.nav.helse.flex.infrastructure.kafka.EnrichedKafkaEvent;
-import no.nav.helse.flex.infrastructure.metrics.Metrics;
-import no.nav.helse.flex.operations.generell.oppgave.Oppgave;
-import no.nav.helse.flex.operations.generell.oppgave.OppgaveClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
+import no.nav.helse.flex.infrastructure.kafka.EnrichedKafkaEvent
+import no.nav.helse.flex.infrastructure.metrics.Metrics.incFeilregCounter
+import no.nav.helse.flex.operations.generell.oppgave.OppgaveClient
+import org.slf4j.LoggerFactory
+import org.slf4j.MDC
+import java.lang.Exception
 
-public class Feilregistrer {
-    private static final Logger log = LoggerFactory.getLogger(Feilregistrer.class);
-    private static final String STATUS_FEILREG = "FEILREGISTRERT";
-    private static final String BESKRIVELSE = "Oppgave feilregistrert automatisk av flex-joark-mottak.";
-    private final OppgaveClient oppgaveClient;
+class Feilregistrer(
+    private val oppgaveClient: OppgaveClient = OppgaveClient()
+) {
+    private val log = LoggerFactory.getLogger(Feilregistrer::class.java)
+    private val STATUS_FEILREG = "FEILREGISTRERT"
+    private val BESKRIVELSE = "Oppgave feilregistrert automatisk av flex-joark-mottak."
 
-    public Feilregistrer() {
-        this.oppgaveClient = new OppgaveClient();
-    }
+    fun feilregistrerOppgave(enrichedKafkaEvent: EnrichedKafkaEvent) {
+        if (enrichedKafkaEvent.oppgave != null) {
+            try {
+                MDC.put("CORRELATION_ID", enrichedKafkaEvent.correlationId)
 
-    public void feilregistrerOppgave(String kafkaId, EnrichedKafkaEvent enrichedKafkaEvent){
-        if(enrichedKafkaEvent.getOppgave() != null){
-            try{
-                MDC.put("CORRELATION_ID", enrichedKafkaEvent.getCorrelationId());
+                val oppgave = enrichedKafkaEvent.oppgave!!
+                oppgave.beskrivelse = BESKRIVELSE
+                oppgave.status = STATUS_FEILREG
+                enrichedKafkaEvent.oppgave = oppgave
+                oppgaveClient.updateOppgave(enrichedKafkaEvent)
 
-                Oppgave oppgave = enrichedKafkaEvent.getOppgave();
-                oppgave.setBeskrivelse(BESKRIVELSE);
-                oppgave.setStatus(STATUS_FEILREG);
-                enrichedKafkaEvent.setOppgave(oppgave);
-                oppgaveClient.updateOppgave(enrichedKafkaEvent);
-
-                log.info("Feilregistrerte oppgave: {} for journalpost: {}", enrichedKafkaEvent.getOppgaveId(), enrichedKafkaEvent.getJournalpostId());
-                Metrics.incFeilregCounter(enrichedKafkaEvent, true);
-            }catch (Exception e){
-                log.error("Klarte ikke feilregistrere oppgave: {} tilhørende journalpost: {}. Sender likevel videre for opprettelse av manuell oppgave", enrichedKafkaEvent.getOppgaveId(), enrichedKafkaEvent.getJournalpostId(), e);
-                Metrics.incFeilregCounter(enrichedKafkaEvent, false);
-            }finally {
-                MDC.clear();
+                log.info("Feilregistrerte oppgave: ${enrichedKafkaEvent.getOppgaveId()} for journalpost: ${enrichedKafkaEvent.journalpostId}")
+                incFeilregCounter(enrichedKafkaEvent, true)
+            } catch (e: Exception) {
+                log.error(
+                    "Klarte ikke feilregistrere oppgave: ${enrichedKafkaEvent.getOppgaveId()} tilhørende journalpost: ${enrichedKafkaEvent.journalpostId}. Sender likevel videre for opprettelse av manuell oppgave",
+                    e
+                )
+                incFeilregCounter(enrichedKafkaEvent, false)
+            } finally {
+                MDC.clear()
             }
         }
     }
-
 }

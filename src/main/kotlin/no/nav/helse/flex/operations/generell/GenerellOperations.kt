@@ -1,72 +1,70 @@
-package no.nav.helse.flex.operations.generell;
+package no.nav.helse.flex.operations.generell
 
-import no.nav.helse.flex.infrastructure.exceptions.ExternalServiceException;
-import no.nav.helse.flex.infrastructure.exceptions.FunctionalRequirementException;
-import no.nav.helse.flex.infrastructure.exceptions.TemporarilyUnavailableException;
-import no.nav.helse.flex.infrastructure.kafka.EnrichedKafkaEvent;
-import no.nav.helse.flex.infrastructure.metrics.Metrics;
-import no.nav.helse.flex.operations.SkjemaMetadata;
-import no.nav.helse.flex.operations.eventenricher.journalpost.Dokument;
-import no.nav.helse.flex.operations.eventenricher.journalpost.Journalpost;
-import no.nav.helse.flex.operations.generell.oppgave.CreateOppgaveData;
-import no.nav.helse.flex.operations.generell.oppgave.Oppgave;
-import no.nav.helse.flex.operations.generell.oppgave.OppgaveClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import no.nav.helse.flex.infrastructure.exceptions.FunctionalRequirementException
+import no.nav.helse.flex.infrastructure.kafka.EnrichedKafkaEvent
+import no.nav.helse.flex.infrastructure.metrics.Metrics.incFailFunctionalRequirements
+import no.nav.helse.flex.operations.SkjemaMetadata
+import no.nav.helse.flex.operations.generell.oppgave.CreateOppgaveData
+import no.nav.helse.flex.operations.generell.oppgave.OppgaveClient
+import org.slf4j.LoggerFactory
 
-public class GenerellOperations {
+class GenerellOperations(
+    private val oppgaveClient: OppgaveClient = OppgaveClient(),
+    private val skjemaMetadata: SkjemaMetadata = SkjemaMetadata()
+) {
 
-    private static final Logger log = LoggerFactory.getLogger(GenerellOperations.class);
-    private final OppgaveClient oppgaveClient;
-    private final SkjemaMetadata skjemaMetadata;
-
-    public GenerellOperations() {
-        this.oppgaveClient = new OppgaveClient();
-        this.skjemaMetadata = new SkjemaMetadata();
-    }
-
-    public void executeProcess(final EnrichedKafkaEvent enrichedKafkaEvent) throws Exception{
-        if(checkFunctionalRequirements(enrichedKafkaEvent)){
-            createOppgave(enrichedKafkaEvent);
-        }else {
-            throw new FunctionalRequirementException();
+    fun executeProcess(enrichedKafkaEvent: EnrichedKafkaEvent) {
+        if (checkFunctionalRequirements(enrichedKafkaEvent)) {
+            createOppgave(enrichedKafkaEvent)
+        } else {
+            throw FunctionalRequirementException()
         }
     }
 
-    private Boolean checkFunctionalRequirements(final EnrichedKafkaEvent enrichedKafkaEvent) {
-        return hasValidDokumentTitler(enrichedKafkaEvent);
+    private fun checkFunctionalRequirements(enrichedKafkaEvent: EnrichedKafkaEvent): Boolean {
+        return hasValidDokumentTitler(enrichedKafkaEvent)
     }
 
-
-    private void createOppgave(final EnrichedKafkaEvent enrichedKafkaEvent) throws ExternalServiceException, TemporarilyUnavailableException {
+    private fun createOppgave(enrichedKafkaEvent: EnrichedKafkaEvent) {
         if (!enrichedKafkaEvent.hasOppgave()) {
-            final Journalpost journalpost = enrichedKafkaEvent.getJournalpost();
-            String behandlingstema = journalpost.getBehandlingstema();
-            String behandlingstype = journalpost.getBehandlingstype();
-            String oppgavetype = skjemaMetadata.getOppgavetype(enrichedKafkaEvent.getTema(), enrichedKafkaEvent.getSkjema());
-            int frist = skjemaMetadata.getFrist(enrichedKafkaEvent.getTema(), enrichedKafkaEvent.getSkjema());
-            final CreateOppgaveData requestData = new CreateOppgaveData(enrichedKafkaEvent.getAktoerId(), journalpost.getJournalpostId(),
-                    journalpost.getTema(), behandlingstema, behandlingstype, oppgavetype, frist);
-            if(journalpost.getJournalforendeEnhet() != null && !journalpost.getJournalforendeEnhet().isBlank()){
-                requestData.setTildeltEnhetsnr(journalpost.getJournalforendeEnhet());
+            val journalpost = enrichedKafkaEvent.journalpost!!
+
+            val behandlingstema = journalpost.behandlingstema
+            val behandlingstype = journalpost.behandlingstype
+            val oppgavetype = skjemaMetadata.getOppgavetype(enrichedKafkaEvent.tema, enrichedKafkaEvent.skjema)
+            val frist = skjemaMetadata.getFrist(enrichedKafkaEvent.tema, enrichedKafkaEvent.skjema)
+
+            val requestData = CreateOppgaveData(
+                enrichedKafkaEvent.aktoerId, journalpost.journalpostId,
+                journalpost.tema, behandlingstema, behandlingstype, oppgavetype, frist
+            )
+
+            if (journalpost.journalforendeEnhet != null && journalpost.journalforendeEnhet!!.isNotBlank()) {
+                requestData.setTildeltEnhetsnr(journalpost.journalforendeEnhet)
             }
 
-            final Oppgave oppgave = oppgaveClient.createOppgave(requestData);
-            enrichedKafkaEvent.setOppgave(oppgave);
-
-            log.info("Opprettet oppgave: {} for journalpost: {}", "id", enrichedKafkaEvent.getJournalpostId());
+            val oppgave = oppgaveClient.createOppgave(requestData)
+            enrichedKafkaEvent.oppgave = oppgave
+            log.info("Opprettet oppgave: ${oppgave.id} for journalpost: ${enrichedKafkaEvent.journalpostId}")
         }
     }
 
-    private boolean hasValidDokumentTitler(final EnrichedKafkaEvent enrichedKafkaEvent){
-        for (Dokument dokument: enrichedKafkaEvent.getJournalpost().getDokumenter()){
-            if(dokument.getTittel() == null || dokument.getTittel().isEmpty()){
-                Metrics.incFailFunctionalRequirements("TITTEL", enrichedKafkaEvent);
-                log.info("Avbryter automatisk behandling. Journalpost {} har dokument {} med tittel {}",
-                        enrichedKafkaEvent.getJournalpostId(), dokument.getDokumentInfoId(), dokument.getTittel());
-                return false;
+    private fun hasValidDokumentTitler(enrichedKafkaEvent: EnrichedKafkaEvent): Boolean {
+        for (dokument in enrichedKafkaEvent.journalpost!!.dokumenter) {
+            if (dokument.tittel.isNullOrEmpty()) {
+                incFailFunctionalRequirements("TITTEL", enrichedKafkaEvent)
+                log.info(
+                    "Avbryter automatisk behandling. " +
+                        "Journalpost ${enrichedKafkaEvent.journalpostId} har dokument " +
+                        "${dokument.dokumentInfoId} med tittel ${dokument.tittel}"
+                )
+                return false
             }
         }
-        return true;
+        return true
+    }
+
+    companion object {
+        private val log = LoggerFactory.getLogger(GenerellOperations::class.java)
     }
 }

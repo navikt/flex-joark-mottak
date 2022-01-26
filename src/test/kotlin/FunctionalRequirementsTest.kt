@@ -1,94 +1,72 @@
+import io.mockk.every
+import io.mockk.junit5.MockKExtension
+import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.verify
 import no.nav.helse.flex.Environment
+import no.nav.helse.flex.infrastructure.exceptions.FunctionalRequirementException
+import no.nav.helse.flex.operations.SkjemaMetadata
 import no.nav.helse.flex.operations.eventenricher.journalpost.Dokument
-import no.nav.helse.flex.operations.eventenricher.pdl.PdlClient
 import no.nav.helse.flex.operations.generell.GenerellOperations
-import no.nav.helse.flex.operations.generell.felleskodeverk.FkvClient
-import no.nav.helse.flex.operations.generell.felleskodeverk.FkvKrutkoder
 import no.nav.helse.flex.operations.generell.oppgave.OppgaveClient
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.powermock.api.mockito.PowerMockito.doReturn
-import org.powermock.api.mockito.PowerMockito.mock
-import org.powermock.api.mockito.PowerMockito.spy
-import org.powermock.api.mockito.PowerMockito.`when`
-import org.powermock.api.mockito.PowerMockito.whenNew
-import org.powermock.core.classloader.annotations.PowerMockIgnore
-import org.powermock.core.classloader.annotations.PrepareForTest
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor
-import org.powermock.modules.junit4.PowerMockRunner
-import org.powermock.reflect.internal.WhiteboxImpl
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.extension.ExtendWith
 import util.TestUtils.mockEnrichedKafkaevent
 import util.TestUtils.mockJournalpost
 
-@RunWith(PowerMockRunner::class)
-@SuppressStaticInitializationFor("no.nav.helse.flex.Environment")
-@PrepareForTest(GenerellOperations::class)
-@PowerMockIgnore("com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "javax.management.*")
+@ExtendWith(MockKExtension::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FunctionalRequirementsTest {
-    private val mockOppgaveClient: OppgaveClient = mock(OppgaveClient::class.java)
-    private val mockFkvClient: FkvClient = mock(FkvClient::class.java)
-    private val mockFkvKrutkoder: FkvKrutkoder = mock(FkvKrutkoder::class.java)
-    private val mockPdlClient: PdlClient = mock(PdlClient::class.java)
+    private val mockOppgaveClient: OppgaveClient = mockk(relaxed = true)
+    private val mockSkjemaMetadata: SkjemaMetadata = mockk()
     private lateinit var generellOperations: GenerellOperations
 
-    @Before
+    @BeforeAll
     fun setup() {
-        whenNew(OppgaveClient::class.java).withNoArguments().thenReturn(mockOppgaveClient)
-        whenNew(FkvClient::class.java).withNoArguments().thenReturn(mockFkvClient)
-        whenNew(PdlClient::class.java).withNoArguments().thenReturn(mockPdlClient)
-        `when`(mockFkvClient.fetchKrutKoder()).thenReturn(mockFkvKrutkoder)
-        spy(Environment::class.java)
-        doReturn("automatiskSkjema.json").`when`(
-            Environment::class.java, "getEnvVar", "STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING"
-        )
+        mockkObject(Environment)
+        every { Environment.getEnvVar("STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING") } returns "automatiskSkjema.json"
 
-        generellOperations = GenerellOperations()
+        generellOperations = GenerellOperations(
+            mockOppgaveClient,
+            mockSkjemaMetadata
+        )
     }
 
     @Test
     fun test_req_all_dok_tilter_set() {
         val jp = mockJournalpost("123456789", "NAV 06-04.04", "SYK", "M")
-        val vedlegg = listOf(
-            Dokument("dontCare", "tittelVedlegg", "321"),
-            Dokument("dontCare", "tittelVedlegg", "123")
+        jp.dokumenter += listOf(
+            Dokument("cafe", "tittelVedlegg", "321"),
+            Dokument("taxi", "tittelVedlegg", "123")
         )
-        val dokumentList: MutableList<Dokument> = ArrayList()
-        dokumentList.addAll(jp.dokumenter)
-        dokumentList.addAll(vedlegg)
-        jp.dokumenter = dokumentList
 
         val enrichedKafkaEvent = mockEnrichedKafkaevent()
         enrichedKafkaEvent.journalpost = jp
-        val dokTitlerSet = WhiteboxImpl.invokeMethod<Boolean>(
-            generellOperations,
-            "hasValidDokumentTitler",
-            enrichedKafkaEvent
-        )
 
-        assertEquals(true, dokTitlerSet)
+        every { mockSkjemaMetadata.getOppgavetype(any(), any()) } returns "SOK"
+        every { mockSkjemaMetadata.getFrist(any(), any()) } returns 3
+
+        generellOperations.executeProcess(enrichedKafkaEvent)
+
+        verify { mockOppgaveClient.createOppgave(any()) }
     }
 
     @Test
     fun test_req_dok_tilter_not_set() {
-        val jp = mockJournalpost("123456789", "NAV 21-04.05", "SYK", "M")
-        val vedlegg = listOf(
-            Dokument("dontCare", "tittelVedlegg", "321"),
-            Dokument("dontCare", null, "123")
+        val jp = mockJournalpost("123456789", "NAV 06-04.04", "SYK", "M")
+        jp.dokumenter += listOf(
+            Dokument("cafe", "tittelVedlegg", "321"),
+            Dokument("taxi", null, "123")
         )
-        val dokumentList: MutableList<Dokument> = ArrayList()
-        dokumentList.addAll(jp.dokumenter)
-        dokumentList.addAll(vedlegg)
-        jp.dokumenter = dokumentList
 
         val enrichedKafkaEvent = mockEnrichedKafkaevent()
         enrichedKafkaEvent.journalpost = jp
-        val dokTitlerSet = WhiteboxImpl.invokeMethod<Boolean>(
-            generellOperations,
-            "hasValidDokumentTitler",
-            enrichedKafkaEvent
-        )
-        assertEquals(false, dokTitlerSet)
+
+        assertThrows<FunctionalRequirementException> {
+            generellOperations.executeProcess(enrichedKafkaEvent)
+        }
     }
 }

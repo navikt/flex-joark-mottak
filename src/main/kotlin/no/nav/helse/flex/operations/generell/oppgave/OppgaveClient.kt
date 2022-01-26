@@ -1,109 +1,103 @@
-package no.nav.helse.flex.operations.generell.oppgave;
+package no.nav.helse.flex.operations.generell.oppgave
 
-import com.google.gson.Gson;
-import io.vavr.CheckedFunction1;
-import no.nav.helse.flex.Environment;
-import no.nav.helse.flex.infrastructure.MDCConstants;
-import no.nav.helse.flex.infrastructure.exceptions.ExternalServiceException;
-import no.nav.helse.flex.infrastructure.exceptions.TemporarilyUnavailableException;
-import no.nav.helse.flex.infrastructure.kafka.EnrichedKafkaEvent;
-import no.nav.helse.flex.infrastructure.resilience.Resilience;
-import no.nav.helse.flex.infrastructure.security.AzureAdClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
+import com.google.gson.Gson
+import io.vavr.CheckedFunction1
+import no.nav.helse.flex.Environment
+import no.nav.helse.flex.Environment.oppgaveClientId
+import no.nav.helse.flex.infrastructure.MDCConstants
+import no.nav.helse.flex.infrastructure.exceptions.ExternalServiceException
+import no.nav.helse.flex.infrastructure.exceptions.TemporarilyUnavailableException
+import no.nav.helse.flex.infrastructure.kafka.EnrichedKafkaEvent
+import no.nav.helse.flex.infrastructure.resilience.Resilience
+import no.nav.helse.flex.infrastructure.security.AzureAdClient
+import org.slf4j.LoggerFactory
+import org.slf4j.MDC
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+class OppgaveClient {
+    private val CONTENT_TYPE_HEADER = "Content-Type"
+    private val AUTHORIZATION_HEADER = "Authorization"
+    private val CORRELATION_HEADER = "X-Correlation-ID"
+    private val log = LoggerFactory.getLogger(OppgaveClient::class.java)
 
-public class OppgaveClient {
-    private static final String CONTENT_TYPE_HEADER = "Content-Type";
-    private static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final String CORRELATION_HEADER = "X-Correlation-ID";
-    private static final Logger log = LoggerFactory.getLogger(OppgaveClient.class);
-    private static final String SERVICENAME_OPPGAVE = "Oppgave";
-    private final Gson gson = new Gson();
-    private final String oppgaveUrl;
-    private final HttpClient client = HttpClient.newHttpClient();
-    private final Resilience<HttpRequest, HttpResponse<String>> resilience;
-    private final AzureAdClient azureAdClient;
+    private val gson = Gson()
+    private val oppgaveUrl: String = Environment.oppgaveUrl
+    private val client = HttpClient.newHttpClient()
+    private val resilience: Resilience<HttpRequest, HttpResponse<String>>
+    private val azureAdClient: AzureAdClient
 
-    public OppgaveClient() {
-        this.oppgaveUrl = Environment.getOppgaveUrl();
-        final CheckedFunction1<HttpRequest, HttpResponse<String>> clientFunction = this::excecute;
-        this.resilience = new Resilience<>(clientFunction);
-        this.azureAdClient = new AzureAdClient(Environment.getOppgaveClientId());
+    init {
+        val clientFunction = CheckedFunction1 { req: HttpRequest -> excecute(req) }
+        resilience = Resilience(clientFunction)
+        azureAdClient = AzureAdClient(oppgaveClientId)
     }
 
-    public Oppgave createOppgave(final CreateOppgaveData requestData) throws ExternalServiceException, TemporarilyUnavailableException {
-        final String correlationId = MDC.get(MDCConstants.CORRELATION_ID);
+    fun createOppgave(requestData: CreateOppgaveData): Oppgave {
+        val correlationId = MDC.get(MDCConstants.CORRELATION_ID)
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create("$oppgaveUrl/api/v1/oppgaver"))
+            .header(CONTENT_TYPE_HEADER, "application/json")
+            .header(AUTHORIZATION_HEADER, azureAdClient.getToken())
+            .header(CORRELATION_HEADER, correlationId)
+            .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(requestData)))
+            .build()
+        val response = resilience.execute(request)
 
-        final HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(oppgaveUrl + "/api/v1/oppgaver"))
-                .header(CONTENT_TYPE_HEADER, "application/json")
-                .header(AUTHORIZATION_HEADER, azureAdClient.getToken())
-                .header(CORRELATION_HEADER, correlationId)
-                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(requestData)))
-                .build();
-        final HttpResponse<String> response = resilience.execute(request);
-        if (response.statusCode() == 201) {
-            Oppgave oppgave = gson.fromJson(response.body(), Oppgave.class);
-            return oppgave;
-        } else if(response.statusCode() == 404){
-            log.error("Klarte ikke opprette oppgave på journalpost {}, statuskode: {}", requestData.getJournalpostId(), response.statusCode());
-            throw new TemporarilyUnavailableException();
-        }else if( response.statusCode() >= 500 ) {
-            final String errorText = hentFeilmelding(response);
-            log.error("Klarte ikke opprette oppgave på journalpost {}, statuskode: {}. {}", requestData.getJournalpostId(), response.statusCode(), errorText);
-            throw new TemporarilyUnavailableException();
-        } else {
-            final String errorText = hentFeilmelding(response);
-            log.error("Klarte ikke opprette oppgave på journalpost {}, statuskode: {}. {}", requestData.getJournalpostId(), response.statusCode(), errorText);
-            throw new ExternalServiceException(SERVICENAME_OPPGAVE, errorText, response.statusCode());
-        }
-    }
-
-    public Oppgave updateOppgave(EnrichedKafkaEvent enrichedKafkaEvent) throws ExternalServiceException, TemporarilyUnavailableException {
-        final String correlationId = MDC.get(MDCConstants.CORRELATION_ID);
-        Oppgave oppgave = enrichedKafkaEvent.getOppgave();
-
-        final HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(oppgaveUrl + "/api/v1/oppgaver/"+oppgave.getId()))
-                .header(CONTENT_TYPE_HEADER, "application/json")
-                .header(AUTHORIZATION_HEADER, azureAdClient.getToken())
-                .header(CORRELATION_HEADER, correlationId)
-                .method("PATCH", HttpRequest.BodyPublishers.ofString(gson.toJson(oppgave)))
-                .build();
-        final HttpResponse<String> response = resilience.execute(request);
-
-        if (response.statusCode() == 200) {
-            Oppgave updatedOppgave = gson.fromJson(response.body(), Oppgave.class);
-            return updatedOppgave;
+        return if (response.statusCode() == 201) {
+            gson.fromJson(response.body(), Oppgave::class.java)
         } else if (response.statusCode() == 404) {
-            log.error("Klarte ikke oppdatere oppgave {} på journalpost {}, statuskode: {}", oppgave.getId(), enrichedKafkaEvent.getJournalpostId(), response.statusCode());
-            throw new TemporarilyUnavailableException();
-        } else if( response.statusCode() >= 500 ) {
-            log.error("5XX fra oppgave {} {} {}", response, response.body(), response.body().toString());
-            final String errorText = hentFeilmelding(response);
-            log.error("Klarte ikke oppdatere oppgave {} på journalpost {}, statuskode: {}. {}", oppgave.getId(), enrichedKafkaEvent.getJournalpostId(), response.statusCode(), errorText);
-            throw new TemporarilyUnavailableException();
-        } else{
-            log.error("Annen feil fra oppgave {} {} {}", response, response.body(), response.body().toString());
-            final String errorText = hentFeilmelding(response);
-            log.error("Klarte ikke oppdatere oppgave {} på journalpost {}, statuskode: {}. {}", oppgave.getId(), enrichedKafkaEvent.getJournalpostId(), response.statusCode(), errorText);
-            throw new ExternalServiceException(SERVICENAME_OPPGAVE, "Feil under oppdatering av oppgave", response.statusCode());
+            log.error("Klarte ikke opprette oppgave på journalpost ${requestData.journalpostId}, statuskode: ${response.statusCode()}")
+            throw TemporarilyUnavailableException()
+        } else if (response.statusCode() >= 500) {
+            val errorText = hentFeilmelding(response)
+            log.error("Klarte ikke opprette oppgave på journalpost ${requestData.journalpostId}, statuskode: ${response.statusCode()}. $errorText")
+            throw TemporarilyUnavailableException()
+        } else {
+            val errorText = hentFeilmelding(response)
+            log.error("Klarte ikke opprette oppgave på journalpost ${requestData.journalpostId}, statuskode: ${response.statusCode()}. $errorText")
+            throw ExternalServiceException(errorText, response.statusCode())
         }
     }
 
-    private HttpResponse<String> excecute(final HttpRequest req) throws Exception {
-        return client.send(req, HttpResponse.BodyHandlers.ofString());
+    fun updateOppgave(enrichedKafkaEvent: EnrichedKafkaEvent): Oppgave {
+        val correlationId = MDC.get(MDCConstants.CORRELATION_ID)
+        val oppgave = enrichedKafkaEvent.oppgave
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create(oppgaveUrl + "/api/v1/oppgaver/" + oppgave!!.id))
+            .header(CONTENT_TYPE_HEADER, "application/json")
+            .header(AUTHORIZATION_HEADER, azureAdClient.getToken())
+            .header(CORRELATION_HEADER, correlationId)
+            .method("PATCH", HttpRequest.BodyPublishers.ofString(gson.toJson(oppgave)))
+            .build()
+        val response = resilience.execute(request)
+
+        return if (response.statusCode() == 200) {
+            gson.fromJson(response.body(), Oppgave::class.java)
+        } else if (response.statusCode() == 404) {
+            log.error("Klarte ikke oppdatere oppgave ${oppgave.id} på journalpost ${enrichedKafkaEvent.journalpostId}, statuskode: ${response.statusCode()}")
+            throw TemporarilyUnavailableException()
+        } else if (response.statusCode() >= 500) {
+            log.error("5XX fra oppgave $response ${response.body()} ${response.body()}")
+            val errorText = hentFeilmelding(response)
+            log.error("Klarte ikke oppdatere oppgave ${oppgave.id} på journalpost ${enrichedKafkaEvent.journalpostId}, statuskode: ${response.statusCode()}. $errorText")
+            throw TemporarilyUnavailableException()
+        } else {
+            log.error("Annen feil fra oppgave $response ${response.body()} ${response.body()}")
+            val errorText = hentFeilmelding(response)
+            log.error("Klarte ikke oppdatere oppgave ${oppgave.id} på journalpost ${enrichedKafkaEvent.journalpostId}, statuskode: ${response.statusCode()}. $errorText")
+            throw ExternalServiceException("Feil under oppdatering av oppgave", response.statusCode())
+        }
     }
 
-    private String hentFeilmelding(final HttpResponse<String> response) {
-        final OppgaveErrorResponse oppgaveErrorResponse = gson.fromJson(response.body(), OppgaveErrorResponse.class);
-        return oppgaveErrorResponse.getFeilmelding();
+    private fun excecute(req: HttpRequest): HttpResponse<String> {
+        return client.send(req, HttpResponse.BodyHandlers.ofString())
     }
 
+    private fun hentFeilmelding(response: HttpResponse<String>): String {
+        val oppgaveErrorResponse = gson.fromJson(response.body(), OppgaveErrorResponse::class.java)
+        return oppgaveErrorResponse.feilmelding
+    }
 }

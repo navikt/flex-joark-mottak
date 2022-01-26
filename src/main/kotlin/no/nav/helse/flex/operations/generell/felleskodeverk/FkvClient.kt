@@ -1,74 +1,75 @@
-package no.nav.helse.flex.operations.generell.felleskodeverk;
+package no.nav.helse.flex.operations.generell.felleskodeverk
 
-import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
-import io.vavr.CheckedFunction1;
-import no.nav.helse.flex.Environment;
-import no.nav.helse.flex.infrastructure.exceptions.TemporarilyUnavailableException;
-import no.nav.helse.flex.infrastructure.resilience.Resilience;
-import no.nav.helse.flex.infrastructure.security.AzureAdClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.gson.Gson
+import com.google.gson.JsonParseException
+import io.vavr.CheckedFunction1
+import no.nav.helse.flex.Environment.fkvUrl
+import no.nav.helse.flex.Environment.proxyClientid
+import no.nav.helse.flex.infrastructure.exceptions.TemporarilyUnavailableException
+import no.nav.helse.flex.infrastructure.resilience.Resilience
+import no.nav.helse.flex.infrastructure.security.AzureAdClient
+import org.slf4j.LoggerFactory
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import javax.naming.ServiceUnavailableException
 
-import javax.naming.ServiceUnavailableException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+class FkvClient {
+    private val CORRELATION_HEADER = "Nav-Call-Id"
+    private val NAV_CONSUMER_ID = "Nav-Consumer-Id"
+    private val AUTHORIZATION_HEADER = "Authorization"
+    private val log = LoggerFactory.getLogger(FkvClient::class.java)
 
-public class FkvClient {
-    private final Logger log = LoggerFactory.getLogger(FkvClient.class);
-    private static final String CORRELATION_HEADER = "Nav-Call-Id";
-    private static final String NAV_CONSUMER_ID = "Nav-Consumer-Id";
-    private static final String AUTHORIZATION_HEADER = "Authorization";
-    private final String fellesKodeverkUrl;
-    private final Gson gson;
-    private final HttpClient client = HttpClient.newHttpClient();
-    private final Resilience<HttpRequest, HttpResponse<String>> resilience;
-    private final AzureAdClient azureAdClient;
+    private val fellesKodeverkUrl = fkvUrl
+    private val gson = Gson()
+    private val client = HttpClient.newHttpClient()
+    private val resilience: Resilience<HttpRequest, HttpResponse<String>>
+    private val azureAdClient: AzureAdClient
 
-    public FkvClient() {
-        this.fellesKodeverkUrl = Environment.getFkvUrl();
-        final CheckedFunction1<HttpRequest, HttpResponse<String>> fkvClientFunction = this::excecute;
-        this.resilience = new Resilience<>(fkvClientFunction);
-        azureAdClient = new AzureAdClient(Environment.getProxyClientid());
-        this.gson = new Gson();
+    init {
+        val fkvClientFunction = CheckedFunction1 { req: HttpRequest -> excecute(req) }
+        resilience = Resilience(fkvClientFunction)
+        azureAdClient = AzureAdClient(proxyClientid)
     }
 
-    public FkvKrutkoder fetchKrutKoder() throws Exception {
-        try {
-            final HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(fellesKodeverkUrl))
-                    .header(CORRELATION_HEADER, "flex-joark-mottak")
-                    .header(NAV_CONSUMER_ID, "flex-joark-mottak")
-                    .header(AUTHORIZATION_HEADER, azureAdClient.getToken())
-                    .GET()
-                    .build();
-            final HttpResponse<String> response = resilience.execute(request);
-            if(response.statusCode() == 200){
-                return mapFKVStringToObject(response.body());
-            }else {
-                log.error("Klarte ikke hente Krutkoder fra Felles kodeverk");
-                throw new TemporarilyUnavailableException();
+    @Throws(Exception::class)
+    fun fetchKrutKoder(): FkvKrutkoder {
+        return try {
+            val request = HttpRequest.newBuilder()
+                .uri(URI.create(fellesKodeverkUrl))
+                .header(CORRELATION_HEADER, "flex-joark-mottak")
+                .header(NAV_CONSUMER_ID, "flex-joark-mottak")
+                .header(AUTHORIZATION_HEADER, azureAdClient.getToken())
+                .GET()
+                .build()
+            val response = resilience.execute(request)
+
+            if (response.statusCode() == 200) {
+                mapFKVStringToObject(response.body())
+            } else {
+                log.error("Klarte ikke hente Krutkoder fra Felles kodeverk")
+                throw TemporarilyUnavailableException()
             }
-        } catch (Exception e) {
-            log.error("Feil ved henting/parsing av KrutKoder: {}" + e.getMessage(), e);
-            throw new ServiceUnavailableException();
+        } catch (e: Exception) {
+            log.error("Feil ved henting/parsing av KrutKoder: {}" + e.message, e)
+            throw ServiceUnavailableException()
         }
     }
 
-    private FkvKrutkoder mapFKVStringToObject(String fellesKodeverkJson) throws ServiceUnavailableException {
-        try {
-            FkvKrutkoder fellesKodeverk = gson.fromJson(fellesKodeverkJson, FkvKrutkoder.class);
-            fellesKodeverk.init();
-            return fellesKodeverk;
-        } catch (final JsonParseException e) {
-            throw new ServiceUnavailableException("Feil under dekoding av melding fra felles kodeverk: " + fellesKodeverkJson);
+    @Throws(ServiceUnavailableException::class)
+    private fun mapFKVStringToObject(fellesKodeverkJson: String): FkvKrutkoder {
+        return try {
+            val fellesKodeverk = gson.fromJson(fellesKodeverkJson, FkvKrutkoder::class.java)
+            fellesKodeverk.init()
+            fellesKodeverk
+        } catch (e: JsonParseException) {
+            throw ServiceUnavailableException("Feil under dekoding av melding fra felles kodeverk: $fellesKodeverkJson")
         }
     }
 
-    private HttpResponse<String> excecute(final HttpRequest req) throws Exception {
-        final HttpResponse<String> response= client.send(req, HttpResponse.BodyHandlers.ofString());
-        return response;
+    @Throws(Exception::class)
+    private fun excecute(req: HttpRequest): HttpResponse<String> {
+        return client.send(req, HttpResponse.BodyHandlers.ofString())
     }
 }

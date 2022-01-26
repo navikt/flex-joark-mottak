@@ -1,15 +1,5 @@
-package no.nav.helse.flex.operations.eventenricher.pdl;
+package no.nav.helse.flex.operations.eventenricher.pdl
 
-public class ErrorMessage {
-    private String message;
-
-    ErrorMessage() {}
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
+class ErrorMessage internal constructor() {
+    var message: String? = null
 }

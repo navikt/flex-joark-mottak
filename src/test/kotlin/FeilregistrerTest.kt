@@ -1,40 +1,37 @@
-import no.nav.helse.flex.infrastructure.kafka.EnrichedKafkaEvent
+import io.mockk.junit5.MockKExtension
+import io.mockk.mockk
+import io.mockk.verify
 import no.nav.helse.flex.operations.Feilregistrer
 import no.nav.helse.flex.operations.generell.oppgave.Oppgave
 import no.nav.helse.flex.operations.generell.oppgave.OppgaveClient
-import org.junit.Assert
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.ArgumentCaptor
-import org.mockito.Mockito
-import org.powermock.api.mockito.PowerMockito
-import org.powermock.api.mockito.PowerMockito.mock
-import org.powermock.api.mockito.PowerMockito.whenNew
-import org.powermock.core.classloader.annotations.PowerMockIgnore
-import org.powermock.core.classloader.annotations.PrepareForTest
-import org.powermock.modules.junit4.PowerMockRunner
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
 import util.TestUtils.mockEnrichedKafkaevent
 
-@RunWith(PowerMockRunner::class)
-@PrepareForTest(Feilregistrer::class)
-@PowerMockIgnore("com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "javax.management.*")
+@ExtendWith(MockKExtension::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FeilregistrerTest {
-    private val mockOppgaveClient = mock(OppgaveClient::class.java)
+    private val mockOppgaveClient: OppgaveClient = mockk()
+
     private lateinit var feilregistrer: Feilregistrer
 
-    @Before
+    @BeforeAll
     fun setup() {
-        whenNew(OppgaveClient::class.java).withNoArguments().thenReturn(mockOppgaveClient)
-        feilregistrer = Feilregistrer()
+        feilregistrer = Feilregistrer(mockOppgaveClient)
     }
 
     @Test
     fun test_ignore_oppgave_null() {
         val enrichedKafkaEvent = mockEnrichedKafkaevent()
-        Assert.assertNull(enrichedKafkaEvent.oppgave)
-        feilregistrer.feilregistrerOppgave("id", enrichedKafkaEvent)
-        PowerMockito.verifyZeroInteractions(mockOppgaveClient)
+        assertNull(enrichedKafkaEvent.oppgave)
+
+        feilregistrer.feilregistrerOppgave(enrichedKafkaEvent)
+        verify(exactly = 0) { mockOppgaveClient.updateOppgave(any()) }
     }
 
     @Test
@@ -42,13 +39,16 @@ class FeilregistrerTest {
         val enrichedKafkaEvent = mockEnrichedKafkaevent()
         val oppgave = Oppgave()
         enrichedKafkaEvent.oppgave = oppgave
-        Assert.assertNotEquals("FEILREGISTRERT", oppgave.status)
-        val argument = ArgumentCaptor.forClass(
-            EnrichedKafkaEvent::class.java
-        )
-        feilregistrer.feilregistrerOppgave("id", enrichedKafkaEvent)
-        Mockito.verify(mockOppgaveClient).updateOppgave(argument.capture())
-        val ferdigstillOppgave = argument.value.oppgave
-        Assert.assertEquals("FEILREGISTRERT", ferdigstillOppgave.status)
+
+        assertNotEquals("FEILREGISTRERT", oppgave.status)
+        feilregistrer.feilregistrerOppgave(enrichedKafkaEvent)
+
+        verify {
+            mockOppgaveClient.updateOppgave(
+                withArg {
+                    assertEquals("FEILREGISTRERT", oppgave.status)
+                }
+            )
+        }
     }
 }

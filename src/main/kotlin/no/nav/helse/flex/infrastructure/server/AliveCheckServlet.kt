@@ -1,14 +1,12 @@
-package no.nav.helse.flex.infrastructure.server;
+package no.nav.helse.flex.infrastructure.server
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import javax.servlet.http.HttpServlet
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
-public class AliveCheckServlet extends HttpServlet {
-    @Override
-    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-        resp.setStatus(HttpServletResponse.SC_OK);
-        resp.getWriter().println("alive");
+class AliveCheckServlet : HttpServlet() {
+    override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
+        resp.status = HttpServletResponse.SC_OK
+        resp.writer.println("alive")
     }
 }

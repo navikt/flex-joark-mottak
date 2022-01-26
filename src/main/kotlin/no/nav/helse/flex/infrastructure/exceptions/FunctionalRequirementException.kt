@@ -1,6 +1,5 @@
-package no.nav.helse.flex.infrastructure.exceptions;
+package no.nav.helse.flex.infrastructure.exceptions
 
-public class FunctionalRequirementException extends Exception {
-    public FunctionalRequirementException() {
-    }
-}
+import java.lang.Exception
+
+class FunctionalRequirementException : Exception()

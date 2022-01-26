@@ -1,105 +1,103 @@
-package no.nav.helse.flex.infrastructure.security;
+package no.nav.helse.flex.infrastructure.security
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import no.nav.helse.flex.Environment;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
+import no.nav.helse.flex.Environment.azureAppClientSecret
+import no.nav.helse.flex.Environment.azureAppURL
+import no.nav.helse.flex.Environment.azureClientId
+import org.apache.commons.lang3.StringUtils
+import org.slf4j.LoggerFactory
+import java.io.IOException
+import java.net.URI
+import java.net.URLEncoder
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.nio.charset.StandardCharsets
+import java.time.Instant
+import java.util.*
+import java.util.stream.Collectors
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
+class AzureAdClient(private val clientId: String) {
+    private val log = LoggerFactory.getLogger(AzureAdClient::class.java)
 
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+    private var token: String
+    private val grantType = "client_credentials"
+    private val discoveryUrl: String
 
-public class AzureAdClient {
-    private static final Logger log = LoggerFactory.getLogger(AzureAdClient.class);
-    private static final String GRANT_TYPE = "client_credentials";
-    private static String discoveryUrl;
-    private String token;
-    private String clientId;
-
-    public AzureAdClient(String clientId){
-        this.clientId = clientId;
+    init {
         try {
-            final HttpClient client = HttpClient.newHttpClient();
-            final HttpRequest request = HttpRequest.newBuilder().uri(URI.create(Environment.azureAppURL()))
-                    .GET()
-                    .build();
-            final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            val client = HttpClient.newHttpClient()
+            val request = HttpRequest.newBuilder().uri(URI.create(azureAppURL))
+                .GET()
+                .build()
+            val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+
             try {
-                final HashMap<String, Object> result = new ObjectMapper().readValue(response.body(), HashMap.class);
-                discoveryUrl = (String) result.get("token_endpoint");
-            } catch (final IOException e) {
-                throw new IllegalStateException("Klarte ikke deserialisere respons fra AzureAd", e);
+                val result: HashMap<String, Any> = ObjectMapper().readValue(response.body())
+                discoveryUrl = result["token_endpoint"].toString()
+            } catch (e: IOException) {
+                throw IllegalStateException("Klarte ikke deserialisere respons fra AzureAd", e)
             }
-        } catch (final Exception e){
-            log.error("Exception under static INIT av AAD client");
-            log.error(e.getMessage());
-            throw new IllegalStateException(e);
+        } catch (e: Exception) {
+            log.error("Exception under static INIT av AAD client")
+            log.error(e.message)
+            throw IllegalStateException(e)
         }
-        this.token = getTokenFromAzureAd();
+        token = tokenFromAzureAd
     }
 
-    public String getToken(){
-        if (isExpired(this.token)) {
-            token = getTokenFromAzureAd();
+    fun getToken(): String {
+        if (isExpired(token)) {
+            token = tokenFromAzureAd
         }
-        return "Bearer " + token;
+        return "Bearer $token"
     }
 
-    private static boolean isExpired(final String AADToken) {
-        final ObjectMapper mapper = new ObjectMapper();
+    private val tokenFromAzureAd: String
+        get() = try {
+            val parameters: MutableMap<String, String> = HashMap()
+            parameters["scope"] = "api://$clientId/.default"
+            parameters["client_id"] = azureClientId
+            parameters["client_secret"] = azureAppClientSecret
+            parameters["grant_type"] = grantType
+            val form = parameters.keys.stream()
+                .map { key: String -> key + "=" + URLEncoder.encode(parameters[key], StandardCharsets.UTF_8) }
+                .collect(Collectors.joining("&"))
+            val client = HttpClient.newHttpClient()
+            val request = HttpRequest.newBuilder().uri(URI.create(discoveryUrl))
+                .headers("Content-Type", "application/x-www-form-urlencoded")
+                .POST(HttpRequest.BodyPublishers.ofString(form)).build()
+            val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+            val azureAdResponse: AzureAdResponse
+
+            try {
+                azureAdResponse = ObjectMapper().readValue(response.body())
+                azureAdResponse.access_token
+            } catch (e: IOException) {
+                log.error(e.message)
+                throw IllegalStateException("Klarte ikke deserialisere respons fra AzureAd", e)
+            }
+        } catch (e: Exception) {
+            log.error(e.message)
+            throw IllegalArgumentException(e)
+        }
+
+    private fun isExpired(AADToken: String): Boolean {
+        val mapper = ObjectMapper()
         try {
-            final String tokenBody = new String(java.util.Base64.getDecoder().decode(substringBetween(AADToken, ".")));
-            final JsonNode node = mapper.readTree(tokenBody);
-            final Instant now = Instant.now();
-            final Instant expiry = Instant.ofEpochSecond(node.get("exp").longValue()).minusSeconds(300);
+            val tokenBody = String(Base64.getDecoder().decode(StringUtils.substringBetween(AADToken, ".")))
+            val node = mapper.readTree(tokenBody)
+            val now = Instant.now()
+            val expiry = Instant.ofEpochSecond(node["exp"].longValue()).minusSeconds(300)
             if (now.isAfter(expiry)) {
-                log.debug("AzureAd token expired. {} is after {}", now, expiry);
-                return true;
+                log.debug("AzureAd token expired. {} is after {}", now, expiry)
+                return true
             }
-        } catch (final IOException e) {
-            log.error("Klarte ikke parse token fra AzureAd");
-            throw new IllegalStateException("Klarte ikke parse token fra AzureAd", e);
+        } catch (e: IOException) {
+            log.error("Klarte ikke parse token fra AzureAd")
+            throw IllegalStateException("Klarte ikke parse token fra AzureAd", e)
         }
-        return false;
-    }
-
-    private String getTokenFromAzureAd(){
-        try {
-            final Map<String, String> parameters = new HashMap<>();
-            parameters.put("scope", "api://" + this.clientId + "/.default");
-            parameters.put("client_id", Environment.azureClientId());
-            parameters.put("client_secret", Environment.azureAppClientSecret());
-            parameters.put("grant_type", GRANT_TYPE);
-            final String form = parameters.keySet().stream()
-                    .map(key -> key + "=" + URLEncoder.encode(parameters.get(key), StandardCharsets.UTF_8))
-                    .collect(Collectors.joining("&"));
-            final HttpClient client = HttpClient.newHttpClient();
-            final HttpRequest request = HttpRequest.newBuilder().uri(URI.create(discoveryUrl))
-                    .headers("Content-Type", "application/x-www-form-urlencoded")
-                    .POST(HttpRequest.BodyPublishers.ofString(form)).build();
-            final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            final AzureAdResponse azureAdResponse;
-            try {
-                azureAdResponse = new ObjectMapper().readValue(response.body(), AzureAdResponse.class);
-                return azureAdResponse.getAccess_token();
-            } catch (final IOException e) {
-                log.error(e.getMessage());
-                throw new IllegalStateException("Klarte ikke deserialisere respons fra AzureAd", e);
-            }
-        } catch (final Exception e){
-            log.error(e.getMessage());
-            throw new IllegalArgumentException(e);
-        }
+        return false
     }
 }

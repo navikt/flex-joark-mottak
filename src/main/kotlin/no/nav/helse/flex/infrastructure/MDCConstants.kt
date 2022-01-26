@@ -1,7 +1,5 @@
-package no.nav.helse.flex.infrastructure;
+package no.nav.helse.flex.infrastructure
 
-public class MDCConstants {
-    private MDCConstants() {} //Util
-
-    public static final String CORRELATION_ID = "CORRELATION_ID";
+object MDCConstants {
+    const val CORRELATION_ID = "CORRELATION_ID"
 }

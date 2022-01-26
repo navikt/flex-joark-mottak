@@ -1,6 +1,5 @@
-package no.nav.helse.flex.infrastructure.exceptions;
+package no.nav.helse.flex.infrastructure.exceptions
 
-public class InvalidJournalpostStatusException extends Exception {
-    public InvalidJournalpostStatusException() {
-    }
-}
+import java.lang.Exception
+
+class InvalidJournalpostStatusException : Exception()

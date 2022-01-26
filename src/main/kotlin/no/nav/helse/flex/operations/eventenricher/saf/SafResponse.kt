@@ -1,31 +1,12 @@
-package no.nav.helse.flex.operations.eventenricher.saf;
+package no.nav.helse.flex.operations.eventenricher.saf
 
-import no.nav.helse.flex.operations.eventenricher.journalpost.Journalpost;
+import no.nav.helse.flex.operations.eventenricher.journalpost.Journalpost
+import java.io.Serializable
 
-import java.io.Serializable;
+class SafResponse : Serializable {
+    var data: Data? = null
 
-public class SafResponse implements Serializable {
-    private Data data;
-
-    public SafResponse() {}
-
-    public Data getData() { return data; }
-
-    public void setData(final Data data) {
-        this.data = data;
-    }
-
-    public class Data implements Serializable {
-        private Journalpost journalpost;
-
-        public Data() {}
-
-        public Journalpost getJournalpost() {
-            return journalpost;
-        }
-
-        public void setJournalpost(final Journalpost journalpost) {
-            this.journalpost = journalpost;
-        }
+    inner class Data : Serializable {
+        var journalpost: Journalpost? = null
     }
 }

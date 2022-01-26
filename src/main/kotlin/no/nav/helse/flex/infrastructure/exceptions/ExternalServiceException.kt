@@ -1,30 +1,13 @@
-package no.nav.helse.flex.infrastructure.exceptions;
+package no.nav.helse.flex.infrastructure.exceptions
 
-public class ExternalServiceException extends Exception {
-    private final String tjeneste;
-    private final String feilmelding;
-    private final String feilkode;
+import java.lang.Exception
 
-    public ExternalServiceException(final String tjeneste, final String feilmelding, final int feilkode) {
-        super(feilmelding);
-        this.tjeneste = tjeneste;
-        this.feilmelding = feilmelding;
-        this.feilkode = Integer.toString(feilkode);
-    }
+class ExternalServiceException(feilmelding: String, feilkode: Int) : Exception(
+    feilmelding
+) {
+    private val feilkode: String
 
-    public String getTjeneste() {
-        return tjeneste;
-    }
-
-    public String getFeilmelding() {
-        return feilmelding;
-    }
-
-    public String getFeilkode() {
-        return feilkode;
-    }
-
-    public String getFeilmeldingTilLogg() {
-        return "Fikk feilkode (" + feilkode + ") under kall mot " + tjeneste + " med feilmelding:\n" + feilmelding;
+    init {
+        this.feilkode = feilkode.toString()
     }
 }

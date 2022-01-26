@@ -1,238 +1,115 @@
-package no.nav.helse.flex.operations.eventenricher.journalpost;
+package no.nav.helse.flex.operations.eventenricher.journalpost
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-
-import java.util.List;
-
-import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import org.apache.commons.lang3.builder.ToStringBuilder
+import org.apache.commons.lang3.builder.ToStringStyle
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Journalpost {
-    private static final String JOURNALSTATUS_MIDLERTIDIG_JOURNALFOERT = "M";
-    private static final String JOURNALSTATUS_MOTTATT = "MOTTATT";
-    private Bruker bruker;
-    private String tittel;
-    private String journalpostId;
-    private String journalstatus;
-    private List<Dokument> dokumenter;
-    private String journalforendeEnhet;
-    private List<RelevanteDatoer> relevanteDatoer;
-    private Sak sak;
-    private String tema;
-    private AvsenderMottaker avsenderMottaker;
-    private String behandlingstema;
-    private String behandlingstype;
+class Journalpost {
+    var bruker: Bruker? = null
+    private var tittel: String? = null
+    lateinit var journalpostId: String
+    lateinit var journalstatus: String
+    lateinit var dokumenter: List<Dokument>
+    var journalforendeEnhet: String? = null
+    private var relevanteDatoer: List<RelevanteDatoer>? = null
+    private var sak: Sak? = null
+    lateinit var tema: String
+    var avsenderMottaker: AvsenderMottaker? = null
+        private set
+    var behandlingstema: String? = null
+    var behandlingstype: String? = null
+    val brevkode: String?
+        get() = if (dokumenter.isNotEmpty()) dokumenter[0].brevkode else ""
 
-    public Journalpost() {
+    fun setTittel(tittel: String?) {
+        this.tittel = tittel
     }
 
-    public String getBrevkode(){
-        return dokumenter.size() > 0 ? dokumenter.get(0).getBrevkode(): "";
+    fun invalidJournalpostStatus(): Boolean {
+        return !(JOURNALSTATUS_MOTTATT == journalstatus || JOURNALSTATUS_MIDLERTIDIG_JOURNALFOERT == journalstatus)
     }
 
-    public String getJournalpostId() {
-        return journalpostId;
+    fun updateWithGenerellSak() {
+        sak = Sak()
     }
 
-    public void setJournalpostId(String journalpostId) {
-        this.journalpostId = journalpostId;
-    }
-
-    public void setTittel(final String tittel) {
-        this.tittel = tittel;
-    }
-
-    public void setJournalforendeEnhet(final String journalforendeEnhet) {
-        this.journalforendeEnhet = journalforendeEnhet;
-    }
-
-    public void setBruker(final Bruker bruker) {
-        this.bruker = bruker;
-    }
-
-    public void setDokumenter(final List<Dokument> dokumentliste) {
-        this.dokumenter = dokumentliste;
-    }
-
-    public void setJournalstatus(final String journalstatus){
-        this.journalstatus = journalstatus;
-    }
-
-    public String getJournalforendeEnhet() {
-        return journalforendeEnhet;
-    }
-
-    public String getJournalstatus() {
-        return journalstatus;
-    }
-
-    public List<Dokument> getDokumenter() {
-        return dokumenter;
-    }
-
-    public Bruker getBruker() {
-        return bruker;
-    }
-
-    public boolean invalidJournalpostStatus(){
-        return !(JOURNALSTATUS_MOTTATT.equals(journalstatus) || JOURNALSTATUS_MIDLERTIDIG_JOURNALFOERT.equals(journalstatus));
-    }
-
-    public void updateWithGenerellSak(){
-        this.sak = new Sak();
-    }
-
-    public String toJson() {
-        StringBuilder builder = new StringBuilder();
+    fun toJson(): String {
+        val builder = StringBuilder()
         return builder.append("{")
-                .append("\"tittel\":\"").append(tittel).append("\",")
-                .append("\"tema\":\"").append(tema).append("\",")
-                .append(avsenderMottaker.toJson()).append(",")
-                .append(sak.toJson()).append(",")
-                .append(bruker.toJson())
-                .append("}")
-                .toString();
+            .append("\"tittel\":\"").append(tittel).append("\",")
+            .append("\"tema\":\"").append(tema).append("\",")
+            .append(avsenderMottaker!!.toJson()).append(",")
+            .append(sak!!.toJson()).append(",")
+            .append(bruker!!.toJson())
+            .append("}")
+            .toString()
     }
 
-    public String toString(){
-        return new ToStringBuilder(this, SHORT_PREFIX_STYLE)
-                .append("id", journalpostId)
-                .append("tema", tema)
-                .append("skjema", getBrevkode())
-                .append("tittel", tittel)
-                .append("journalforendeEnhet", journalforendeEnhet)
-                .append("journalstatus", journalstatus)
-                .append("behandlingstema", behandlingstema)
-                .toString();
+    override fun toString(): String {
+        return ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+            .append("id", journalpostId)
+            .append("tema", tema)
+            .append("skjema", brevkode)
+            .append("tittel", tittel)
+            .append("journalforendeEnhet", journalforendeEnhet)
+            .append("journalstatus", journalstatus)
+            .append("behandlingstema", behandlingstema)
+            .toString()
     }
 
-    public String getTema() {
-        return tema;
+    fun settAvsenderMottaker(brukerId: String, idType: String) {
+        avsenderMottaker = AvsenderMottaker(brukerId, idType)
     }
 
-    public void setTema(String tema) {
-        this.tema = tema;
-    }
-
-    public String getBehandlingstema() {
-        return behandlingstema;
-    }
-
-    public void setBehandlingstema(String behandlingsTema) {
-        this.behandlingstema = behandlingsTema;
-    }
-
-    public String getBehandlingstype() {
-        return behandlingstype;
-    }
-
-    public void setBehandlingstype(String behandlingsType) {
-        this.behandlingstype = behandlingsType;
-    }
-
-    public void settAvsenderMottaker(String brukerId, String idType) {
-        avsenderMottaker = new AvsenderMottaker(brukerId, idType);
-    }
-
-    public AvsenderMottaker getAvsenderMottaker() {
-        return avsenderMottaker;
-    }
-
-    public void setRelevanteDatoer(List<RelevanteDatoer> relevanteDatoer) {
-        this.relevanteDatoer = relevanteDatoer;
+    fun setRelevanteDatoer(relevanteDatoer: List<RelevanteDatoer>?) {
+        this.relevanteDatoer = relevanteDatoer
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class Bruker {
-        private static final String AKTOERID = "AKTOERID";
-        private static final String PERSONBRUKER = "FNR";
-        private static final String ORGANISASJON = "ORGNR";
-        private String id;
-        private String type;
+    class Bruker(val id: String, private val type: String) {
+        val isAktoerId: Boolean
+            get() = AKTOERID == type
+        val isFNR: Boolean
+            get() = PERSONBRUKER == type
+        val isORGNR: Boolean
+            get() = ORGANISASJON == type
 
-        public Bruker(final String id, final String type) {
-            this.id = id;
-            this.type = type;
+        fun toJson(): String {
+            return """"bruker": {"id":"$id","idType":"$type"}"""
         }
 
-        public String getId() {
-            return id;
-        }
-
-        public boolean isAktoerId() {
-            return AKTOERID.equals(type);
-        }
-
-        public boolean isFNR(){
-            return PERSONBRUKER.equals(type);
-        }
-
-        public boolean isORGNR(){
-            return ORGANISASJON.equals(type);
-        }
-
-        String toJson() {
-            return "\"bruker\": {" +
-                    "\"id\":\"" + id + "\"," +
-                    "\"idType\":\"" + type + "\"" +
-                    "}";
+        companion object {
+            private const val AKTOERID = "AKTOERID"
+            private const val PERSONBRUKER = "FNR"
+            private const val ORGANISASJON = "ORGNR"
         }
     }
 
-    public static class RelevanteDatoer {
-        private String dato;
-        private String datotype;
+    class RelevanteDatoer(private val dato: String, private val datotype: String)
 
-        public RelevanteDatoer(String dato, String datotype) {
-            this.dato = dato;
-            this.datotype = datotype;
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    class Sak {
+        private val sakstype: String = SAKSTYPE_GENERELL
+
+        fun toJson(): String {
+            return """"sak": {"sakstype":"$sakstype"}"""
+        }
+
+        companion object {
+            private const val SAKSTYPE_GENERELL = "GENERELL_SAK"
         }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class Sak {
-        private static final String SAKSTYPE_GENERELL = "GENERELL_SAK";
-
-        private final String sakstype;
-
-        public Sak() {
-            this.sakstype = SAKSTYPE_GENERELL;
-        }
-
-        String toJson() {
-            return "\"sak\": {" +
-                    "\"sakstype\":\"" + sakstype + "\"" +
-                    "}";
+    class AvsenderMottaker internal constructor(var id: String, private val type: String) {
+        fun toJson(): String {
+            return """"avsenderMottaker": {"id":"$id","idType":"$type"}"""
         }
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class AvsenderMottaker {
-
-        private String id;
-        private String type;
-
-
-        AvsenderMottaker(final String id, final String idType) {
-            this.id = id;
-            this.type = idType;
-        }
-
-        String toJson() {
-            return "\"avsenderMottaker\": {" +
-                    "\"id\":\"" + id + "\"," +
-                    "\"idType\":\"" + type + "\"" +
-                    "}";
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
+    companion object {
+        private const val JOURNALSTATUS_MIDLERTIDIG_JOURNALFOERT = "M"
+        private const val JOURNALSTATUS_MOTTATT = "MOTTATT"
     }
 }
-

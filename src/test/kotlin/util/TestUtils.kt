@@ -13,38 +13,41 @@ import org.apache.avro.generic.GenericRecord
 import java.util.*
 
 object TestUtils {
-    @JvmStatic
+    fun mockJournalpost(event: KafkaEvent) = mockJournalpost(
+        journalpostId = event.getJournalpostId(),
+        brevkode = "NAV 08-07.04 D",
+        tema = event.temaNytt,
+        journalpostStatus = event.journalpostStatus
+    )
+
     fun mockJournalpost(
-        journalpostId: String?,
+        journalpostId: String,
         brevkode: String?,
-        tema: String?,
-        journalpostStatus: String?
+        tema: String,
+        journalpostStatus: String
     ): Journalpost {
-        val mockBruker: Bruker
-        mockBruker = Bruker("10108000398", "FNR")
         val mockJournalpost = Journalpost()
         mockJournalpost.setTittel("Test Journalpost")
         mockJournalpost.journalpostId = journalpostId
         mockJournalpost.journalforendeEnhet = "1111"
         mockJournalpost.dokumenter = listOf(Dokument(brevkode, "DokTittel", "123"))
         mockJournalpost.setRelevanteDatoer(listOf(RelevanteDatoer("2021-10-20T20:20:00", "DATO_REGISTRERT")))
-        mockJournalpost.bruker = mockBruker
+        mockJournalpost.bruker = Bruker("10108000398", "FNR")
         mockJournalpost.journalstatus = journalpostStatus
         mockJournalpost.tema = tema
+
         return mockJournalpost
     }
 
-    @JvmStatic
     fun mockEnrichedKafkaevent(): EnrichedKafkaEvent {
-        val kafkaEvent = KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 123456789, "SYK", "NAV_NO")
+        val kafkaEvent = KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 123456789, "SYK", "NAV_NO", "M")
         val enrichedKafkaEvent = EnrichedKafkaEvent(kafkaEvent)
         val journalpost = mockJournalpost("123456789", "NAV 08-07.04 D", "SYK", "M")
         enrichedKafkaEvent.journalpost = journalpost
-        enrichedKafkaEvent.setIdenter(listOf(Ident("1122334455", false, "AKTORID")))
+        enrichedKafkaEvent.identer = listOf(Ident("1122334455", false, "AKTORID"))
         return enrichedKafkaEvent
     }
 
-    @JvmStatic
     fun mockJournalpostEvent(tema: String?): GenericRecord {
         val journalHendelseSchema =
             """{  

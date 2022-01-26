@@ -38,9 +38,9 @@ val gsonVersion = "2.8.9"
 val apacheCommonsVersion = "2.7"
 val logbackVersion = "1.2.10"
 
-val junitVersion = "4.13.2"
-val powermockVersion = "2.0.9"
 val mockitoKotlinVersion = "2.2.0"
+val mockkVersion = "1.12.2"
+val junitVersion = "5.8.2"
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -52,7 +52,6 @@ dependencies {
     implementation("io.confluent:kafka-streams-avro-serde:$confluentVersion")
     implementation("org.eclipse.jetty:jetty-servlet:$jettyVersion")
     implementation("org.eclipse.jetty:jetty-server:$jettyVersion")
-    implementation("no.bekk.bekkopen:nocommons:0.12.0")
     implementation("io.prometheus:simpleclient_servlet:$prometheusVersion")
     implementation("io.prometheus:simpleclient_hotspot:$prometheusVersion")
     implementation("io.prometheus:simpleclient_logback:$prometheusVersion")
@@ -66,13 +65,12 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:7.0.1")
 
-    testImplementation("junit:junit:$junitVersion")
     testImplementation("org.apache.kafka:kafka-streams-test-utils:$kafkaVersion")
-    testImplementation("org.powermock:powermock-module-junit4:$powermockVersion")
-    testImplementation("org.powermock:powermock-api-mockito2:$powermockVersion")
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlinVersion")
+    testImplementation("io.mockk:mockk:$mockkVersion")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
 
-    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.8.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
 }
 
 tasks {

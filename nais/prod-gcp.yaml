@@ -42,8 +42,6 @@ spec:
         - host: "oppgave.prod-fss-pub.nais.io"
         - host: "flex-fss-proxy.prod-fss-pub.nais.io"
   env:
-    - name: KAFKA_BOOTSTRAP_SERVERS_URL
-      value: a01apvl00145.adeo.no:8443,a01apvl00146.adeo.no:8443,a01apvl00147.adeo.no:8443,a01apvl00149.adeo.no:8443
     - name: AIVEN_DOKUMENT_TOPIC
       value: teamdokumenthandtering.aapen-dok-journalfoering
     - name: AIVEN_TO_MANUELL_TOPIC

@@ -1,42 +1,22 @@
-package no.nav.helse.flex.infrastructure.kafka;
+package no.nav.helse.flex.infrastructure.kafka
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class KafkaEvent {
-    private String hendelsesId; //CorrolationId
-    private int versjon;
-    private String hendelsesType;
-    private long journalpostId;
-    private String journalpostStatus;
-    private String temaGammelt;
-    private String temaNytt;
-    private String mottaksKanal;
-    private String kanalReferanseId;
-    private String behandlingstema;
+data class KafkaEvent(
+    private val hendelsesId: String,
+    private val hendelsesType: String,
+    private val journalpostId: Long,
+    val temaNytt: String,
+    val mottaksKanal: String,
+    val journalpostStatus: String
+) {
+    private val versjon = 0
+    private val temaGammelt: String? = null
+    private val kanalReferanseId: String? = null
+    private val behandlingstema: String? = null
 
-    public KafkaEvent(String hendelsesId, String hendelsesType, long journalpostId, String temaNytt, String mottaksKanal) {
-        this.hendelsesId = hendelsesId;
-        this.hendelsesType = hendelsesType;
-        this.journalpostId = journalpostId;
-        this.temaNytt = temaNytt;
-        this.mottaksKanal = mottaksKanal;
+    fun getJournalpostId(): String {
+        return journalpostId.toString()
     }
-
-    public String getJournalpostId() {
-        return String.valueOf(journalpostId);
-    }
-
-    public String getJournalpostStatus() {
-        return journalpostStatus;
-    }
-
-    public String getTemaNytt() {
-        return temaNytt;
-    }
-
-    public String getMottaksKanal() {
-        return mottaksKanal;
-    }
-
 }
