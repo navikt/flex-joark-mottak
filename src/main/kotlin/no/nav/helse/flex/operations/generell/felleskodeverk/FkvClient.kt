@@ -51,7 +51,7 @@ class FkvClient {
                 throw TemporarilyUnavailableException()
             }
         } catch (e: Exception) {
-            log.error("Feil ved henting/parsing av KrutKoder: {}" + e.message, e)
+            log.error("Feil ved henting/parsing av KrutKoder: ${e.message}", e)
             throw ServiceUnavailableException()
         }
     }
