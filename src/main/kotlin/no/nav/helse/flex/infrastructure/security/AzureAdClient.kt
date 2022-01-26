@@ -1,10 +1,10 @@
 package no.nav.helse.flex.infrastructure.security
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.helse.flex.Environment.azureAppClientSecret
 import no.nav.helse.flex.Environment.azureAppURL
 import no.nav.helse.flex.Environment.azureClientId
+import no.nav.helse.flex.objectMapper
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import java.io.IOException
@@ -34,7 +34,7 @@ class AzureAdClient(private val clientId: String) {
             val response = client.send(request, HttpResponse.BodyHandlers.ofString())
 
             try {
-                val result: HashMap<String, Any> = ObjectMapper().readValue(response.body())
+                val result: HashMap<String, Any> = objectMapper.readValue(response.body())
                 discoveryUrl = result["token_endpoint"].toString()
             } catch (e: IOException) {
                 throw IllegalStateException("Klarte ikke deserialisere respons fra AzureAd", e)
@@ -69,10 +69,9 @@ class AzureAdClient(private val clientId: String) {
                 .headers("Content-Type", "application/x-www-form-urlencoded")
                 .POST(HttpRequest.BodyPublishers.ofString(form)).build()
             val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-            val azureAdResponse: AzureAdResponse
 
             try {
-                azureAdResponse = ObjectMapper().readValue(response.body())
+                val azureAdResponse: AzureAdResponse = objectMapper.readValue(response.body())
                 azureAdResponse.access_token
             } catch (e: IOException) {
                 log.error(e.message)
@@ -84,10 +83,9 @@ class AzureAdClient(private val clientId: String) {
         }
 
     private fun isExpired(AADToken: String): Boolean {
-        val mapper = ObjectMapper()
         try {
             val tokenBody = String(Base64.getDecoder().decode(StringUtils.substringBetween(AADToken, ".")))
-            val node = mapper.readTree(tokenBody)
+            val node = objectMapper.readTree(tokenBody)
             val now = Instant.now()
             val expiry = Instant.ofEpochSecond(node["exp"].longValue()).minusSeconds(300)
             if (now.isAfter(expiry)) {
