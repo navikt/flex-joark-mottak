@@ -6,22 +6,20 @@ import java.lang.IndexOutOfBoundsException
 import java.lang.StringBuilder
 import java.util.*
 
-class FkvKrutkoder {
+class FkvKrutkoder(
+    betydninger: Map<String, List<Betydning>> = emptyMap()
+) {
     private val log = LoggerFactory.getLogger(FkvKrutkoder::class.java)
     private val skjemaMangler = ""
-    private var betydninger: Map<String, List<Betydning>>? = null
     private val temaSkjemaDataMap: MutableMap<String, TemaSkjemaData> = HashMap()
 
-    fun init() {
-        val betydningNokkler = betydninger!!.keys
-        for (key in betydningNokkler) {
-            val betydningListe = betydninger!![key]!!
+    init {
+        for ((key, betydning) in betydninger) {
             try {
-                val betydning = betydningListe[0]
-                temaSkjemaDataMap[key] = betydning.init()
+                temaSkjemaDataMap[key] = betydning.first().init()
             } catch (ie: IndexOutOfBoundsException) {
                 log.error(
-                    "Feil ved dekoding av felles kodeverk, feil format i fkv - betydning ($key) - liste($betydningListe)"
+                    "Feil ved dekoding av felles kodeverk, feil format i fkv - betydning ($key) - liste($betydning)"
                 )
             }
         }
@@ -39,7 +37,7 @@ class FkvKrutkoder {
     }
 
     fun getBehandlingstype(tema: String?, skjema: String?): String {
-        return if (tema == null || tema.isBlank() || skjema == null || skjema.isBlank()) {
+        return if (tema.isNullOrBlank() || skjema.isNullOrBlank()) {
             skjemaMangler
         } else getTemaSkjema(lagTemaSkjemaNokkel(tema, skjema))!!.behandlingstype
     }

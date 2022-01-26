@@ -1,6 +1,6 @@
 package no.nav.helse.flex.operations.generell.felleskodeverk
 
-import com.google.gson.Gson
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.google.gson.JsonParseException
 import io.vavr.CheckedFunction1
 import no.nav.helse.flex.Environment.fkvUrl
@@ -8,6 +8,7 @@ import no.nav.helse.flex.Environment.proxyClientid
 import no.nav.helse.flex.infrastructure.exceptions.TemporarilyUnavailableException
 import no.nav.helse.flex.infrastructure.resilience.Resilience
 import no.nav.helse.flex.infrastructure.security.AzureAdClient
+import no.nav.helse.flex.objectMapper
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.net.http.HttpClient
@@ -22,7 +23,6 @@ class FkvClient {
     private val log = LoggerFactory.getLogger(FkvClient::class.java)
 
     private val fellesKodeverkUrl = fkvUrl
-    private val gson = Gson()
     private val client = HttpClient.newHttpClient()
     private val resilience: Resilience<HttpRequest, HttpResponse<String>>
     private val azureAdClient: AzureAdClient
@@ -33,9 +33,8 @@ class FkvClient {
         azureAdClient = AzureAdClient(proxyClientid)
     }
 
-    @Throws(Exception::class)
     fun fetchKrutKoder(): FkvKrutkoder {
-        return try {
+        try {
             val request = HttpRequest.newBuilder()
                 .uri(URI.create(fellesKodeverkUrl))
                 .header(CORRELATION_HEADER, "flex-joark-mottak")
@@ -46,7 +45,7 @@ class FkvClient {
             val response = resilience.execute(request)
 
             if (response.statusCode() == 200) {
-                mapFKVStringToObject(response.body())
+                return mapFKVStringToObject(response.body())
             } else {
                 log.error("Klarte ikke hente Krutkoder fra Felles kodeverk")
                 throw TemporarilyUnavailableException()
@@ -57,18 +56,14 @@ class FkvClient {
         }
     }
 
-    @Throws(ServiceUnavailableException::class)
     private fun mapFKVStringToObject(fellesKodeverkJson: String): FkvKrutkoder {
-        return try {
-            val fellesKodeverk = gson.fromJson(fellesKodeverkJson, FkvKrutkoder::class.java)
-            fellesKodeverk.init()
-            fellesKodeverk
+        try {
+            return objectMapper.readValue(fellesKodeverkJson)
         } catch (e: JsonParseException) {
             throw ServiceUnavailableException("Feil under dekoding av melding fra felles kodeverk: $fellesKodeverkJson")
         }
     }
 
-    @Throws(Exception::class)
     private fun excecute(req: HttpRequest): HttpResponse<String> {
         return client.send(req, HttpResponse.BodyHandlers.ofString())
     }

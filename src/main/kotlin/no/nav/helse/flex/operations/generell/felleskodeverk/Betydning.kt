@@ -1,11 +1,11 @@
 package no.nav.helse.flex.operations.generell.felleskodeverk
 
 data class Betydning(
-    var gyldigFra: String? = null,
-    var gyldigTil: String? = null,
-    var beskrivelser: Map<String, Beskrivelse>? = null
+    var gyldigFra: String,
+    var gyldigTil: String,
+    var beskrivelser: Map<String, Beskrivelse>
 ) {
     fun init(): TemaSkjemaData {
-        return beskrivelser!!["nb"]!!.init()
+        return beskrivelser["nb"]!!.init()
     }
 }
