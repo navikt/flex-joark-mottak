@@ -167,7 +167,7 @@ class JfrTopologies(
                 "Journalposten: ${enrichKafkaEvent.journalpostId} sendes til manuell-oppretter"
             )
         }
-            .to(manuellTopic, Produced.with(Serdes.String(), enhancedKafkaEventSerde))
+            //.to(manuellTopic, Produced.with(Serdes.String(), enhancedKafkaEventSerde))
     }
 
     private fun logWithCorrelationId(enrichedKafkaEvent: EnrichedKafkaEvent, s: String) {
