@@ -48,15 +48,10 @@ class SafClient {
             .build()
         val response = resilience.execute(request)
 
-        if (checkResponse(response, journalpostId)) {
-            val body = response.body()
-
-            log.info("SAF response: $body")
-
-            val obj: SafResponse = gson.fromJson(response.body(), SafResponse::class.java)
-            val data = obj.data
-            val jp = data.journalpost
-            return jp
+        return if (checkResponse(response, journalpostId)) {
+            gson.fromJson(response.body(), SafResponse::class.java)
+                .data
+                .journalpost
         } else {
             val safErrorMessage = gson.fromJson(response.body(), SafErrorMessage::class.java)
             log.error("Ved behandling av Journalpost $journalpostId: Feil (${safErrorMessage.status}) $SERVICENAME_SAF; error: ${safErrorMessage.error}, message: ${safErrorMessage.message}",)
