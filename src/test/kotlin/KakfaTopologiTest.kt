@@ -111,8 +111,8 @@ class KakfaTopologiTest {
         every { mockEnrichTransformer.transform(any(), any()) } returns KeyValue("Test123", enrichedKafkaEvent)
         inputTopic.pipeInput("Test123", mockedJournalpostEvent)
 
-        //assertEquals(1, outputTopic.queueSize)
-        //assertEquals("123456789", outputTopic.readValue().journalpostId)
+        // assertEquals(1, outputTopic.queueSize)
+        // assertEquals("123456789", outputTopic.readValue().journalpostId)
     }
 
     @Test
@@ -125,8 +125,8 @@ class KakfaTopologiTest {
         every { mockEnrichTransformer.transform(any(), any()) } returns KeyValue.pair("Test123", enrichedKafkaEvent)
         inputTopic.pipeInput("Test123", mockJournalpostEvent("SYK"))
 
-        //assertEquals(1, outputTopic.queueSize)
-        //assertEquals("123456789", outputTopic.readValue().journalpostId)
+        // assertEquals(1, outputTopic.queueSize)
+        // assertEquals("123456789", outputTopic.readValue().journalpostId)
     }
 
     @Test
@@ -168,8 +168,8 @@ class KakfaTopologiTest {
         every { mockGenerellTransformer.transform(any(), any()) } returns KeyValue("Test123", generellKafkaEvent.withSetToManuell(true))
         inputTopic.pipeInput("Test123", mockJournalpostEvent("SYK"))
 
-        //assertEquals(1, outputTopic.queueSize)
-        //assertEquals("123456789", outputTopic.readValue().journalpostId)
+        // assertEquals(1, outputTopic.queueSize)
+        // assertEquals("123456789", outputTopic.readValue().journalpostId)
     }
 
     @Test
@@ -186,8 +186,8 @@ class KakfaTopologiTest {
 
         inputTopic.pipeInput("Test123", mockJournalpostEvent("SYK"))
 
-        //assertEquals(1, outputTopic.queueSize)
-        //assertEquals("123456789", outputTopic.readValue().journalpostId)
+        // assertEquals(1, outputTopic.queueSize)
+        // assertEquals("123456789", outputTopic.readValue().journalpostId)
     }
 
     @Test

@@ -17,7 +17,6 @@ import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.Topology
 import org.apache.kafka.streams.kstream.Consumed
 import org.apache.kafka.streams.kstream.KStream
-import org.apache.kafka.streams.kstream.Produced
 import org.apache.kafka.streams.state.Stores
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
@@ -167,7 +166,7 @@ class JfrTopologies(
                 "Journalposten: ${enrichKafkaEvent.journalpostId} sendes til manuell-oppretter"
             )
         }
-            //.to(manuellTopic, Produced.with(Serdes.String(), enhancedKafkaEventSerde))
+        // .to(manuellTopic, Produced.with(Serdes.String(), enhancedKafkaEventSerde))
     }
 
     private fun logWithCorrelationId(enrichedKafkaEvent: EnrichedKafkaEvent, s: String) {
