@@ -31,13 +31,11 @@ class SafClient {
         azureAdClient = AzureAdClient(Environment.safClientId)
     }
 
-    @Throws(Exception::class)
     private fun excecute(req: HttpRequest): HttpResponse<String?> {
         return client.send(req, HttpResponse.BodyHandlers.ofString())
     }
 
-    @Throws(ExternalServiceException::class, TemporarilyUnavailableException::class)
-    fun retriveJournalpost(journalpostId: String): Journalpost? {
+    fun retriveJournalpost(journalpostId: String): Journalpost {
         val correlationId = MDC.get(MDCConstants.CORRELATION_ID)
         val request = HttpRequest.newBuilder()
             .uri(URI.create(safUrl))
@@ -51,17 +49,10 @@ class SafClient {
         val response = resilience.execute(request)
 
         return if (checkResponse(response, journalpostId)) {
-            gson.fromJson(response.body(), SafResponse::class.java).data!!.journalpost
+            gson.fromJson(response.body(), SafResponse::class.java).data.journalpost
         } else {
             val safErrorMessage = gson.fromJson(response.body(), SafErrorMessage::class.java)
-            log.error(
-                "Ved behandling av Journalpost {}: Feil ({})  {}; error: {}, message: {}",
-                journalpostId,
-                safErrorMessage.status,
-                SERVICENAME_SAF,
-                safErrorMessage.error,
-                safErrorMessage.message
-            )
+            log.error("Ved behandling av Journalpost $journalpostId: Feil (${safErrorMessage.status}) $SERVICENAME_SAF; error: ${safErrorMessage.error}, message: ${safErrorMessage.message}",)
             throw ExternalServiceException(safErrorMessage.message!!, safErrorMessage.status)
         }
     }
@@ -73,16 +64,12 @@ class SafClient {
         return body.toString()
     }
 
-    @Throws(TemporarilyUnavailableException::class)
     private fun checkResponse(response: HttpResponse<String?>, journalpostId: String): Boolean {
         return if (response.statusCode() == STATUS_OK) {
             true
         } else {
             if (response.statusCode() == NOT_AVAILABLE) {
-                log.info(
-                    "journalposten {} : JournalpostApi returnerte 404, tjeneste ikke tigjengelig.",
-                    journalpostId
-                )
+                log.info("journalposten $journalpostId : JournalpostApi returnerte 404, tjeneste ikke tigjengelig.")
                 throw TemporarilyUnavailableException()
             }
             false
