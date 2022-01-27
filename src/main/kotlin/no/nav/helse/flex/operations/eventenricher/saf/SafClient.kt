@@ -85,20 +85,31 @@ class SafClient {
 
     companion object {
         private val log = LoggerFactory.getLogger(SafClient::class.java)
-        private val SAF_JOURNALPOST_QUERY = """"
-            { journalpost(journalpostId: "%s") { 
-                tittel 
-                journalforendeEnhet 
-                journalpostId 
-                avsenderMottaker { id type } 
-                journalstatus 
-                tema 
-                behandlingstema 
-                bruker { id type } 
-                relevanteDatoer { dato datotype } 
-                dokumenter { brevkode tittel dokumentInfoId }
-            }}
-        """.trimIndent()
+        private const val SAF_JOURNALPOST_QUERY = "{journalpost(journalpostId: \"%s\") {" +
+            " tittel" +
+            " journalforendeEnhet" +
+            " journalpostId" +
+            " avsenderMottaker {" +
+            " id" +
+            " type" +
+            " }" +
+            " journalstatus" +
+            " tema" +
+            " behandlingstema" +
+            " bruker {" +
+            "   id" +
+            "   type" +
+            " }" +
+            " relevanteDatoer {" +
+            "   dato" +
+            "   datotype" +
+            " }" +
+            " dokumenter {" +
+            "   brevkode" +
+            "   tittel" +
+            "   dokumentInfoId" +
+            " }" +
+            "}}"
         private const val CORRELATION_HEADER = "X-Correlation-ID"
         private const val AUTHORIZATION_HEADER = "Authorization"
         private const val CONTENT_TYPE_HEADER = "Content-Type"
