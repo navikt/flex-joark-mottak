@@ -43,7 +43,7 @@ spec:
         - host: "flex-fss-proxy.dev-fss-pub.nais.io"
   env:
     - name: AIVEN_DOKUMENT_TOPIC
-      value: teamdokumenthandtering.aapen-dok-journalfoering
+      value: teamdokumenthandtering.aapen-dok-journalfoering-q1
     - name: AIVEN_TO_MANUELL_TOPIC
       value: flex.flex-joark-manuell
     - name: STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING
@@ -67,7 +67,7 @@ spec:
     - name: OPPGAVE_CLIENT_ID
       value: 41ca50ba-e44f-4bc8-9e31-b745a0041926
     - name: OPPGAVE_URL
-      value: https://oppgave.dev-fss-pub.nais.io
+      value: https://oppgave-q1.dev-fss-pub.nais.io
     # Felleskodeverk
     - name: FLEX_FSS_PROXY_CLIENT_ID
       value: dev-fss.flex.flex-fss-proxy
