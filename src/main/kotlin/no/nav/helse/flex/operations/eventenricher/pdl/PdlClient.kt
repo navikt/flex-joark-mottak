@@ -26,16 +26,8 @@ class PdlClient {
     private val resilience: Resilience<HttpRequest, HttpResponse<String?>>
     private val azureAdClient: AzureAdClient
     private val HENT_PERSON_QUERY =
-        """
-query(${"$"}ident: ID!){
-  hentIdenter(ident: ${"$"}ident, historikk: false) {
-    identer {
-      ident,
-      gruppe
-    }
-  }
-}
-"""
+        "{\"query\":\"query(\$ident: ID!, \$grupper: [IdentGruppe!], \$historikk:Boolean = false){ hentIdenter(ident: \$ident, grupper:\$grupper, historikk:\$historikk){ identer{ident, historisk,gruppe}}}\"," +
+            "\"variables\": {\"ident\":\"%s\",\"historikk\": false}}"
 
     init {
         val pdlClientFunction = CheckedFunction1 { req: HttpRequest -> excecute(req) }
@@ -74,23 +66,14 @@ query(${"$"}ident: ID!){
                 val identer = gson.fromJson(response.body(), PdlResponse::class.java).identer
                 identer!!.identer
             } catch (e: NullPointerException) {
-                log.error(
-                    "Klarer ikke hente ut bruker i responsen fra PDL på journalpost {} - {}",
-                    journalpostId,
-                    e.message
-                )
+                log.error("Klarer ikke hente ut bruker i responsen fra PDL på journalpost $journalpostId - ${e.message}")
                 throw Exception("Klarer ikke hente ut bruker i responsen fra PDL på journalpost", e)
             }
         } else if (response.statusCode() == 404 || response.statusCode() == 503) {
             throw TemporarilyUnavailableException()
         } else {
             val errorMessage = gson.fromJson(response.body(), PdlErrorResponse::class.java).errors!![0].message
-            log.error(
-                "Feil ved kall mot PDL på journalpost {}. Status: {} og feilmelding {}",
-                journalpostId,
-                response.statusCode(),
-                errorMessage
-            )
+            log.error("Feil ved kall mot PDL på journalpost $journalpostId. Status: ${response.statusCode()} og feilmelding $errorMessage")
             throw ExternalServiceException(errorMessage!!, response.statusCode())
         }
     }
