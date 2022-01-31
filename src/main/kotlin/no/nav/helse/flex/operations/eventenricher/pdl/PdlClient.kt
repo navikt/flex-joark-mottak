@@ -1,5 +1,7 @@
 package no.nav.helse.flex.operations.eventenricher.pdl
 
+import com.fasterxml.jackson.core.JsonProcessingException
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.gson.Gson
 import io.vavr.CheckedFunction1
 import no.nav.helse.flex.Environment
@@ -15,6 +17,7 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.util.*
 
 class PdlClient {
     private val persondataUrl: String = Environment.persondataUrl
@@ -22,14 +25,17 @@ class PdlClient {
     private val client = HttpClient.newHttpClient()
     private val resilience: Resilience<HttpRequest, HttpResponse<String?>>
     private val azureAdClient: AzureAdClient
-    private val query = """{
-        "query":"query(${"$"}ident: ID!, ${"$"}grupper: [IdentGruppe!], ${"$"}historikk:Boolean = false){ 
-            hentIdenter(ident: ${"$"}ident, grupper:${"$"}grupper, historikk:${"$"}historikk){ 
-                identer{ident, historisk, gruppe}
-            }
-        }",
-        "variables": {"ident":"%s","historikk": false}}
-    """.trimIndent()
+    private val HENT_PERSON_QUERY =
+        """
+query(${"$"}ident: ID!){
+  hentIdenter(ident: ${"$"}ident, historikk: false) {
+    identer {
+      ident,
+      gruppe
+    }
+  }
+}
+"""
 
     init {
         val pdlClientFunction = CheckedFunction1 { req: HttpRequest -> excecute(req) }
@@ -38,12 +44,10 @@ class PdlClient {
         gson = Gson()
     }
 
-    @Throws(Exception::class)
     private fun excecute(req: HttpRequest): HttpResponse<String?> {
         return client.send(req, HttpResponse.BodyHandlers.ofString())
     }
 
-    @Throws(Exception::class)
     fun retrieveIdenterFromPDL(fnr: String, tema: String?, journalpostId: String?): List<Ident> {
         val correlationId = MDC.get(MDCConstants.CORRELATION_ID)
         val request = HttpRequest.newBuilder()
@@ -52,7 +56,16 @@ class PdlClient {
             .header(AUTHORIZATION_HEADER, azureAdClient.getToken())
             .header(CORRELATION_HEADER, correlationId)
             .header(TEMA_HEADER, tema)
-            .POST(HttpRequest.BodyPublishers.ofString(persondataBody(query, fnr)))
+            .POST(
+                HttpRequest.BodyPublishers.ofString(
+                    requestToJson(
+                        GraphQLRequest(
+                            query = HENT_PERSON_QUERY,
+                            variables = Collections.singletonMap(IDENT, fnr)
+                        )
+                    )
+                )
+            )
             .build()
         val response = resilience.execute(request)
 
@@ -82,8 +95,14 @@ class PdlClient {
         }
     }
 
-    private fun persondataBody(query: String, fnr: String): String {
-        return String.format(query, fnr)
+    data class GraphQLRequest(val query: String, val variables: Map<String, String>)
+
+    private fun requestToJson(graphQLRequest: GraphQLRequest): String {
+        return try {
+            ObjectMapper().writeValueAsString(graphQLRequest)
+        } catch (e: JsonProcessingException) {
+            throw RuntimeException(e)
+        }
     }
 
     companion object {
@@ -93,5 +112,6 @@ class PdlClient {
         private const val CONTENT_TYPE_HEADER = "Content-Type"
         private const val TEMA_HEADER = "tema"
         private const val STATUS_OK = 200
+        private const val IDENT = "ident"
     }
 }
