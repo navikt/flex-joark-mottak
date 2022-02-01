@@ -1,12 +1,13 @@
 package no.nav.helse.flex.operations.generell.felleskodeverk
 
-import com.google.gson.Gson
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.vavr.CheckedFunction1
 import no.nav.helse.flex.Environment.fkvUrl
 import no.nav.helse.flex.Environment.proxyClientid
 import no.nav.helse.flex.infrastructure.exceptions.TemporarilyUnavailableException
 import no.nav.helse.flex.infrastructure.resilience.Resilience
 import no.nav.helse.flex.infrastructure.security.AzureAdClient
+import no.nav.helse.flex.objectMapper
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.net.http.HttpClient
@@ -20,7 +21,6 @@ class FkvClient {
     private val AUTHORIZATION_HEADER = "Authorization"
     private val log = LoggerFactory.getLogger(FkvClient::class.java)
 
-    private val gson = Gson()
     private val fellesKodeverkUrl = fkvUrl
     private val client = HttpClient.newHttpClient()
     private val resilience: Resilience<HttpRequest, HttpResponse<String>>
@@ -58,8 +58,10 @@ class FkvClient {
     }
 
     private fun mapFKVStringToObject(fellesKodeverkJson: String): FkvKrutkoder {
+        log.info("fellesKodeverkJson: $fellesKodeverkJson")
+
         try {
-            return gson.fromJson(fellesKodeverkJson, FkvKrutkoder::class.java)
+            return objectMapper.readValue(fellesKodeverkJson)
         } catch (e: Exception) {
             throw ServiceUnavailableException("Feil under dekoding av melding fra felles kodeverk: $fellesKodeverkJson")
         }

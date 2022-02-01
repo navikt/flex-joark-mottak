@@ -6,14 +6,16 @@ import java.lang.IndexOutOfBoundsException
 import java.lang.StringBuilder
 import java.util.*
 
-class FkvKrutkoder(
-    betydninger: Map<String, List<Betydning>> = emptyMap()
+data class FkvKrutkoder(
+    val betydninger: Map<String, List<Betydning>> = emptyMap()
 ) {
     private val log = LoggerFactory.getLogger(FkvKrutkoder::class.java)
     private val skjemaMangler = ""
     private val temaSkjemaDataMap: MutableMap<String, TemaSkjemaData> = HashMap()
 
     init {
+        log.info("betydninger: $betydninger")
+
         for ((key, betydning) in betydninger) {
             try {
                 temaSkjemaDataMap[key] = betydning.first().init()
