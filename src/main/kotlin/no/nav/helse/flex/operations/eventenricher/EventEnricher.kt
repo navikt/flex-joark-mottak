@@ -89,7 +89,7 @@ class EventEnricher(
         val journalpost = enrichedKafkaEvent.journalpost!!
 
         try {
-            var behandlingsTema: String? = fkvKrutkoder.getBehandlingstema(journalpost.tema, journalpost.brevkode)
+            var behandlingsTema = fkvKrutkoder.getBehandlingstema(journalpost.tema, journalpost.brevkode)
             val behandlingsType = fkvKrutkoder.getBehandlingstype(journalpost.tema, journalpost.brevkode)
             if (!(journalpost.behandlingstema == null || journalpost.behandlingstema!!.isEmpty())) {
                 behandlingsTema = journalpost.behandlingstema

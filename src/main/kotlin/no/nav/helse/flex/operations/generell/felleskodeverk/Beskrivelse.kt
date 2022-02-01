@@ -6,9 +6,7 @@ data class Beskrivelse(
 ) {
     fun init(): TemaSkjemaData {
         val tittelBrevkodeBehandlingstemaBehandlingstype = term
-            .split(";".toRegex())
-            .dropLastWhile { it.isEmpty() }
-            .toTypedArray()
+            .split(";".toRegex(), -1)
 
         return TemaSkjemaData(
             tittelBrevkodeBehandlingstemaBehandlingstype[0],
