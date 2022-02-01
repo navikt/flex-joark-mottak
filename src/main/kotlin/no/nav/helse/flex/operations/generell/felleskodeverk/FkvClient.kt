@@ -58,8 +58,6 @@ class FkvClient {
     }
 
     private fun mapFKVStringToObject(fellesKodeverkJson: String): FkvKrutkoder {
-        log.info("fellesKodeverkJson: $fellesKodeverkJson")
-
         try {
             return objectMapper.readValue(fellesKodeverkJson)
         } catch (e: Exception) {

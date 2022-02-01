@@ -14,8 +14,6 @@ data class FkvKrutkoder(
     private val temaSkjemaDataMap: MutableMap<String, TemaSkjemaData> = HashMap()
 
     init {
-        log.info("betydninger: $betydninger")
-
         for ((key, betydning) in betydninger) {
             try {
                 temaSkjemaDataMap[key] = betydning.first().init()
@@ -25,7 +23,6 @@ data class FkvKrutkoder(
                 )
             }
         }
-        log.info("temaSkjemaDataMap: $temaSkjemaDataMap")
     }
 
     internal fun getTemaSkjema(temaSkjema: String): TemaSkjemaData? {
