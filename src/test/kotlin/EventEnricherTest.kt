@@ -55,9 +55,8 @@ class EventEnricherTest {
         every { mockSafClient.retriveJournalpost(any()) } returns journalpost
         every { mockPdlClient.retrieveIdenterFromPDL(any(), any(), any()) } returns listOf(
             Ident(
-                "1234567891113",
-                false,
-                "AKTORID"
+                "AKTORID",
+                "1234567891113"
             )
         )
         every { fkvKrutkoder.getTemaSkjema(any()) } returns TemaSkjemaData(
@@ -79,9 +78,8 @@ class EventEnricherTest {
         every { mockSafClient.retriveJournalpost(any()) } returns journalpost
         every { mockPdlClient.retrieveIdenterFromPDL(any(), any(), any()) } returns listOf(
             Ident(
-                "1234567891113",
-                false,
-                "AKTORID"
+                "AKTORID",
+                "1234567891113"
             )
         )
 

@@ -44,7 +44,7 @@ object TestUtils {
         val enrichedKafkaEvent = EnrichedKafkaEvent(kafkaEvent)
         val journalpost = mockJournalpost("123456789", "NAV 08-07.04 D", "SYK", "M")
         enrichedKafkaEvent.journalpost = journalpost
-        enrichedKafkaEvent.identer = listOf(Ident("1122334455", false, "AKTORID"))
+        enrichedKafkaEvent.identer = listOf(Ident("AKTORID", "1122334455"))
         return enrichedKafkaEvent
     }
 

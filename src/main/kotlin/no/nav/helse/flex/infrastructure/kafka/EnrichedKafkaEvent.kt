@@ -41,7 +41,7 @@ data class EnrichedKafkaEvent(
                 return journalpost!!.bruker!!.id
             } else {
                 for (ident in identer!!) {
-                    if (ident.isFNR) return ident.iD
+                    if (ident.isFNR) return ident.ident
                 }
             }
             return null
@@ -53,7 +53,7 @@ data class EnrichedKafkaEvent(
                 return journalpost!!.bruker!!.id
             } else {
                 for (ident in identer!!) {
-                    if (ident.isAktoerId) return ident.iD
+                    if (ident.isAktoerId) return ident.ident
                 }
             }
             return null

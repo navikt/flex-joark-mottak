@@ -2,6 +2,7 @@ package no.nav.helse.flex.operations.eventenricher.pdl
 
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.google.gson.Gson
 import io.vavr.CheckedFunction1
 import no.nav.helse.flex.Environment
@@ -11,6 +12,7 @@ import no.nav.helse.flex.infrastructure.exceptions.ExternalServiceException
 import no.nav.helse.flex.infrastructure.exceptions.TemporarilyUnavailableException
 import no.nav.helse.flex.infrastructure.resilience.Resilience
 import no.nav.helse.flex.infrastructure.security.AzureAdClient
+import no.nav.helse.flex.objectMapper
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import java.net.URI
@@ -26,8 +28,16 @@ class PdlClient {
     private val resilience: Resilience<HttpRequest, HttpResponse<String?>>
     private val azureAdClient: AzureAdClient
     private val HENT_PERSON_QUERY =
-        "{\"query\":\"query(\$ident: ID!, \$grupper: [IdentGruppe!], \$historikk:Boolean = false){ hentIdenter(ident: \$ident, grupper:\$grupper, historikk:\$historikk){ identer{ident, historisk,gruppe}}}\"," +
-            "\"variables\": {\"ident\":\"%s\",\"historikk\": false}}"
+        """
+query(${"$"}ident: ID!){
+  hentIdenter(ident: ${"$"}ident, historikk: false) {
+    identer {
+      ident,
+      gruppe
+    }
+  }
+}
+"""
 
     init {
         val pdlClientFunction = CheckedFunction1 { req: HttpRequest -> excecute(req) }
@@ -61,24 +71,29 @@ class PdlClient {
             .build()
         val response = resilience.execute(request)
 
-        return if (response.statusCode() == STATUS_OK) {
-            try {
-                val identer = gson.fromJson(response.body(), PdlResponse::class.java).identer
-                identer!!.identer
-            } catch (e: NullPointerException) {
-                log.error("Klarer ikke hente ut bruker i responsen fra PDL på journalpost $journalpostId - ${e.message}")
-                throw Exception("Klarer ikke hente ut bruker i responsen fra PDL på journalpost", e)
-            }
-        } else if (response.statusCode() == 404 || response.statusCode() == 503) {
+        if (response.statusCode() == 404 || response.statusCode() == 503) {
             throw TemporarilyUnavailableException()
-        } else {
-            val errorMessage = gson.fromJson(response.body(), PdlErrorResponse::class.java).errors!![0].message
-            log.error("Feil ved kall mot PDL på journalpost $journalpostId. Status: ${response.statusCode()} og feilmelding $errorMessage")
-            throw ExternalServiceException(errorMessage!!, response.statusCode())
         }
-    }
 
-    data class GraphQLRequest(val query: String, val variables: Map<String, String>)
+        val parsedResponse: GetPersonResponse? = response.body()?.let {
+            objectMapper.readValue(it)
+        }
+
+        if (response.statusCode() == STATUS_OK) {
+            val identer = parsedResponse?.data?.hentIdenter?.identer
+
+            if (identer != null) {
+                return identer
+            } else {
+                log.error("Klarer ikke hente ut bruker i responsen fra PDL på journalpost $journalpostId - ${parsedResponse.hentErrors()}")
+                throw Exception("Klarer ikke hente ut bruker i responsen fra PDL på journalpost")
+            }
+        }
+
+        val errorMessage = parsedResponse.hentErrors()
+        log.error("Feil ved kall mot PDL på journalpost $journalpostId. Status: ${response.statusCode()} og feilmelding $errorMessage")
+        throw ExternalServiceException(errorMessage!!, response.statusCode())
+    }
 
     private fun requestToJson(graphQLRequest: GraphQLRequest): String {
         return try {
@@ -86,6 +101,12 @@ class PdlClient {
         } catch (e: JsonProcessingException) {
             throw RuntimeException(e)
         }
+    }
+
+    data class GraphQLRequest(val query: String, val variables: Map<String, String>)
+
+    private fun GetPersonResponse?.hentErrors(): String? {
+        return this?.errors?.map { it.message }?.joinToString(" - ")
     }
 
     companion object {

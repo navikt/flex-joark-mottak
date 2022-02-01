@@ -96,7 +96,7 @@ class GenerellOperationTransformerSupplierTest {
     private fun getEntrichKafkaEvent(event: KafkaEvent): EnrichedKafkaEvent {
         val enrichedKafkaEvent = EnrichedKafkaEvent(event)
         enrichedKafkaEvent.journalpost = mockJournalpost(event)
-        enrichedKafkaEvent.identer = listOf(Ident("1122334455", false, "AKTORID"))
+        enrichedKafkaEvent.identer = listOf(Ident("AKTORID", "1122334455"))
         return enrichedKafkaEvent
     }
 
@@ -152,7 +152,7 @@ class GenerellOperationTransformerSupplierTest {
         val event = testEvent
         val enrichedKafkaEvent = EnrichedKafkaEvent(event)
         enrichedKafkaEvent.journalpost = mockJournalpost(event)
-        enrichedKafkaEvent.identer = listOf(Ident("1122334455", false, "AKTORID"))
+        enrichedKafkaEvent.identer = listOf(Ident("AKTORID", "1122334455"))
 
         inputTopic.pipeInput("Test3", event)
         for (i in 1 until MAX_RETRY) {
