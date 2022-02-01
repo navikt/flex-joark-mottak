@@ -29,28 +29,29 @@ data class FkvKrutkoder(
     }
 
     internal fun getTemaSkjema(temaSkjema: String): TemaSkjemaData? {
-        return if (temaSkjemaDataMap.containsKey(temaSkjema.trim { it <= ' ' })) {
-            temaSkjemaDataMap[temaSkjema.trim { it <= ' ' }]
-        } else Optional.ofNullable(temaSkjemaDataMap[temaSkjema.trim { it <= ' ' }])
-            .orElseThrow { IllegalArgumentException("Skjema/Tema $temaSkjema finnes ikke i kodeverket") }
+        if (temaSkjemaDataMap.containsKey(temaSkjema.trim { it <= ' ' })) {
+            return temaSkjemaDataMap[temaSkjema.trim { it <= ' ' }]
+        } else {
+            throw IllegalArgumentException("Skjema/Tema $temaSkjema finnes ikke i kodeverket")
+        }
     }
 
     private fun lagTemaSkjemaNokkel(tema: String, skjema: String): String {
         return skjema.trim { it <= ' ' } + ":" + tema.trim { it <= ' ' }
     }
 
-    fun getBehandlingstype(tema: String?, skjema: String?): String {
+    fun getBehandlingstype(tema: String?, skjema: String?): String? {
         return if (tema.isNullOrBlank() || skjema.isNullOrBlank()) {
             skjemaMangler
-        } else getTemaSkjema(lagTemaSkjemaNokkel(tema, skjema))!!.behandlingstype
+        } else getTemaSkjema(lagTemaSkjemaNokkel(tema, skjema))?.behandlingstype
     }
 
-    fun getBehandlingstema(tema: String?, skjema: String?): String {
+    fun getBehandlingstema(tema: String?, skjema: String?): String? {
         return if (tema.isNullOrBlank() || skjema.isNullOrBlank()) {
             skjemaMangler
         } else getTemaSkjema(
             lagTemaSkjemaNokkel(tema, skjema)
-        )!!.behandlingstema
+        )?.behandlingstema
     }
 
     override fun toString(): String {
