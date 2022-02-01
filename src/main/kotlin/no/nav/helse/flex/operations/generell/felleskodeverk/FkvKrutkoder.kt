@@ -23,6 +23,7 @@ class FkvKrutkoder(
                 )
             }
         }
+        log.info("temaSkjemaDataMap: $temaSkjemaDataMap")
     }
 
     internal fun getTemaSkjema(temaSkjema: String): TemaSkjemaData? {
