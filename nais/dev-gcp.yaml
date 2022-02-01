@@ -50,22 +50,22 @@ spec:
       value: automatiskSkjema.json
     # SAF
     - name: SAF_CLIENT_ID
-      value: c7adbfbb-1b1e-41f6-9b7a-af9627c04998
+      value: dev-fss.teamdokumenthandtering.saf-q1
     - name: SAF_URL
       value: https://saf.dev-fss-pub.nais.io/graphql
     # Dokarkiv / JournlapostAPI
     - name: DOKARKIV_CLIENT_ID
-      value: 972814f3-8bdf-44f8-a191-c2ed00020b54
+      value: dev-fss.teamdokumenthandtering.dokarkiv-q1
     - name: JOURNALPOSTAPI_URL
       value: https://dokarkiv.dev-fss-pub.nais.io/rest/journalpostapi/v1/journalpost
     # PDL
     - name: PDL_CLIENT_ID
-      value: 30df8ce8-6433-41fa-8cd5-163180420682
+      value: dev-fss.pdl.pdl-api
     - name: PDL_URL
       value: https://pdl-api.dev-fss-pub.nais.io/graphql
     # Oppgave
     - name: OPPGAVE_CLIENT_ID
-      value: 41ca50ba-e44f-4bc8-9e31-b745a0041926
+      value: dev-fss.oppgavehandtering.oppgave-q1
     - name: OPPGAVE_URL
       value: https://oppgave-q1.dev-fss-pub.nais.io
     # Felleskodeverk
