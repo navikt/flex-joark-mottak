@@ -3,7 +3,6 @@ package no.nav.helse.flex.operations.eventenricher.pdl
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.google.gson.Gson
 import io.vavr.CheckedFunction1
 import no.nav.helse.flex.Environment
 import no.nav.helse.flex.Environment.pdlClientid
@@ -23,7 +22,6 @@ import java.util.*
 
 class PdlClient {
     private val persondataUrl: String = Environment.persondataUrl
-    private val gson: Gson
     private val client = HttpClient.newHttpClient()
     private val resilience: Resilience<HttpRequest, HttpResponse<String?>>
     private val azureAdClient: AzureAdClient
@@ -43,7 +41,6 @@ query(${"$"}ident: ID!){
         val pdlClientFunction = CheckedFunction1 { req: HttpRequest -> excecute(req) }
         resilience = Resilience(pdlClientFunction)
         azureAdClient = AzureAdClient(pdlClientid)
-        gson = Gson()
     }
 
     private fun excecute(req: HttpRequest): HttpResponse<String?> {
