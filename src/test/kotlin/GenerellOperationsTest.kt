@@ -68,16 +68,16 @@ class GenerellOperationsTest {
             holiday
         )
 
-        val cod1 = CreateOppgaveData("123", "123", "SYK", "", "", "", 3)
+        val cod1 = CreateOppgaveData(aktoerId = "123", journalpostId = "123", tema = "SYK", behandlingstema = "", behandlingstype = "", oppgavetype = "", frist = 3)
         assertEquals("2021-10-21", cod1.fristFerdigstillelse, "Journalpost mottatt på morgenen")
 
-        val cod2 = CreateOppgaveData("123", "123", "SYK", "", "", "", 3)
+        val cod2 = CreateOppgaveData(aktoerId = "123", journalpostId = "123", tema = "SYK", behandlingstema = "", behandlingstype = "", oppgavetype = "", frist = 3)
         assertEquals("2021-10-22", cod2.fristFerdigstillelse, "Journalpost mottatt på kvelden")
 
-        val cod3 = CreateOppgaveData("123", "123", "SYK", "", "", "", 3)
+        val cod3 = CreateOppgaveData(aktoerId = "123", journalpostId = "123", tema = "SYK", behandlingstema = "", behandlingstype = "", oppgavetype = "", frist = 3)
         assertEquals("2021-10-27", cod3.fristFerdigstillelse, "Journalpost mottatt fredag")
 
-        val cod4 = CreateOppgaveData("123", "123", "SYK", "", "", "", 3)
+        val cod4 = CreateOppgaveData(aktoerId = "123", journalpostId = "123", tema = "SYK", behandlingstema = "", behandlingstype = "", oppgavetype = "", frist = 3)
         assertEquals("2021-12-30", cod4.fristFerdigstillelse, "Journalpost mottatt før helligdag")
     }
 }

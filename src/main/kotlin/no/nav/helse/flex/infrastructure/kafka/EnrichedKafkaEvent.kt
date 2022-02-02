@@ -61,10 +61,7 @@ data class EnrichedKafkaEvent(
 
     val isPersonbruker: Boolean
         get() {
-            if (journalpost?.bruker == null) {
-                return false
-            }
-            return !journalpost!!.bruker!!.isORGNR
+            return journalpost?.bruker?.isORGNR != true
         }
 
     fun withSetToManuell(toManuell: Boolean): EnrichedKafkaEvent {
@@ -78,5 +75,15 @@ data class EnrichedKafkaEvent(
 
     fun getOppgaveId(): String? {
         return oppgave?.id
+    }
+
+    fun getId(): String? {
+        return if (isPersonbruker) {
+            aktoerId
+        } else if (journalpost?.bruker?.isORGNR == true) {
+            journalpost?.bruker?.id
+        } else {
+            null
+        }
     }
 }

@@ -7,7 +7,7 @@ import org.apache.commons.lang3.builder.ToStringStyle
 @JsonIgnoreProperties(ignoreUnknown = true)
 class Journalpost {
     var bruker: Bruker? = null
-    private var tittel: String? = null
+    var tittel: String? = null
     lateinit var journalpostId: String
     lateinit var journalstatus: String
     lateinit var dokumenter: List<Dokument>
@@ -21,10 +21,6 @@ class Journalpost {
     var behandlingstype: String? = null
     val brevkode: String?
         get() = if (dokumenter.isNotEmpty()) dokumenter[0].brevkode else ""
-
-    fun setTittel(tittel: String?) {
-        this.tittel = tittel
-    }
 
     fun invalidJournalpostStatus(): Boolean {
         return !(JOURNALSTATUS_MOTTATT == journalstatus || JOURNALSTATUS_MIDLERTIDIG_JOURNALFOERT == journalstatus)

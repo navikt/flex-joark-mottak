@@ -47,6 +47,20 @@ object Metrics {
         .labelNames("transformer")
         .register()
 
+    private val jfrManuellProcessCounter = Counter.build(
+        "jfr_manuell_process_counter",
+        "Teller antall manuelle journalposter som behandles."
+    )
+        .labelNames("result", "desired", "tema")
+        .register()
+
+    private val createOppgaveCounter = Counter.build(
+        "jfr_manuell_create_oppgaver_counter",
+        "Teller antall manuelle oppgaver som opprettes. Diffrensierer på fordeling og journalføringsoppgave"
+    )
+        .labelNames("oppgavetype", "tema")
+        .register()
+
     fun incJfrManuallProcess(enrichedKafkaEvent: EnrichedKafkaEvent, desiredAutomaticJfr: Boolean) {
         val desired: String
         var skjema = "null"
@@ -142,5 +156,13 @@ object Metrics {
         } catch (e: Exception) {
             log.error("Klarte ikke sette retry gauge")
         }
+    }
+
+    fun incProcessCounter(result: String?, desireResult: String?, tema: String?) {
+        jfrManuellProcessCounter.labels(result, desireResult, tema).inc()
+    }
+
+    fun incCreateOppgaveCounter(oppgavetype: String?, tema: String?) {
+        createOppgaveCounter.labels(oppgavetype, tema).inc()
     }
 }

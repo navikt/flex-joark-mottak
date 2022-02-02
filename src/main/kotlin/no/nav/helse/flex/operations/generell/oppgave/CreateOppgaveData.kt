@@ -6,18 +6,28 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 
 data class CreateOppgaveData(
-    val aktoerId: String? = null,
+    var aktoerId: String? = null,
+    var orgnr: String? = null,
     val journalpostId: String,
-    val tema: String? = null,
+    var tema: String? = null,
     val behandlingstema: String? = null,
     val behandlingstype: String? = null,
     val oppgavetype: String,
-    private val frist: Int
+    private val frist: Int,
+    var tildeltEnhetsnr: String? = null,
+    val beskrivelse: String? = null
 ) {
     val prioritet = "NORM"
     val aktivDato = LocalDate.now().toString()
     val fristFerdigstillelse = nextValidFrist(frist)
-    var tildeltEnhetsnr: String? = null
+
+    fun removeJournalforendeEnhet() {
+        tildeltEnhetsnr = null
+    }
+
+    fun removeOrgNr() {
+        orgnr = null
+    }
 
     private fun nextValidFrist(frist: Int): String {
         var oppgaveFrist = LocalDateTime.now().atZone(ZoneId.of("Europe/Oslo"))

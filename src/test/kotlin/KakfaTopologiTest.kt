@@ -14,6 +14,7 @@ import no.nav.helse.flex.infrastructure.kafka.KafkaEvent
 import no.nav.helse.flex.infrastructure.kafka.transformerSupplier.EventEnricherTransformerSupplier
 import no.nav.helse.flex.infrastructure.kafka.transformerSupplier.GenerellOperationsTransformerSupplier
 import no.nav.helse.flex.infrastructure.kafka.transformerSupplier.JournalOperationsTransformerSupplier
+import no.nav.helse.flex.infrastructure.kafka.transformerSupplier.OppgaveOperationsTransformerSupplier
 import no.nav.helse.flex.operations.Feilregistrer
 import org.apache.avro.generic.GenericRecord
 import org.apache.kafka.common.serialization.Serde
@@ -49,10 +50,12 @@ class KakfaTopologiTest {
     val mockEnrichTransformer: Transformer<String, KafkaEvent, KeyValue<String, EnrichedKafkaEvent>> = mockk(relaxed = true)
     val mockGenerellTransformer: Transformer<String, EnrichedKafkaEvent, KeyValue<String, EnrichedKafkaEvent>> = mockk(relaxed = true)
     val mockJournalfoeringTransformer: Transformer<String, EnrichedKafkaEvent, KeyValue<String, EnrichedKafkaEvent>> = mockk(relaxed = true)
+    val mockOppgaveTransformer: Transformer<String, EnrichedKafkaEvent, KeyValue<String, EnrichedKafkaEvent>> = mockk(relaxed = true)
 
     val eventEnricherTransformerSupplier: EventEnricherTransformerSupplier = mockk(relaxed = true)
     val generellOperationsTransformerSupplier: GenerellOperationsTransformerSupplier = mockk(relaxed = true)
     val journalOperationsTransformerSupplier: JournalOperationsTransformerSupplier = mockk(relaxed = true)
+    val oppgaveOperationsTransformerSupplier: OppgaveOperationsTransformerSupplier = mockk(relaxed = true)
     val feilregistrer: Feilregistrer = mockk(relaxed = true)
 
     @BeforeAll
@@ -60,6 +63,8 @@ class KakfaTopologiTest {
         every { eventEnricherTransformerSupplier.get() } returns mockEnrichTransformer
         every { generellOperationsTransformerSupplier.get() } returns mockGenerellTransformer
         every { journalOperationsTransformerSupplier.get() } returns mockJournalfoeringTransformer
+        every { oppgaveOperationsTransformerSupplier.get() } returns mockOppgaveTransformer
+        every { mockOppgaveTransformer.transform(any(), any()) } returns null
 
         mockkObject(Environment)
         every { Environment.getEnvVar("STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING") } returns "automatiskSkjema.json"
@@ -73,7 +78,8 @@ class KakfaTopologiTest {
             feilregistrer = feilregistrer,
             eventEnricherTransformerSupplier = eventEnricherTransformerSupplier,
             generellOperationsTransformerSupplier = generellOperationsTransformerSupplier,
-            journalOperationsTransformerSupplier = journalOperationsTransformerSupplier
+            journalOperationsTransformerSupplier = journalOperationsTransformerSupplier,
+            oppgaveOperationsTransformerSupplier = oppgaveOperationsTransformerSupplier,
         )
         val topology = jfrTopologies.jfrTopologi
         val props = Properties()
@@ -110,9 +116,6 @@ class KakfaTopologiTest {
 
         every { mockEnrichTransformer.transform(any(), any()) } returns KeyValue("Test123", enrichedKafkaEvent)
         inputTopic.pipeInput("Test123", mockedJournalpostEvent)
-
-        // assertEquals(1, outputTopic.queueSize)
-        // assertEquals("123456789", outputTopic.readValue().journalpostId)
     }
 
     @Test
@@ -124,9 +127,6 @@ class KakfaTopologiTest {
 
         every { mockEnrichTransformer.transform(any(), any()) } returns KeyValue.pair("Test123", enrichedKafkaEvent)
         inputTopic.pipeInput("Test123", mockJournalpostEvent("SYK"))
-
-        // assertEquals(1, outputTopic.queueSize)
-        // assertEquals("123456789", outputTopic.readValue().journalpostId)
     }
 
     @Test
@@ -167,9 +167,6 @@ class KakfaTopologiTest {
         every { mockEnrichTransformer.transform(any(), any()) } returns KeyValue("Test123", enrichedKafkaEvent)
         every { mockGenerellTransformer.transform(any(), any()) } returns KeyValue("Test123", generellKafkaEvent.withSetToManuell(true))
         inputTopic.pipeInput("Test123", mockJournalpostEvent("SYK"))
-
-        // assertEquals(1, outputTopic.queueSize)
-        // assertEquals("123456789", outputTopic.readValue().journalpostId)
     }
 
     @Test
@@ -185,9 +182,6 @@ class KakfaTopologiTest {
         every { mockJournalfoeringTransformer.transform(any(), any()) } returns KeyValue("Test123", postJournalfoeringKafkaEvent.withSetToManuell(true))
 
         inputTopic.pipeInput("Test123", mockJournalpostEvent("SYK"))
-
-        // assertEquals(1, outputTopic.queueSize)
-        // assertEquals("123456789", outputTopic.readValue().journalpostId)
     }
 
     @Test

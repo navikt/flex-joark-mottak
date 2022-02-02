@@ -6,6 +6,7 @@ import no.nav.helse.flex.Environment.kafkaSerdeConfig
 import no.nav.helse.flex.infrastructure.kafka.transformerSupplier.EventEnricherTransformerSupplier
 import no.nav.helse.flex.infrastructure.kafka.transformerSupplier.GenerellOperationsTransformerSupplier
 import no.nav.helse.flex.infrastructure.kafka.transformerSupplier.JournalOperationsTransformerSupplier
+import no.nav.helse.flex.infrastructure.kafka.transformerSupplier.OppgaveOperationsTransformerSupplier
 import no.nav.helse.flex.infrastructure.metrics.Metrics.incJfrAutoProcess
 import no.nav.helse.flex.infrastructure.metrics.Metrics.incJfrManuallProcess
 import no.nav.helse.flex.operations.Feilregistrer
@@ -26,9 +27,18 @@ class JfrTopologies(
     private val manuellTopic: String,
     private val skjemaMetadata: SkjemaMetadata = SkjemaMetadata(),
     private val feilregistrer: Feilregistrer = Feilregistrer(),
-    private val eventEnricherTransformerSupplier: EventEnricherTransformerSupplier = EventEnricherTransformerSupplier(ENRICHER_OPERATION_STORE),
-    private val generellOperationsTransformerSupplier: GenerellOperationsTransformerSupplier = GenerellOperationsTransformerSupplier(GENERELL_OPERATION_STORE),
-    private val journalOperationsTransformerSupplier: JournalOperationsTransformerSupplier = JournalOperationsTransformerSupplier(JOURNALFOERING_OPERATION_STORE)
+    private val eventEnricherTransformerSupplier: EventEnricherTransformerSupplier = EventEnricherTransformerSupplier(
+        ENRICHER_OPERATION_STORE
+    ),
+    private val generellOperationsTransformerSupplier: GenerellOperationsTransformerSupplier = GenerellOperationsTransformerSupplier(
+        GENERELL_OPERATION_STORE
+    ),
+    private val journalOperationsTransformerSupplier: JournalOperationsTransformerSupplier = JournalOperationsTransformerSupplier(
+        JOURNALFOERING_OPERATION_STORE
+    ),
+    private val oppgaveOperationsTransformerSupplier: OppgaveOperationsTransformerSupplier = OppgaveOperationsTransformerSupplier(
+        OPPGAVE_OPERATION_STORE
+    )
 ) {
 
     private val enhancedKafkaEventSerde = Serdes.serdeFrom(
@@ -52,6 +62,11 @@ class JfrTopologies(
         Serdes.String(),
         enhancedKafkaEventSerde
     )
+    private val oppgaveOperationSupplier = Stores.keyValueStoreBuilder(
+        Stores.inMemoryKeyValueStore(OPPGAVE_OPERATION_STORE),
+        Serdes.String(),
+        enhancedKafkaEventSerde
+    )
 
     val jfrTopologi: Topology
         get() {
@@ -62,15 +77,23 @@ class JfrTopologies(
             streamsBuilder.addStateStore(eventEnricherSupplier)
             streamsBuilder.addStateStore(generellOperationSupplier)
             streamsBuilder.addStateStore(journalOperationSupplier)
+            streamsBuilder.addStateStore(oppgaveOperationSupplier)
 
             val aapenDokStream = streamsBuilder.stream(
                 inputTopic, Consumed.with(Serdes.String(), valueGenericAvroSerde)
             )
+
+            // Pre-processing
             val filteredEvents = filterGenerelleEvent(aapenDokStream)
             val kafkaEventKStream = convertGenericRecordToKafkaEvent(filteredEvents)
+
             val enrichedEventsStream = enrichKafkaEvent(kafkaEventKStream)
+
             val filterJournalpostToAuto = filterJournalpostToAuto(enrichedEventsStream)
+
             val processedGenerellStream = generellOperations(filterJournalpostToAuto)
+
+            // Finish journalpost
             journalfoerJournalpost(processedGenerellStream)
 
             return streamsBuilder.build()
@@ -96,62 +119,69 @@ class JfrTopologies(
 
     private fun enrichKafkaEvent(kafkaEventKStream: KStream<String, KafkaEvent>): KStream<String, EnrichedKafkaEvent> {
         val enrichedKafkaEvent = kafkaEventKStream.transform(eventEnricherTransformerSupplier, ENRICHER_OPERATION_STORE)
-        val toManuell =
-            enrichedKafkaEvent.filter { _, jfrEnhancedKafkaEvent -> jfrEnhancedKafkaEvent.isToManuell && !jfrEnhancedKafkaEvent.isToIgnore }
+        val toManuell = enrichedKafkaEvent
+            .filter { _, jfrEnhancedKafkaEvent -> jfrEnhancedKafkaEvent.isToManuell && !jfrEnhancedKafkaEvent.isToIgnore }
+
         sendToJfrManuellOppretter(toManuell)
+
         return enrichedKafkaEvent.filter { _, jfrEnhancedKafkaEvent -> !jfrEnhancedKafkaEvent.isToManuell && !jfrEnhancedKafkaEvent.isToIgnore }
     }
 
     private fun filterJournalpostToAuto(enrichedKafkaEventStream: KStream<String, EnrichedKafkaEvent>): KStream<String, EnrichedKafkaEvent> {
-        val toAuto = enrichedKafkaEventStream.filter { _, jfrEnhancedKafkaEvent ->
-            skjemaMetadata.inAutoList(
-                jfrEnhancedKafkaEvent.tema,
-                jfrEnhancedKafkaEvent.skjema
-            )
-        }
+        val toAuto = enrichedKafkaEventStream
+            .filter { _, jfrEnhancedKafkaEvent ->
+                skjemaMetadata.inAutoList(jfrEnhancedKafkaEvent.tema, jfrEnhancedKafkaEvent.skjema)
+            }
             .peek { _, enrichedKafkaEvent ->
                 logWithCorrelationId(
-                    enrichedKafkaEvent, "Forsøker automatisk behandling på journalpost ${enrichedKafkaEvent.journalpostId} med tema ${enrichedKafkaEvent.tema} og skjema ${enrichedKafkaEvent.skjema}"
+                    enrichedKafkaEvent,
+                    "Forsøker automatisk behandling på journalpost ${enrichedKafkaEvent.journalpostId} med tema ${enrichedKafkaEvent.tema} og skjema ${enrichedKafkaEvent.skjema}"
                 )
             }
+
         val toManuell = enrichedKafkaEventStream.filterNot { _, jfrEnhancedKafkaEvent ->
-            skjemaMetadata.inAutoList(
-                jfrEnhancedKafkaEvent.tema,
-                jfrEnhancedKafkaEvent.skjema
-            )
+            skjemaMetadata.inAutoList(jfrEnhancedKafkaEvent.tema, jfrEnhancedKafkaEvent.skjema)
         }
+
         sendToJfrManuellOppretter(toManuell)
+
         return toAuto
     }
 
     private fun generellOperations(enrichedKafkaEventStream: KStream<String, EnrichedKafkaEvent>): KStream<String, EnrichedKafkaEvent> {
-        val afterGenerellOperationStream =
-            enrichedKafkaEventStream.transform(generellOperationsTransformerSupplier, GENERELL_OPERATION_STORE)
-        val toManuell =
-            afterGenerellOperationStream.filter { _, enrichedKafkaEvent -> enrichedKafkaEvent.isToManuell }
+        val afterGenerellOperationStream = enrichedKafkaEventStream
+            .transform(generellOperationsTransformerSupplier, GENERELL_OPERATION_STORE)
+
+        val toManuell = afterGenerellOperationStream
+            .filter { _, enrichedKafkaEvent -> enrichedKafkaEvent.isToManuell }
+
         sendToJfrManuellOppretter(toManuell)
+
         return afterGenerellOperationStream.filterNot { _, enrichedKafkaEvent -> enrichedKafkaEvent.isToManuell }
     }
 
     private fun journalfoerJournalpost(oppgaveFilteredStream: KStream<String, EnrichedKafkaEvent>) {
-        val journalpostAfterJournalfoering =
-            oppgaveFilteredStream.transform(journalOperationsTransformerSupplier, JOURNALFOERING_OPERATION_STORE)
-        val toManuell =
-            journalpostAfterJournalfoering.filter { _, enrichedKafkaEvent -> enrichedKafkaEvent.isToManuell }
-        val doneProcessing =
-            journalpostAfterJournalfoering.filterNot { _, enrichedKafkaEvent -> enrichedKafkaEvent.isToManuell }
-        doneProcessing.peek { _, enrichedKafkaEvent ->
-            incJfrAutoProcess(
-                enrichedKafkaEvent!!
-            )
-        }
+        val journalpostAfterJournalfoering = oppgaveFilteredStream
+            .transform(journalOperationsTransformerSupplier, JOURNALFOERING_OPERATION_STORE)
+
+        val toManuell = journalpostAfterJournalfoering
+            .filter { _, enrichedKafkaEvent -> enrichedKafkaEvent.isToManuell }
+
+        journalpostAfterJournalfoering
+            .filterNot { _, enrichedKafkaEvent -> enrichedKafkaEvent.isToManuell }
+            .peek { _, enrichedKafkaEvent ->
+                incJfrAutoProcess(
+                    enrichedKafkaEvent!!
+                )
+            }
+
         sendToJfrManuellOppretter(toManuell)
     }
 
     private fun sendToJfrManuellOppretter(manuelle: KStream<String, EnrichedKafkaEvent>) {
-        manuelle.foreach { _, enrichedKafkaEvent1 ->
+        manuelle.foreach { _, enrichedKafkaEvent ->
             feilregistrer.feilregistrerOppgave(
-                enrichedKafkaEvent1!!
+                enrichedKafkaEvent!!
             )
         }
         manuelle.peek { _, enrichedKafkaEvent ->
@@ -160,13 +190,13 @@ class JfrTopologies(
                 skjemaMetadata.inAutoList(enrichedKafkaEvent.tema, enrichedKafkaEvent.skjema)
             )
         }
-        manuelle.peek { _, enrichKafkaEvent ->
+        manuelle.peek { _, enrichedKafkaEvent ->
             logWithCorrelationId(
-                enrichKafkaEvent,
-                "Journalposten: ${enrichKafkaEvent.journalpostId} sendes til manuell-oppretter"
+                enrichedKafkaEvent,
+                "Journalposten: ${enrichedKafkaEvent.journalpostId} sendes til manuell-oppretter"
             )
         }
-        // .to(manuellTopic, Produced.with(Serdes.String(), enhancedKafkaEventSerde))
+        manuelle.transform(oppgaveOperationsTransformerSupplier, OPPGAVE_OPERATION_STORE)
     }
 
     private fun logWithCorrelationId(enrichedKafkaEvent: EnrichedKafkaEvent, s: String) {
@@ -181,5 +211,6 @@ class JfrTopologies(
         private const val ENRICHER_OPERATION_STORE = "enrichoperations"
         private const val GENERELL_OPERATION_STORE = "generelloperations"
         private const val JOURNALFOERING_OPERATION_STORE = "journalfoeringoperations"
+        private const val OPPGAVE_OPERATION_STORE = "oppgave"
     }
 }

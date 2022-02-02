@@ -1,13 +1,15 @@
 package no.nav.helse.flex.operations.generell.oppgave
 
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.google.gson.Gson
 import io.vavr.CheckedFunction1
 import no.nav.helse.flex.Environment
 import no.nav.helse.flex.Environment.oppgaveClientId
-import no.nav.helse.flex.infrastructure.MDCConstants
+import no.nav.helse.flex.infrastructure.MDCConstants.CORRELATION_ID
 import no.nav.helse.flex.infrastructure.exceptions.ExternalServiceException
 import no.nav.helse.flex.infrastructure.exceptions.TemporarilyUnavailableException
 import no.nav.helse.flex.infrastructure.kafka.EnrichedKafkaEvent
+import no.nav.helse.flex.infrastructure.metrics.Metrics.incCreateOppgaveCounter
 import no.nav.helse.flex.infrastructure.resilience.Resilience
 import no.nav.helse.flex.infrastructure.security.AzureAdClient
 import no.nav.helse.flex.objectMapper
@@ -22,6 +24,10 @@ class OppgaveClient {
     private val CONTENT_TYPE_HEADER = "Content-Type"
     private val AUTHORIZATION_HEADER = "Authorization"
     private val CORRELATION_HEADER = "X-Correlation-ID"
+    private val PARAM_STATUSKATEGORI_AAPEN = "AAPEN"
+    private val PARAM_OPPGAVETYPE_JFR = "JFR"
+    private val PARAM_OPPGAVETYPE_FDR = "FDR"
+    private val STATUS_OK = 200
     private val log = LoggerFactory.getLogger(OppgaveClient::class.java)
 
     private val gson = Gson()
@@ -37,7 +43,7 @@ class OppgaveClient {
     }
 
     fun createOppgave(requestData: CreateOppgaveData): Oppgave {
-        val correlationId = MDC.get(MDCConstants.CORRELATION_ID)
+        val correlationId = MDC.get(CORRELATION_ID)
         val request = HttpRequest.newBuilder()
             .uri(URI.create("$oppgaveUrl/api/v1/oppgaver"))
             .header(CONTENT_TYPE_HEADER, "application/json")
@@ -47,8 +53,10 @@ class OppgaveClient {
             .build()
         val response = resilience.execute(request)
 
-        return if (response.statusCode() == 201) {
-            gson.fromJson(response.body(), Oppgave::class.java)
+        if (response.statusCode() == 201) {
+            val oppgave = gson.fromJson(response.body(), Oppgave::class.java)
+            incCreateOppgaveCounter(oppgave.oppgavetype, oppgave.tema)
+            return oppgave
         } else if (response.statusCode() == 404) {
             log.error("Klarte ikke opprette oppgave på journalpost ${requestData.journalpostId}, statuskode: ${response.statusCode()}")
             throw TemporarilyUnavailableException()
@@ -64,7 +72,7 @@ class OppgaveClient {
     }
 
     fun updateOppgave(enrichedKafkaEvent: EnrichedKafkaEvent): Oppgave {
-        val correlationId = MDC.get(MDCConstants.CORRELATION_ID)
+        val correlationId = MDC.get(CORRELATION_ID)
         val oppgave = enrichedKafkaEvent.oppgave
         val request = HttpRequest.newBuilder()
             .uri(URI.create(oppgaveUrl + "/api/v1/oppgaver/" + oppgave!!.id))
@@ -91,6 +99,32 @@ class OppgaveClient {
             log.error("Klarte ikke oppdatere oppgave ${oppgave.id} på journalpost ${enrichedKafkaEvent.journalpostId}, statuskode: ${response.statusCode()}. $errorText")
             throw ExternalServiceException("Feil under oppdatering av oppgave", response.statusCode())
         }
+    }
+
+    fun checkIfJournapostHasOppgave(journalpostId: String): Boolean {
+        val request = HttpRequest.newBuilder()
+            .uri(buildUri(journalpostId))
+            .header(CONTENT_TYPE_HEADER, "application/json")
+            .header(AUTHORIZATION_HEADER, azureAdClient.getToken())
+            .header(CORRELATION_HEADER, MDC.get(CORRELATION_ID))
+            .GET()
+            .build()
+        val response = resilience.execute(request)
+
+        if (response.statusCode() == STATUS_OK) {
+            return objectMapper
+                .readValue<OppgaveSearchResponse>(response.body())
+                .harTilknyttetOppgave()
+        } else if (response.statusCode() == 404 || response.statusCode() == 503) {
+            throw TemporarilyUnavailableException()
+        } else {
+            val error: OppgaveErrorResponse = objectMapper.readValue(response.body())
+            throw ExternalServiceException(error.feilmelding, response.statusCode())
+        }
+    }
+
+    fun buildUri(journalpostId: String): URI {
+        return URI.create("$oppgaveUrl/api/v1/oppgaver?statuskategori=$PARAM_STATUSKATEGORI_AAPEN&oppgavetype=$PARAM_OPPGAVETYPE_JFR&oppgavetype=$PARAM_OPPGAVETYPE_FDR&journalpostId=$journalpostId")
     }
 
     private fun excecute(req: HttpRequest): HttpResponse<String> {

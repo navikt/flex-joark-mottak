@@ -27,7 +27,7 @@ object TestUtils {
         journalpostStatus: String
     ): Journalpost {
         val mockJournalpost = Journalpost()
-        mockJournalpost.setTittel("Test Journalpost")
+        mockJournalpost.tittel = "Test Journalpost"
         mockJournalpost.journalpostId = journalpostId
         mockJournalpost.journalforendeEnhet = "1111"
         mockJournalpost.dokumenter = listOf(Dokument(brevkode, "DokTittel", "123"))
