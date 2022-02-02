@@ -2,6 +2,7 @@ package no.nav.helse.flex.operations.journalforing
 
 import no.nav.helse.flex.infrastructure.kafka.EnrichedKafkaEvent
 import no.nav.helse.flex.operations.eventenricher.journalpost.Journalpost
+import no.nav.helse.flex.operations.eventenricher.journalpost.Journalpost.AvsenderMottaker
 import no.nav.helse.flex.operations.journalforing.dokarkiv.JournalpostAPIClient
 import org.slf4j.LoggerFactory
 
@@ -19,7 +20,7 @@ class JournalforingOperations(
 
     private fun populateAvsendeMottaker(journalpost: Journalpost, fnr: String) {
         if (journalpost.avsenderMottaker?.id == null) {
-            journalpost.settAvsenderMottaker(fnr, "FNR")
+            journalpost.avsenderMottaker = AvsenderMottaker(fnr, "FNR")
             log.info("Setter bruker som avsender på journalpost: ${journalpost.journalpostId}")
         }
     }

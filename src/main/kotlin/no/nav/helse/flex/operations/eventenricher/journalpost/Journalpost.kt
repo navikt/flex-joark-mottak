@@ -12,11 +12,10 @@ class Journalpost {
     lateinit var journalstatus: String
     lateinit var dokumenter: List<Dokument>
     var journalforendeEnhet: String? = null
-    private var relevanteDatoer: List<RelevanteDatoer>? = null
-    private var sak: Sak? = null
+    var relevanteDatoer: List<RelevanteDatoer>? = null
+    var sak: Sak? = null
     lateinit var tema: String
     var avsenderMottaker: AvsenderMottaker? = null
-        private set
     var behandlingstema: String? = null
     var behandlingstype: String? = null
     val brevkode: String?
@@ -52,14 +51,6 @@ class Journalpost {
             .append("journalstatus", journalstatus)
             .append("behandlingstema", behandlingstema)
             .toString()
-    }
-
-    fun settAvsenderMottaker(brukerId: String, idType: String) {
-        avsenderMottaker = AvsenderMottaker(brukerId, idType)
-    }
-
-    fun setRelevanteDatoer(relevanteDatoer: List<RelevanteDatoer>?) {
-        this.relevanteDatoer = relevanteDatoer
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -98,7 +89,7 @@ class Journalpost {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    class AvsenderMottaker internal constructor(var id: String, private val type: String) {
+    class AvsenderMottaker internal constructor(var id: String?, private val type: String) {
         fun toJson(): String {
             return """"avsenderMottaker": {"id":"$id","idType":"$type"}"""
         }

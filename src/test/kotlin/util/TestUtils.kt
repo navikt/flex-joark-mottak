@@ -31,7 +31,7 @@ object TestUtils {
         mockJournalpost.journalpostId = journalpostId
         mockJournalpost.journalforendeEnhet = "1111"
         mockJournalpost.dokumenter = listOf(Dokument(brevkode, "DokTittel", "123"))
-        mockJournalpost.setRelevanteDatoer(listOf(RelevanteDatoer("2021-10-20T20:20:00", "DATO_REGISTRERT")))
+        mockJournalpost.relevanteDatoer = listOf(RelevanteDatoer("2021-10-20T20:20:00", "DATO_REGISTRERT"))
         mockJournalpost.bruker = Bruker("10108000398", "FNR")
         mockJournalpost.journalstatus = journalpostStatus
         mockJournalpost.tema = tema
