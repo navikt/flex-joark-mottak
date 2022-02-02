@@ -8,7 +8,6 @@ import io.mockk.mockk
 import io.mockk.mockkObject
 import no.nav.helse.flex.Environment
 import no.nav.helse.flex.infrastructure.kafka.EnrichedKafkaEvent
-import no.nav.helse.flex.infrastructure.kafka.JfrKafkaDeserializer
 import no.nav.helse.flex.infrastructure.kafka.JfrTopologies
 import no.nav.helse.flex.infrastructure.kafka.KafkaEvent
 import no.nav.helse.flex.infrastructure.kafka.transformerSupplier.EventEnricherTransformerSupplier
@@ -18,16 +17,13 @@ import no.nav.helse.flex.infrastructure.kafka.transformerSupplier.OppgaveOperati
 import no.nav.helse.flex.operations.Feilregistrer
 import org.apache.avro.generic.GenericRecord
 import org.apache.kafka.common.serialization.Serde
-import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
 import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.StreamsConfig
 import org.apache.kafka.streams.TestInputTopic
-import org.apache.kafka.streams.TestOutputTopic
 import org.apache.kafka.streams.TopologyTestDriver
 import org.apache.kafka.streams.kstream.Transformer
 import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -40,12 +36,10 @@ import java.util.*
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class KakfaTopologiTest {
     val INPUT_TOPIC = "source-topic"
-    val OUTPUT_TOPIC = "output-topic"
     val MOCK_SCHEMA_REGISTRY_URL = "mock://SCHEMA_REGISTRY_URL"
 
     lateinit var testDriver: TopologyTestDriver
     lateinit var inputTopic: TestInputTopic<String, GenericRecord>
-    lateinit var outputTopic: TestOutputTopic<String, EnrichedKafkaEvent>
 
     val mockEnrichTransformer: Transformer<String, KafkaEvent, KeyValue<String, EnrichedKafkaEvent>> = mockk(relaxed = true)
     val mockGenerellTransformer: Transformer<String, EnrichedKafkaEvent, KeyValue<String, EnrichedKafkaEvent>> = mockk(relaxed = true)
@@ -74,7 +68,6 @@ class KakfaTopologiTest {
 
         val jfrTopologies = JfrTopologies(
             inputTopic = INPUT_TOPIC,
-            manuellTopic = OUTPUT_TOPIC,
             feilregistrer = feilregistrer,
             eventEnricherTransformerSupplier = eventEnricherTransformerSupplier,
             generellOperationsTransformerSupplier = generellOperationsTransformerSupplier,
@@ -99,11 +92,6 @@ class KakfaTopologiTest {
             INPUT_TOPIC,
             StringSerializer(),
             valueGenericAvroSerde.serializer()
-        )
-        outputTopic = testDriver.createOutputTopic(
-            OUTPUT_TOPIC,
-            StringDeserializer(),
-            JfrKafkaDeserializer(EnrichedKafkaEvent::class.java)
         )
     }
 
@@ -138,8 +126,6 @@ class KakfaTopologiTest {
 
         every { mockEnrichTransformer.transform(any(), any()) } returns KeyValue("Test123", enrichedKafkaEvent)
         inputTopic.pipeInput("Test123", mockJournalpostEvent("SYK"))
-
-        assertEquals(0, outputTopic.queueSize)
     }
 
     @Test
@@ -152,8 +138,6 @@ class KakfaTopologiTest {
 
         every { mockEnrichTransformer.transform(any(), any()) } returns KeyValue("Test123", enrichedKafkaEvent)
         inputTopic.pipeInput("Test123", mockJournalpostEvent("SYK"))
-
-        assertEquals(0, outputTopic.queueSize)
     }
 
     @Test
@@ -197,8 +181,6 @@ class KakfaTopologiTest {
         every { mockJournalfoeringTransformer.transform(any(), any()) } returns KeyValue("Test123", postJournalfoeringKafkaEvent)
 
         inputTopic.pipeInput("Test123", mockJournalpostEvent("SYK"))
-
-        assertEquals(0, outputTopic.queueSize)
     }
 
     @AfterAll

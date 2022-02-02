@@ -30,7 +30,6 @@ object Environment {
     private const val KAFKA_KEYSTORE_PATH = "KAFKA_KEYSTORE_PATH"
 
     private const val AIVEN_DOKUMENT_TOPIC = "AIVEN_DOKUMENT_TOPIC"
-    private const val AIVEN_TO_MANUELL_TOPIC = "AIVEN_TO_MANUELL_TOPIC"
 
     private const val STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING = "STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING"
 
@@ -85,7 +84,6 @@ object Environment {
     )
 
     val dokumentEventTopic get() = getEnvVar(AIVEN_DOKUMENT_TOPIC)
-    val manuellTopic get() = getEnvVar(AIVEN_TO_MANUELL_TOPIC)
 
     fun getSkjemaerJson() =
         readSupportedTemaerOgSkjemaerFromFile(getEnvVar(STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING))

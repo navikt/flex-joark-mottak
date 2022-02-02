@@ -44,8 +44,6 @@ spec:
   env:
     - name: AIVEN_DOKUMENT_TOPIC
       value: teamdokumenthandtering.aapen-dok-journalfoering-q1
-    - name: AIVEN_TO_MANUELL_TOPIC
-      value: flex.flex-joark-manuell
     - name: STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING
       value: automatiskSkjema.json
     # SAF

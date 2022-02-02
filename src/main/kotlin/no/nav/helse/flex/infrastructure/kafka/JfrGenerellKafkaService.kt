@@ -1,7 +1,6 @@
 package no.nav.helse.flex.infrastructure.kafka
 
 import no.nav.helse.flex.Environment.dokumentEventTopic
-import no.nav.helse.flex.Environment.manuellTopic
 import org.apache.kafka.common.errors.AuthorizationException
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.errors.StreamsUncaughtExceptionHandler
@@ -37,9 +36,8 @@ class JfrGenerellKafkaService {
         log.info("Starter opp Kafka Stream")
         val aivenKafkaConfig = JfrAivenKafkaConfig()
         val inputTopic = dokumentEventTopic
-        val manuellTopic = manuellTopic
         val properties = aivenKafkaConfig.kafkaProperties
-        val aivenStream = KafkaStreams(JfrTopologies(inputTopic, manuellTopic).jfrTopologi, properties)
+        val aivenStream = KafkaStreams(JfrTopologies(inputTopic).jfrTopologi, properties)
         aivenStream.setUncaughtExceptionHandler(CustomUncaughtExceptionHandler())
         aivenStream.start()
         Runtime.getRuntime().addShutdownHook(

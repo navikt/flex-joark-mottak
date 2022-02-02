@@ -24,7 +24,6 @@ import org.slf4j.MDC
 
 class JfrTopologies(
     private val inputTopic: String,
-    private val manuellTopic: String,
     private val skjemaMetadata: SkjemaMetadata = SkjemaMetadata(),
     private val feilregistrer: Feilregistrer = Feilregistrer(),
     private val eventEnricherTransformerSupplier: EventEnricherTransformerSupplier = EventEnricherTransformerSupplier(
