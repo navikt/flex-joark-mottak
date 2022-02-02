@@ -10,6 +10,7 @@ import no.nav.helse.flex.infrastructure.exceptions.TemporarilyUnavailableExcepti
 import no.nav.helse.flex.infrastructure.kafka.EnrichedKafkaEvent
 import no.nav.helse.flex.infrastructure.resilience.Resilience
 import no.nav.helse.flex.infrastructure.security.AzureAdClient
+import no.nav.helse.flex.objectMapper
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import java.net.URI
@@ -42,7 +43,7 @@ class OppgaveClient {
             .header(CONTENT_TYPE_HEADER, "application/json")
             .header(AUTHORIZATION_HEADER, azureAdClient.getToken())
             .header(CORRELATION_HEADER, correlationId)
-            .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(requestData)))
+            .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(requestData)))
             .build()
         val response = resilience.execute(request)
 

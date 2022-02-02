@@ -40,7 +40,7 @@ class GenerellOperations(
             )
 
             if (journalpost.journalforendeEnhet != null && journalpost.journalforendeEnhet!!.isNotBlank()) {
-                requestData.setTildeltEnhetsnr(journalpost.journalforendeEnhet)
+                requestData.tildeltEnhetsnr = journalpost.journalforendeEnhet
             }
 
             val oppgave = oppgaveClient.createOppgave(requestData)
