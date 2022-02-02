@@ -47,18 +47,17 @@ object Metrics {
         .labelNames("transformer")
         .register()
 
-    @JvmStatic
     fun incJfrManuallProcess(enrichedKafkaEvent: EnrichedKafkaEvent, desiredAutomaticJfr: Boolean) {
         val desired: String
-        var skjema: String? = null
+        var skjema = "null"
 
         try {
             MDC.put("CORRELATION_ID", enrichedKafkaEvent.correlationId)
 
             desired = if (desiredAutomaticJfr) AUTO else MANUELL
 
-            if (enrichedKafkaEvent.journalpost != null) {
-                skjema = enrichedKafkaEvent.skjema
+            if (enrichedKafkaEvent.journalpost != null && enrichedKafkaEvent.skjema != null) {
+                skjema = enrichedKafkaEvent.skjema!!
             }
 
             jfrProcessCounter.labels(
@@ -69,7 +68,6 @@ object Metrics {
         }
     }
 
-    @JvmStatic
     fun incJfrAutoProcess(enrichedKafkaEvent: EnrichedKafkaEvent) {
         try {
             MDC.put("CORRELATION_ID", enrichedKafkaEvent.correlationId)
@@ -81,7 +79,6 @@ object Metrics {
         }
     }
 
-    @JvmStatic
     fun incFeilregCounter(enrichedKafkaEvent: EnrichedKafkaEvent, sucessfullFeilreg: Boolean) {
         try {
             MDC.put("CORRELATION_ID", enrichedKafkaEvent.correlationId)
@@ -96,7 +93,6 @@ object Metrics {
         }
     }
 
-    @JvmStatic
     fun incFailFunctionalRequirements(reason: String?, enrichedKafkaEvent: EnrichedKafkaEvent) {
         try {
             MDC.put("CORRELATION_ID", enrichedKafkaEvent.correlationId)
@@ -111,7 +107,6 @@ object Metrics {
         }
     }
 
-    @JvmStatic
     fun incInvalidJournalpostStatus(enrichedKafkaEvent: EnrichedKafkaEvent) {
         try {
             MDC.put("CORRELATION_ID", enrichedKafkaEvent.correlationId)
@@ -126,7 +121,6 @@ object Metrics {
         }
     }
 
-    @JvmStatic
     fun incRetry(transformer: String?, enrichedKafkaEvent: EnrichedKafkaEvent) {
         try {
             MDC.put("CORRELATION_ID", enrichedKafkaEvent.correlationId)
@@ -142,7 +136,6 @@ object Metrics {
         }
     }
 
-    @JvmStatic
     fun setRetrystoreGauge(name: String?, num: Long) {
         try {
             retrystoreGauge.labels(name).set(num.toDouble())

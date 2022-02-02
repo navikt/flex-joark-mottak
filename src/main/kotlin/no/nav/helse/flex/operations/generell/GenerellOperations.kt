@@ -35,8 +35,13 @@ class GenerellOperations(
             val frist = skjemaMetadata.getFrist(enrichedKafkaEvent.tema, enrichedKafkaEvent.skjema)
 
             val requestData = CreateOppgaveData(
-                enrichedKafkaEvent.aktoerId, journalpost.journalpostId,
-                journalpost.tema, behandlingstema, behandlingstype, oppgavetype, frist
+                aktoerId = enrichedKafkaEvent.aktoerId,
+                journalpostId = journalpost.journalpostId,
+                tema = journalpost.tema,
+                behandlingstema = behandlingstema,
+                behandlingstype = behandlingstype,
+                oppgavetype = oppgavetype,
+                frist = frist
             )
 
             if (journalpost.journalforendeEnhet != null && journalpost.journalforendeEnhet!!.isNotBlank()) {
