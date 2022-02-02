@@ -1,7 +1,6 @@
 package no.nav.helse.flex.operations.generell.oppgave
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.google.gson.Gson
 import io.vavr.CheckedFunction1
 import no.nav.helse.flex.Environment
 import no.nav.helse.flex.Environment.oppgaveClientId
@@ -30,7 +29,6 @@ class OppgaveClient {
     private val STATUS_OK = 200
     private val log = LoggerFactory.getLogger(OppgaveClient::class.java)
 
-    private val gson = Gson()
     private val oppgaveUrl: String = Environment.oppgaveUrl
     private val client = HttpClient.newHttpClient()
     private val resilience: Resilience<HttpRequest, HttpResponse<String>>
@@ -54,7 +52,7 @@ class OppgaveClient {
         val response = resilience.execute(request)
 
         if (response.statusCode() == 201) {
-            val oppgave = gson.fromJson(response.body(), Oppgave::class.java)
+            val oppgave: Oppgave = objectMapper.readValue(response.body())
             incCreateOppgaveCounter(oppgave.oppgavetype, oppgave.tema)
             return oppgave
         } else if (response.statusCode() == 404) {
@@ -79,12 +77,12 @@ class OppgaveClient {
             .header(CONTENT_TYPE_HEADER, "application/json")
             .header(AUTHORIZATION_HEADER, azureAdClient.getToken())
             .header(CORRELATION_HEADER, correlationId)
-            .method("PATCH", HttpRequest.BodyPublishers.ofString(gson.toJson(oppgave)))
+            .method("PATCH", HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(oppgave)))
             .build()
         val response = resilience.execute(request)
 
-        return if (response.statusCode() == 200) {
-            gson.fromJson(response.body(), Oppgave::class.java)
+        if (response.statusCode() == 200) {
+            return objectMapper.readValue(response.body())
         } else if (response.statusCode() == 404) {
             log.error("Klarte ikke oppdatere oppgave ${oppgave.id} på journalpost ${enrichedKafkaEvent.journalpostId}, statuskode: ${response.statusCode()}")
             throw TemporarilyUnavailableException()
@@ -132,7 +130,7 @@ class OppgaveClient {
     }
 
     private fun hentFeilmelding(response: HttpResponse<String>): String {
-        val oppgaveErrorResponse = gson.fromJson(response.body(), OppgaveErrorResponse::class.java)
+        val oppgaveErrorResponse: OppgaveErrorResponse = objectMapper.readValue(response.body())
         return oppgaveErrorResponse.feilmelding
     }
 }
