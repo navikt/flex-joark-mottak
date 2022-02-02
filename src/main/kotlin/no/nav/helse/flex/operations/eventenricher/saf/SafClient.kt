@@ -1,6 +1,5 @@
 package no.nav.helse.flex.operations.eventenricher.saf
 
-import com.google.gson.Gson
 import io.vavr.CheckedFunction1
 import no.nav.helse.flex.Environment
 import no.nav.helse.flex.infrastructure.MDCConstants
@@ -8,6 +7,7 @@ import no.nav.helse.flex.infrastructure.exceptions.ExternalServiceException
 import no.nav.helse.flex.infrastructure.exceptions.TemporarilyUnavailableException
 import no.nav.helse.flex.infrastructure.resilience.Resilience
 import no.nav.helse.flex.infrastructure.security.AzureAdClient
+import no.nav.helse.flex.objectMapper
 import no.nav.helse.flex.operations.eventenricher.journalpost.Journalpost
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
@@ -21,7 +21,6 @@ import java.net.http.HttpResponse
 class SafClient {
     private val safUrl: String = Environment.safUrl
     private val azureAdClient: AzureAdClient
-    private val gson = Gson()
     private val client = HttpClient.newHttpClient()
     private val resilience: Resilience<HttpRequest, HttpResponse<String?>>
 
@@ -48,12 +47,17 @@ class SafClient {
             .build()
         val response = resilience.execute(request)
 
-        return if (checkResponse(response, journalpostId)) {
-            gson.fromJson(response.body(), SafResponse::class.java)
+        if (response.statusCode() == STATUS_OK) {
+            return objectMapper.readValue(response.body(), SafResponse::class.java)
                 .data
                 .journalpost
-        } else {
-            val safErrorMessage = gson.fromJson(response.body(), SafErrorMessage::class.java)
+        }
+        if (response.statusCode() == NOT_AVAILABLE) {
+            log.info("journalposten $journalpostId : JournalpostApi returnerte 404, tjeneste ikke tigjengelig.")
+            throw TemporarilyUnavailableException()
+        }
+        else {
+            val safErrorMessage = objectMapper.readValue(response.body(), SafErrorMessage::class.java)
             log.error("Ved behandling av Journalpost $journalpostId: Feil (${safErrorMessage.status}) $SERVICENAME_SAF; error: ${safErrorMessage.error}, message: ${safErrorMessage.message}",)
             throw ExternalServiceException(safErrorMessage.message!!, safErrorMessage.status)
         }
@@ -64,18 +68,6 @@ class SafClient {
         val body = JSONObject()
         body.put(QUERY_TAG, query)
         return body.toString()
-    }
-
-    private fun checkResponse(response: HttpResponse<String?>, journalpostId: String): Boolean {
-        return if (response.statusCode() == STATUS_OK) {
-            true
-        } else {
-            if (response.statusCode() == NOT_AVAILABLE) {
-                log.info("journalposten $journalpostId : JournalpostApi returnerte 404, tjeneste ikke tigjengelig.")
-                throw TemporarilyUnavailableException()
-            }
-            false
-        }
     }
 
     companion object {
