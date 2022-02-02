@@ -39,7 +39,7 @@ spec:
         - host: "saf.dev-fss-pub.nais.io"
         - host: "dokarkiv.dev-fss-pub.nais.io"
         - host: "pdl-api.dev-fss-pub.nais.io"
-        - host: "oppgave.dev-fss-pub.nais.io"
+        - host: "oppgave-q1.dev-fss-pub.nais.io"
         - host: "flex-fss-proxy.dev-fss-pub.nais.io"
   env:
     - name: AIVEN_DOKUMENT_TOPIC
@@ -50,7 +50,7 @@ spec:
       value: automatiskSkjema.json
     # SAF
     - name: SAF_CLIENT_ID
-      value: dev-fss.teamdokumenthandtering.saf-q1
+      value: dev-fss.teamdokumenthandtering.saf
     - name: SAF_URL
       value: https://saf.dev-fss-pub.nais.io/graphql
     # Dokarkiv / JournlapostAPI
