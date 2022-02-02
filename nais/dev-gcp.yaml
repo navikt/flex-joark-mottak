@@ -55,7 +55,7 @@ spec:
       value: https://saf.dev-fss-pub.nais.io/graphql
     # Dokarkiv / JournlapostAPI
     - name: DOKARKIV_CLIENT_ID
-      value: dev-fss.teamdokumenthandtering.dokarkiv-q1
+      value: dev-fss.teamdokumenthandtering.dokarkiv
     - name: JOURNALPOSTAPI_URL
       value: https://dokarkiv.dev-fss-pub.nais.io/rest/journalpostapi/v1/journalpost
     # PDL
