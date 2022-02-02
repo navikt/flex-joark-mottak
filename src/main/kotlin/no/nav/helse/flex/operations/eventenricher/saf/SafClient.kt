@@ -55,8 +55,7 @@ class SafClient {
         if (response.statusCode() == NOT_AVAILABLE) {
             log.info("journalposten $journalpostId : JournalpostApi returnerte 404, tjeneste ikke tigjengelig.")
             throw TemporarilyUnavailableException()
-        }
-        else {
+        } else {
             val safErrorMessage = objectMapper.readValue(response.body(), SafErrorMessage::class.java)
             log.error("Ved behandling av Journalpost $journalpostId: Feil (${safErrorMessage.status}) $SERVICENAME_SAF; error: ${safErrorMessage.error}, message: ${safErrorMessage.message}",)
             throw ExternalServiceException(safErrorMessage.message!!, safErrorMessage.status)
