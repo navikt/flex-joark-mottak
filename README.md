@@ -18,6 +18,11 @@ Her kan man opprette journalpost [syfomock](https://syfomock.dev-sbs.nais.io/opp
 Ta med journalpost id og sjekk resultatet [her](https://gosys-q1.dev.intern.nav.no/gosys/dokument/sokjournalpost.jsf) og inne på J.post finner man tilhørende oppgave.
 Logg inn med felles syfo Z992389 bruker, eller opprett egen i [IDA](https://confluence.adeo.no/display/ATOM/IDA).
 
+## Felles kodeverk - krutkoder
+Består av `<brevkode>:<tema>` = `<tittel>;<brevkode>;<behandlingstema>;<behandlingstype>;` og det er 49 forskjellige som gjelder for tema SYK
+
+Listen finnes [her](https://kodeverk-web.nais.adeo.no/kodeverksoversikt/kodeverk/Krutkoder) hvis man filtrerer på `:SYK`
+
 ## Endre offsett :exclamation: ikke testet :exclamation:
 Kafka må være innstalert på maskinen: `brew install kafka`. Kan verifiseres med å kjøre kommando: `kafka-consumer-group`.
 
