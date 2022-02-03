@@ -34,7 +34,7 @@ class OppgaveOperationsTransformerSupplier(
                         val completeSendToStream = doOperations(enrichedKafkaEvent)
                         if (completeSendToStream) {
                             stateStore.delete(id)
-                            context.forward<String, Any>(id, enrichedKafkaEvent)
+                            context.forward(id, enrichedKafkaEvent)
                             context.commit()
                         } else {
                             stateStore.put(id, enrichedKafkaEvent)

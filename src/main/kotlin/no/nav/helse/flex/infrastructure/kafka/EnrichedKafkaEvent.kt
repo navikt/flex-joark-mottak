@@ -10,7 +10,7 @@ data class EnrichedKafkaEvent(
     var journalpost: Journalpost? = null,
     var oppgave: Oppgave? = null,
     val saksId: String? = null,
-    var identer: List<Ident>? = null
+    var identer: List<Ident> = emptyList()
 ) {
     val correlationId = UUID.randomUUID().toString()
     var numFailedAttempts = 0
@@ -37,10 +37,10 @@ data class EnrichedKafkaEvent(
 
     val fnr: String?
         get() {
-            if (journalpost!!.bruker!!.isFNR) {
+            if (journalpost?.bruker?.isFNR == true) {
                 return journalpost!!.bruker!!.id
             } else {
-                for (ident in identer!!) {
+                for (ident in identer) {
                     if (ident.isFNR) return ident.ident
                 }
             }
@@ -49,10 +49,10 @@ data class EnrichedKafkaEvent(
 
     val aktoerId: String?
         get() {
-            if (journalpost!!.bruker!!.isAktoerId) {
+            if (journalpost?.bruker?.isAktoerId == true) {
                 return journalpost!!.bruker!!.id
             } else {
-                for (ident in identer!!) {
+                for (ident in identer) {
                     if (ident.isAktoerId) return ident.ident
                 }
             }
