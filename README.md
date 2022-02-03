@@ -23,7 +23,7 @@ Består av `<brevkode>:<tema>` = `<tittel>;<brevkode>;<behandlingstema>;<behandl
 
 Listen finnes [her](https://kodeverk-web.nais.adeo.no/kodeverksoversikt/kodeverk/Krutkoder) hvis man filtrerer på `:SYK`
 
-## Endre offsett :exclamation: ikke testet :exclamation:
+## Endre offsett
 Kafka må være innstalert på maskinen: `brew install kafka`. Kan verifiseres med å kjøre kommando: `kafka-consumer-group`.
 
 **1. Logg inn på GCP** med kommando: `gcloud auth login` og gi deg nødvendige tilganger i naisdevice (aiven dev eller aiven prod)
@@ -44,7 +44,9 @@ Kafka må være innstalert på maskinen: `brew install kafka`. Kan verifiseres m
   kubectl scale --replicas=0 deployment/flex-joark-mottak
   ```
 **4. Sett offset** med kommando `kafka-consumer-groups --command-config ~/.config/aiven.conf --bootstrap-server nav-<context>-kafka-nav-<context>.aivencloud.com:26484 --group <gruppenavn> --topic <topic> --reset-offsets --to-datetime <YYYY-MM-DDTHH:mm:ss.sss> --dry-run`
-Offsett kan også settes til earliest, da byttes `--to-datetime <YYYY-MM-DDTHH:mm:ss.sss>` ut med `--to-earliest`
+
+Offsett kan også settes til earliest `--to-earliest` eller `--to-datetime 2022-02-03T08:00:00.000`
+
   ```
   kafka-consumer-groups --command-config ~/.config/aiven.conf --bootstrap-server nav-prod-kafka-nav-prod.aivencloud.com:26484 --group flex.flex-joark-mottak --topic teamdokumenthandtering.aapen-dok-journalfoering --reset-offsets --to-earliest --dry-run
   ```
