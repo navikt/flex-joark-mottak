@@ -48,7 +48,7 @@ class ManuellOperations(
             oppgave
         } catch (e: ExternalServiceException) {
             if (enrichedKafkaEvent.numFailedAttempts > 10) {
-                enrichedKafkaEvent.identer = null
+                enrichedKafkaEvent.identer = emptyList()
                 return createFordelingsoppgave(enrichedKafkaEvent)
             }
             throw e

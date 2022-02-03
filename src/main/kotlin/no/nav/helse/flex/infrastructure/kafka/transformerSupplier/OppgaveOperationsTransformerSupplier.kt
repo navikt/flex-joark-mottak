@@ -69,7 +69,6 @@ class OppgaveOperationsTransformerSupplier(
                 } catch (e: Exception) {
                     enrichedKafkaEvent.incNumFailedAttempts()
                     log.error("Uventet feil på journalpost ${enrichedKafkaEvent.journalpostId} etter forsøk nr. ${enrichedKafkaEvent.numFailedAttempts}", e)
-                    return true
                 } finally {
                     MDC.clear()
                 }
