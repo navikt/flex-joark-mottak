@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 
 class JfrGenerellKafkaService {
-    @Throws(Exception::class)
     fun start() {
         log.info("Starter jfrKafkaStream")
         try {
@@ -31,7 +30,6 @@ class JfrGenerellKafkaService {
         }
     }
 
-    @Throws(Exception::class)
     fun startKafkaStream() {
         log.info("Starter opp Kafka Stream")
         val aivenKafkaConfig = JfrAivenKafkaConfig()

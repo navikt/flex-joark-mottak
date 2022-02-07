@@ -1,6 +1,6 @@
 package no.nav.helse.flex.infrastructure.kafka
 
-import com.google.gson.Gson
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.confluent.kafka.streams.serdes.avro.GenericAvroSerde
 import no.nav.helse.flex.Environment.kafkaSerdeConfig
 import no.nav.helse.flex.infrastructure.kafka.transformerSupplier.EventEnricherTransformerSupplier
@@ -9,6 +9,7 @@ import no.nav.helse.flex.infrastructure.kafka.transformerSupplier.JournalOperati
 import no.nav.helse.flex.infrastructure.kafka.transformerSupplier.OppgaveOperationsTransformerSupplier
 import no.nav.helse.flex.infrastructure.metrics.Metrics.incJfrAutoProcess
 import no.nav.helse.flex.infrastructure.metrics.Metrics.incJfrManuallProcess
+import no.nav.helse.flex.objectMapper
 import no.nav.helse.flex.operations.Feilregistrer
 import no.nav.helse.flex.operations.SkjemaMetadata
 import org.apache.avro.generic.GenericRecord
@@ -109,9 +110,8 @@ class JfrTopologies(
 
     private fun convertGenericRecordToKafkaEvent(genericRecordString: KStream<String, GenericRecord>): KStream<String, KafkaEvent> {
         return genericRecordString.mapValues { genericRecord: GenericRecord ->
-            Gson().fromJson(
-                genericRecord.toString(),
-                KafkaEvent::class.java
+            objectMapper.readValue<KafkaEvent>(
+                genericRecord.toString()
             )
         }
     }
