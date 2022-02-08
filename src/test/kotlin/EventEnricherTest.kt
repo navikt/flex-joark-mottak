@@ -1,9 +1,7 @@
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
-import io.mockk.mockkObject
 import io.mockk.spyk
-import no.nav.helse.flex.Environment
 import no.nav.helse.flex.infrastructure.kafka.EnrichedKafkaEvent
 import no.nav.helse.flex.infrastructure.kafka.KafkaEvent
 import no.nav.helse.flex.operations.eventenricher.EventEnricher
@@ -38,9 +36,6 @@ class EventEnricherTest {
     @BeforeAll
     fun setup() {
         every { mockFkvClient.fetchKrutKoder() } returns fkvKrutkoder
-
-        mockkObject(Environment)
-        every { Environment.getEnvVar("STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING") } returns "automatiskSkjema.json"
 
         eventEnricher = EventEnricher(
             safClient = mockSafClient,

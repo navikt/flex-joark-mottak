@@ -1,10 +1,7 @@
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
-import io.mockk.mockkObject
 import io.mockk.mockkStatic
-import no.nav.helse.flex.Environment
-import no.nav.helse.flex.operations.SkjemaMetadata
 import no.nav.helse.flex.operations.generell.GenerellOperations
 import no.nav.helse.flex.operations.generell.oppgave.CreateOppgaveData
 import no.nav.helse.flex.operations.generell.oppgave.Oppgave
@@ -21,26 +18,16 @@ import java.time.LocalDateTime
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GenerellOperationsTest {
     val mockOppgaveClient: OppgaveClient = mockk(relaxed = true)
-    val mockSkjemaMetadata: SkjemaMetadata = mockk()
 
     lateinit var generellOperations: GenerellOperations
 
     @BeforeAll
     fun setup() {
-        mockkObject(Environment)
-        every { Environment.getEnvVar("STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING") } returns "automatiskSkjema.json"
-
-        generellOperations = GenerellOperations(
-            mockOppgaveClient,
-            mockSkjemaMetadata
-        )
+        generellOperations = GenerellOperations(mockOppgaveClient)
     }
 
     @Test
     fun test_oppgave_saved_on_event() {
-        every { mockSkjemaMetadata.getOppgavetype(any(), any()) } returns "SOK"
-        every { mockSkjemaMetadata.getFrist(any(), any()) } returns 3
-
         val enrichedKafkaEvent = mockEnrichedKafkaevent()
         val createOppgave = Oppgave()
         createOppgave.id = "123"

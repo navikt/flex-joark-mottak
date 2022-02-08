@@ -9,8 +9,7 @@ import no.nav.helse.flex.operations.generell.oppgave.OppgaveClient
 import org.slf4j.LoggerFactory
 
 class GenerellOperations(
-    private val oppgaveClient: OppgaveClient = OppgaveClient(),
-    private val skjemaMetadata: SkjemaMetadata = SkjemaMetadata()
+    private val oppgaveClient: OppgaveClient = OppgaveClient()
 ) {
 
     fun executeProcess(enrichedKafkaEvent: EnrichedKafkaEvent) {
@@ -31,8 +30,8 @@ class GenerellOperations(
 
             val behandlingstema = journalpost.behandlingstema
             val behandlingstype = journalpost.behandlingstype
-            val oppgavetype = skjemaMetadata.getOppgavetype(enrichedKafkaEvent.tema, enrichedKafkaEvent.skjema)
-            val frist = skjemaMetadata.getFrist(enrichedKafkaEvent.tema, enrichedKafkaEvent.skjema)
+            val oppgavetype = SkjemaMetadata.getOppgavetype(enrichedKafkaEvent.tema, enrichedKafkaEvent.skjema)
+            val frist = SkjemaMetadata.getFrist(enrichedKafkaEvent.tema, enrichedKafkaEvent.skjema)
 
             val requestData = CreateOppgaveData(
                 aktoerId = enrichedKafkaEvent.aktoerId,

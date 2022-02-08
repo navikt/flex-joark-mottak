@@ -44,8 +44,6 @@ spec:
   env:
     - name: AIVEN_DOKUMENT_TOPIC
       value: teamdokumenthandtering.aapen-dok-journalfoering
-    - name: STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING
-      value: automatiskSkjema.json
     # SAF
     - name: SAF_CLIENT_ID
       value: feb9588b-a3d6-4d2f-8809-97284046ae72
