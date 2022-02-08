@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 
 class JfrGenerellKafkaService {
-    @Throws(Exception::class)
     fun start() {
         log.info("Starter jfrKafkaStream")
         try {
@@ -31,7 +30,6 @@ class JfrGenerellKafkaService {
         }
     }
 
-    @Throws(Exception::class)
     fun startKafkaStream() {
         log.info("Starter opp Kafka Stream")
         val aivenKafkaConfig = JfrAivenKafkaConfig()
@@ -39,7 +37,7 @@ class JfrGenerellKafkaService {
         val properties = aivenKafkaConfig.kafkaProperties
         val aivenStream = KafkaStreams(JfrTopologies(inputTopic).jfrTopologi, properties)
         aivenStream.setUncaughtExceptionHandler(CustomUncaughtExceptionHandler())
-        aivenStream.start()
+        // aivenStream.start()
         Runtime.getRuntime().addShutdownHook(
             Thread {
                 log.info("Kafka Stream stopper!")

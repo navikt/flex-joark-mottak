@@ -1,4 +1,4 @@
-import com.google.gson.Gson
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig
 import io.confluent.kafka.streams.serdes.avro.GenericAvroSerde
@@ -14,6 +14,7 @@ import no.nav.helse.flex.infrastructure.kafka.transformerSupplier.EventEnricherT
 import no.nav.helse.flex.infrastructure.kafka.transformerSupplier.GenerellOperationsTransformerSupplier
 import no.nav.helse.flex.infrastructure.kafka.transformerSupplier.JournalOperationsTransformerSupplier
 import no.nav.helse.flex.infrastructure.kafka.transformerSupplier.OppgaveOperationsTransformerSupplier
+import no.nav.helse.flex.objectMapper
 import no.nav.helse.flex.operations.Feilregistrer
 import org.apache.avro.generic.GenericRecord
 import org.apache.kafka.common.serialization.Serde
@@ -98,7 +99,7 @@ class KakfaTopologiTest {
     @Test
     fun test_skjema_is_not_automatic_expect_to_manuell() {
         val mockedJournalpostEvent = mockJournalpostEvent("SYK")
-        val event = Gson().fromJson(mockedJournalpostEvent.toString(), KafkaEvent::class.java)
+        val event: KafkaEvent = objectMapper.readValue(mockedJournalpostEvent.toString())
         val enrichedKafkaEvent = EnrichedKafkaEvent(event)
         enrichedKafkaEvent.journalpost = mockJournalpost("123456789", "ABC", "SYK", "M")
 
