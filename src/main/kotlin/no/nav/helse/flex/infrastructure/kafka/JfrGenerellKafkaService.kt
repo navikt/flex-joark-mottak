@@ -37,7 +37,7 @@ class JfrGenerellKafkaService {
         val properties = aivenKafkaConfig.kafkaProperties
         val aivenStream = KafkaStreams(JfrTopologies(inputTopic).jfrTopologi, properties)
         aivenStream.setUncaughtExceptionHandler(CustomUncaughtExceptionHandler())
-        // aivenStream.start()
+        aivenStream.start()
         Runtime.getRuntime().addShutdownHook(
             Thread {
                 log.info("Kafka Stream stopper!")
