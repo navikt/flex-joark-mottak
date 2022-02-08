@@ -25,7 +25,6 @@ import org.slf4j.MDC
 
 class JfrTopologies(
     private val inputTopic: String,
-    private val skjemaMetadata: SkjemaMetadata = SkjemaMetadata(),
     private val feilregistrer: Feilregistrer = Feilregistrer(),
     private val eventEnricherTransformerSupplier: EventEnricherTransformerSupplier = EventEnricherTransformerSupplier(
         ENRICHER_OPERATION_STORE
@@ -129,7 +128,7 @@ class JfrTopologies(
     private fun filterJournalpostToAuto(enrichedKafkaEventStream: KStream<String, EnrichedKafkaEvent>): KStream<String, EnrichedKafkaEvent> {
         val toAuto = enrichedKafkaEventStream
             .filter { _, jfrEnhancedKafkaEvent ->
-                skjemaMetadata.inAutoList(jfrEnhancedKafkaEvent.tema, jfrEnhancedKafkaEvent.skjema)
+                SkjemaMetadata.inAutoList(jfrEnhancedKafkaEvent.tema, jfrEnhancedKafkaEvent.skjema)
             }
             .peek { _, enrichedKafkaEvent ->
                 logWithCorrelationId(
@@ -139,7 +138,7 @@ class JfrTopologies(
             }
 
         val toManuell = enrichedKafkaEventStream.filterNot { _, jfrEnhancedKafkaEvent ->
-            skjemaMetadata.inAutoList(jfrEnhancedKafkaEvent.tema, jfrEnhancedKafkaEvent.skjema)
+            SkjemaMetadata.inAutoList(jfrEnhancedKafkaEvent.tema, jfrEnhancedKafkaEvent.skjema)
         }
 
         sendToJfrManuellOppretter(toManuell)
@@ -186,7 +185,7 @@ class JfrTopologies(
         manuelle.peek { _, enrichedKafkaEvent ->
             incJfrManuallProcess(
                 enrichedKafkaEvent,
-                skjemaMetadata.inAutoList(enrichedKafkaEvent.tema, enrichedKafkaEvent.skjema)
+                SkjemaMetadata.inAutoList(enrichedKafkaEvent.tema, enrichedKafkaEvent.skjema)
             )
         }
         manuelle.peek { _, enrichedKafkaEvent ->

@@ -62,7 +62,6 @@ class KakfaTopologiTest {
         every { mockOppgaveTransformer.transform(any(), any()) } returns null
 
         mockkObject(Environment)
-        every { Environment.getEnvVar("STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING") } returns "automatiskSkjema.json"
         every { Environment.getEnvVar("KAFKA_SCHEMA_REGISTRY") } returns MOCK_SCHEMA_REGISTRY_URL
         every { Environment.getEnvVar("KAFKA_SCHEMA_REGISTRY_USER") } returns "username"
         every { Environment.getEnvVar("KAFKA_SCHEMA_REGISTRY_PASSWORD") } returns "password"

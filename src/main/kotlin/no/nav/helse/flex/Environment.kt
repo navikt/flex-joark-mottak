@@ -7,10 +7,6 @@ import org.apache.commons.configuration2.CompositeConfiguration
 import org.apache.commons.configuration2.Configuration
 import org.apache.commons.configuration2.EnvironmentConfiguration
 import org.slf4j.LoggerFactory
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStreamReader
-import java.io.UncheckedIOException
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
@@ -30,8 +26,6 @@ object Environment {
     private const val KAFKA_KEYSTORE_PATH = "KAFKA_KEYSTORE_PATH"
 
     private const val AIVEN_DOKUMENT_TOPIC = "AIVEN_DOKUMENT_TOPIC"
-
-    private const val STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING = "STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING"
 
     private const val AZURE_APP_CLIENT_ID = "AZURE_APP_CLIENT_ID"
     private const val AZURE_APP_CLIENT_SECRET = "AZURE_APP_CLIENT_SECRET"
@@ -85,9 +79,6 @@ object Environment {
 
     val dokumentEventTopic get() = getEnvVar(AIVEN_DOKUMENT_TOPIC)
 
-    fun getSkjemaerJson() =
-        readSupportedTemaerOgSkjemaerFromFile(getEnvVar(STOTTEDE_TEMAER_OG_SKJEMAER_FILPLASSERING))
-
     val azureClientId get() = getEnvVar(AZURE_APP_CLIENT_ID)
     val azureAppClientSecret get() = getEnvVar(AZURE_APP_CLIENT_SECRET)
     val azureAppURL get() = getEnvVar(AZURE_APP_WELL_KNOWN_URL)
@@ -123,27 +114,5 @@ object Environment {
             log.error("Klarte ikke laste property for path {}", path)
         }
         return null
-    }
-
-    private fun readFile(reader: BufferedReader): String {
-        val stringBuilder = StringBuilder()
-        while (reader.ready()) {
-            stringBuilder.append(reader.readLine().trim { it <= ' ' })
-        }
-        return stringBuilder.toString()
-    }
-
-    private fun readSupportedTemaerOgSkjemaerFromFile(fileName: String): String {
-        val s = Environment::class.java.getResourceAsStream("/$fileName")!!
-        val reader = BufferedReader(InputStreamReader(s))
-        val tilganger: String
-        try {
-            tilganger = readFile(reader)
-            reader.close()
-        } catch (e: IOException) {
-            log.error("Feil i lesing av støttede temaer og skjemaer: {}", e.message)
-            throw UncheckedIOException(e)
-        }
-        return tilganger
     }
 }

@@ -21,7 +21,6 @@ class EventEnricher(
     private val safClient: SafClient = SafClient(),
     private val pdlClient: PdlClient = PdlClient(),
     private val fkvClient: FkvClient = FkvClient(),
-    private val skjemaMetadata: SkjemaMetadata = SkjemaMetadata()
 ) {
     private val log = LoggerFactory.getLogger(EventEnricher::class.java)
     private val KRUT_KODER_REFRESH_INTERVAL_HOURS = 5L
@@ -51,7 +50,7 @@ class EventEnricher(
             incInvalidJournalpostStatus(enrichedKafkaEvent)
             throw InvalidJournalpostStatusException()
         }
-        if (skjemaMetadata.isIgnoreskjema(enrichedKafkaEvent.tema, enrichedKafkaEvent.skjema)) {
+        if (SkjemaMetadata.isIgnoreskjema(enrichedKafkaEvent.tema, enrichedKafkaEvent.skjema)) {
             log.info("Avslutter videre behandling da journalpost ${enrichedKafkaEvent.journalpostId} har skjema ${enrichedKafkaEvent.skjema} på tema ${enrichedKafkaEvent.tema} som eksplisitt skal ignoreres!")
             throw InvalidJournalpostStatusException()
         }
