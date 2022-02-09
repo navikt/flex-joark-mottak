@@ -29,7 +29,6 @@ import org.apache.kafka.streams.kstream.Transformer
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
@@ -39,7 +38,6 @@ import java.util.*
 
 @ExtendWith(MockKExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Disabled
 class KakfaTopologiTest {
     val INPUT_TOPIC = "source-topic"
     val MOCK_SCHEMA_REGISTRY_URL = "mock://SCHEMA_REGISTRY_URL"
