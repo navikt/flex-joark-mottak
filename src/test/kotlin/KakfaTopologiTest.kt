@@ -2,10 +2,12 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig
 import io.confluent.kafka.streams.serdes.avro.GenericAvroSerde
+import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.mockkObject
+import io.mockk.verify
 import no.nav.helse.flex.Environment
 import no.nav.helse.flex.infrastructure.kafka.EnrichedKafkaEvent
 import no.nav.helse.flex.infrastructure.kafka.JfrTopologies
@@ -26,6 +28,8 @@ import org.apache.kafka.streams.TopologyTestDriver
 import org.apache.kafka.streams.kstream.Transformer
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
@@ -35,6 +39,7 @@ import java.util.*
 
 @ExtendWith(MockKExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Disabled
 class KakfaTopologiTest {
     val INPUT_TOPIC = "source-topic"
     val MOCK_SCHEMA_REGISTRY_URL = "mock://SCHEMA_REGISTRY_URL"
@@ -95,6 +100,11 @@ class KakfaTopologiTest {
         )
     }
 
+    @BeforeEach
+    fun clear() {
+        clearMocks(feilregistrer)
+    }
+
     @Test
     fun test_skjema_is_not_automatic_expect_to_manuell() {
         val mockedJournalpostEvent = mockJournalpostEvent("SYK")
@@ -104,6 +114,8 @@ class KakfaTopologiTest {
 
         every { mockEnrichTransformer.transform(any(), any()) } returns KeyValue("Test123", enrichedKafkaEvent)
         inputTopic.pipeInput("Test123", mockedJournalpostEvent)
+
+        verify { feilregistrer.feilregistrerOppgave(any()) }
     }
 
     @Test
@@ -115,6 +127,8 @@ class KakfaTopologiTest {
 
         every { mockEnrichTransformer.transform(any(), any()) } returns KeyValue.pair("Test123", enrichedKafkaEvent)
         inputTopic.pipeInput("Test123", mockJournalpostEvent("SYK"))
+
+        verify { feilregistrer.feilregistrerOppgave(any()) }
     }
 
     @Test
@@ -126,6 +140,8 @@ class KakfaTopologiTest {
 
         every { mockEnrichTransformer.transform(any(), any()) } returns KeyValue("Test123", enrichedKafkaEvent)
         inputTopic.pipeInput("Test123", mockJournalpostEvent("SYK"))
+
+        verify(exactly = 0) { feilregistrer.feilregistrerOppgave(any()) }
     }
 
     @Test
@@ -138,6 +154,8 @@ class KakfaTopologiTest {
 
         every { mockEnrichTransformer.transform(any(), any()) } returns KeyValue("Test123", enrichedKafkaEvent)
         inputTopic.pipeInput("Test123", mockJournalpostEvent("SYK"))
+
+        verify(exactly = 0) { feilregistrer.feilregistrerOppgave(any()) }
     }
 
     @Test
@@ -151,6 +169,8 @@ class KakfaTopologiTest {
         every { mockEnrichTransformer.transform(any(), any()) } returns KeyValue("Test123", enrichedKafkaEvent)
         every { mockGenerellTransformer.transform(any(), any()) } returns KeyValue("Test123", generellKafkaEvent.withSetToManuell(true))
         inputTopic.pipeInput("Test123", mockJournalpostEvent("SYK"))
+
+        verify { feilregistrer.feilregistrerOppgave(any()) }
     }
 
     @Test
@@ -166,6 +186,8 @@ class KakfaTopologiTest {
         every { mockJournalfoeringTransformer.transform(any(), any()) } returns KeyValue("Test123", postJournalfoeringKafkaEvent.withSetToManuell(true))
 
         inputTopic.pipeInput("Test123", mockJournalpostEvent("SYK"))
+
+        verify { feilregistrer.feilregistrerOppgave(any()) }
     }
 
     @Test
@@ -181,6 +203,8 @@ class KakfaTopologiTest {
         every { mockJournalfoeringTransformer.transform(any(), any()) } returns KeyValue("Test123", postJournalfoeringKafkaEvent)
 
         inputTopic.pipeInput("Test123", mockJournalpostEvent("SYK"))
+
+        verify(exactly = 0) { feilregistrer.feilregistrerOppgave(any()) }
     }
 
     @AfterAll
