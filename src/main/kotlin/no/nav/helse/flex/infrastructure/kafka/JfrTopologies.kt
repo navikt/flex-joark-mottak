@@ -86,18 +86,14 @@ class JfrTopologies(
             val filteredEvents = filterGenerelleEvent(aapenDokStream)
             val kafkaEventKStream = convertGenericRecordToKafkaEvent(filteredEvents)
 
-            kafkaEventKStream.foreach { _, value ->
-                log.info("Mottok journalpost journalpost ${value.getJournalpostId()} med tema ${value.temaNytt} og status ${value.journalpostStatus}")
-            }
+            val enrichedEventsStream = enrichKafkaEvent(kafkaEventKStream)
 
-            // val enrichedEventsStream = enrichKafkaEvent(kafkaEventKStream)
+            val filterJournalpostToAuto = filterJournalpostToAuto(enrichedEventsStream)
 
-            // val filterJournalpostToAuto = filterJournalpostToAuto(enrichedEventsStream)
-
-            //  val processedGenerellStream = generellOperations(filterJournalpostToAuto)
+            val processedGenerellStream = generellOperations(filterJournalpostToAuto)
 
             // Finish journalpost
-            // journalfoerJournalpost(processedGenerellStream)
+            journalfoerJournalpost(processedGenerellStream)
 
             return streamsBuilder.build()
         }
