@@ -5,10 +5,6 @@ data class OppgaveSearchResponse(
     val oppgaver: List<Oppgave>? = null
 ) {
     fun harTilknyttetOppgave(): Boolean {
-        return (antallTreffTotalt > 0 && !oppgaver.isNullOrEmpty() && oppgaver[0].id > 0)
-    }
-
-    inner class Oppgave {
-        val id: Long = 0
+        return (antallTreffTotalt > 0 && !oppgaver.isNullOrEmpty() && oppgaver[0].id != null)
     }
 }
