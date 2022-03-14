@@ -1,4 +1,4 @@
-FROM gcr.io/distroless/java11@sha256:a4d1f70b37f807ab5e6863b3464ae56cda6fc5a4cf47be6e49bac063c3a9d089
+FROM gcr.io/distroless/java17@sha256:63548c70f5bb6f33c15d1420475f0a39119fd7b5112097433708bad2771e5ccc
 
 COPY build/libs/*.jar app.jar
 CMD ["app.jar"]
