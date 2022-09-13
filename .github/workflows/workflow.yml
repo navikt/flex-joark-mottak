@@ -1,0 +1,114 @@
+name: Build, push, and deploy
+on: push
+env:
+  APP: flex-joark-mottak
+jobs:
+  build-and-publish:
+    name: Bygg, test og publiser docker image
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.lag-image.outputs.image }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup java
+        uses: actions/setup-java@v1
+        with:
+          java-version: '11.x'
+      - name: Generer image
+        id: lag-image
+        run: |
+          TIME=$(TZ="Europe/Oslo" date +%Y.%m.%d-%H.%M)
+          COMMIT=$(git rev-parse --short=8 HEAD)
+          VERSION=$TIME-$COMMIT
+          echo "::set-output name=image::ghcr.io/navikt/$APP:$VERSION"
+      - name: Gradle wrapper validation
+        uses: gradle/wrapper-validation-action@v1
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-cache-${{ hashFiles('build.gradle.kts') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-cache-
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-wrapper-
+      - name: Lint koden
+        env:
+          ORG_GRADLE_PROJECT_githubUser: x-access-token
+          ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ./gradlew ktlintCheck
+      - name: Run tests
+        env:
+          ORG_GRADLE_PROJECT_githubUser: x-access-token
+          ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ./gradlew test
+      - name: Build jar
+        env:
+          ORG_GRADLE_PROJECT_githubUser: x-access-token
+          ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ./gradlew shadowJar -x test
+
+      - name: Docker login
+        uses: docker/login-action@49ed152c8eca782a232dede0303416e8f356c37b
+        if: github.ref_name == 'master' || startsWith(github.ref_name, 'dev-')
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bygg og push Docker image
+        if: github.ref_name == 'master' || startsWith(github.ref_name, 'dev-')
+        run: |
+          docker build . -f Dockerfile -t ${{ steps.lag-image.outputs.image }}
+          docker push ${{ steps.lag-image.outputs.image }}
+
+  snyk-docker:
+    needs: build-and-publish
+    uses: navikt/flex-github-actions-workflows/.github/workflows/snyk-docker.yml@master
+    with:
+      image: ${{ needs.build-and-publish.outputs.image }}
+    secrets: inherit
+
+  nais-deploy:
+    needs: build-and-publish
+    uses: navikt/flex-github-actions-workflows/.github/workflows/nais-deploy-dev-og-prod.yml@master
+    with:
+      image: ${{ needs.build-and-publish.outputs.image }}
+      app: ${{ inputs.app }}
+    secrets: inherit
+
+  snyk-monitor-gradle:
+    if: github.ref_name == 'master'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/gradle-jdk11@master
+        env:
+          ORG_GRADLE_PROJECT_githubUser: x-access-token
+          ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: monitor
+          args: --org=flex-kmy --project-name=${{ github.repository }} --remote-repo-url=https://github.com/${{ github.repository }}.git
+
+  snyk-test-gradle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/gradle-jdk11@master
+        env:
+          ORG_GRADLE_PROJECT_githubUser: x-access-token
+          ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: test
+          args: --org=flex-kmy --severity-threshold=high --project-name=${{ github.repository }} --remote-repo-url=https://github.com/${{ github.repository }}.git
+

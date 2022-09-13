@@ -1,0 +1,23 @@
+kafkaPool: nav-dev
+safHost: saf.dev-fss-pub.nais.io
+dokarkivHost: dokarkiv.dev-fss-pub.nais.io
+pdlHost: pdl-api.dev-fss-pub.nais.io
+oppgaveHost: oppgave-q1.dev-fss-pub.nais.io
+flexFssProxyHost: flex-fss-proxy.dev-fss-pub.nais.io
+env:
+  AIVEN_DOKUMENT_TOPIC: teamdokumenthandtering.aapen-dok-journalfoering-q1
+    # SAF
+  SAF_CLIENT_ID: dev-fss.teamdokumenthandtering.saf
+  SAF_URL: https://saf.dev-fss-pub.nais.io/graphql
+    # Dokarkiv / JournlapostAPI
+  DOKARKIV_CLIENT_ID: dev-fss.teamdokumenthandtering.dokarkiv-q1
+  JOURNALPOSTAPI_URL: https://dokarkiv.dev-fss-pub.nais.io/rest/journalpostapi/v1/journalpost
+    # PDL
+  PDL_CLIENT_ID: dev-fss.pdl.pdl-api
+  PDL_URL: https://pdl-api.dev-fss-pub.nais.io/graphql
+    # Oppgave
+  OPPGAVE_CLIENT_ID: dev-fss.oppgavehandtering.oppgave-q1
+  OPPGAVE_URL: https://oppgave-q1.dev-fss-pub.nais.io
+    # Felleskodeverk
+  FLEX_FSS_PROXY_CLIENT_ID: dev-fss.flex.flex-fss-proxy
+  FKV_URL: https://flex-fss-proxy.dev-fss-pub.nais.io/api/v1/kodeverk/Krutkoder/koder/betydninger
