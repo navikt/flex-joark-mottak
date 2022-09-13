@@ -1,0 +1,49 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: flex-joark-mottak
+  namespace: flex
+  labels:
+    team: flex
+spec:
+  image: {{ image }}
+  port: 8080
+  liveness:
+    path: internal/alive
+    initialDelay: 20
+  readiness:
+    path: internal/ready
+    initialDelay: 20
+  replicas:
+    min: 1
+    max: 1
+  prometheus:
+    enabled: true
+    path: internal/metrics
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  kafka:
+    pool: {{kafkaPool}}
+    streams: true
+  azure:
+    application:
+      enabled: true
+  accessPolicy:
+    outbound:
+      external:
+        - host: safHost
+        - host: dokarkivHost
+        - host: pdlHost
+        - host: oppgaveHost
+        - host: flexFssProxyHost
+  env:
+  {{#each env}}
+     - name: {{@key}}
+       value: {{this}}
+  {{/each}}
+
