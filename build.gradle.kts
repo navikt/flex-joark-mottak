@@ -40,7 +40,7 @@ val logbackVersion = "1.2.10"
 
 val mockitoKotlinVersion = "2.2.0"
 val mockkVersion = "1.12.2"
-val junitVersion = "5.8.2"
+val junitVersion = "5.9.1"
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
