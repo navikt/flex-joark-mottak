@@ -3,9 +3,9 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransf
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
-    id("com.github.johnrengelman.shadow") version "7.0.0"
-    kotlin("jvm") version "1.6.10"
+    id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
+    kotlin("jvm") version "1.7.10"
 }
 
 group = "no.nav.helse.flex"
@@ -29,18 +29,19 @@ repositories {
     maven(url = "https://jitpack.io")
 }
 
-val kafkaVersion = "3.0.0"
-val confluentVersion = "7.0.1"
+val kafkaVersion = "3.2.3"
+val confluentVersion = "7.2.1"
 val jettyVersion = "11.0.11"
 val prometheusVersion = "0.16.0"
-val resilience4jVersion = "1.6.1"
+val resilience4jVersion = "1.7.1"
 val gsonVersion = "2.8.9"
 val apacheCommonsVersion = "2.8.0"
 val logbackVersion = "1.2.10"
+val logstashVersion = "7.2"
 
 val mockitoKotlinVersion = "2.2.0"
-val mockkVersion = "1.12.2"
-val junitVersion = "5.8.2"
+val mockkVersion = "1.13.1"
+val junitVersion = "5.9.1"
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -62,7 +63,7 @@ dependencies {
     implementation("org.apache.commons:commons-configuration2:$apacheCommonsVersion")
     implementation("ch.qos.logback:logback-core:$logbackVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
-    implementation("net.logstash.logback:logstash-logback-encoder:7.0.1")
+    implementation("net.logstash.logback:logstash-logback-encoder:$logstashVersion")
 
     testImplementation("org.apache.kafka:kafka-streams-test-utils:$kafkaVersion")
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlinVersion")
