@@ -11,7 +11,7 @@ plugins {
 group = "no.nav.helse.flex"
 version = "1.0.0"
 description = "flex-joark-mottak"
-java.sourceCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 buildscript {
     repositories {
@@ -35,7 +35,7 @@ val jettyVersion = "11.0.11"
 val prometheusVersion = "0.16.0"
 val resilience4jVersion = "1.6.1"
 val gsonVersion = "2.8.9"
-val apacheCommonsVersion = "2.7"
+val apacheCommonsVersion = "2.8.0"
 val logbackVersion = "1.2.10"
 
 val mockitoKotlinVersion = "2.2.0"
@@ -62,7 +62,7 @@ dependencies {
     implementation("org.apache.commons:commons-configuration2:$apacheCommonsVersion")
     implementation("ch.qos.logback:logback-core:$logbackVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
-    implementation("net.logstash.logback:logstash-logback-encoder:7.0.1")
+    implementation("net.logstash.logback:logstash-logback-encoder:7.2")
 
     testImplementation("org.apache.kafka:kafka-streams-test-utils:$kafkaVersion")
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlinVersion")
