@@ -35,7 +35,7 @@ val jettyVersion = "11.0.11"
 val prometheusVersion = "0.16.0"
 val resilience4jVersion = "1.6.1"
 val gsonVersion = "2.8.9"
-val apacheCommonsVersion = "2.7"
+val apacheCommonsVersion = "2.8.0"
 val logbackVersion = "1.2.10"
 
 val mockitoKotlinVersion = "2.2.0"
