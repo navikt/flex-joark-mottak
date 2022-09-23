@@ -30,7 +30,7 @@ repositories {
 }
 
 val kafkaVersion = "3.0.0"
-val confluentVersion = "7.0.1"
+val confluentVersion = "7.2.1"
 val jettyVersion = "11.0.11"
 val prometheusVersion = "0.16.0"
 val resilience4jVersion = "1.6.1"
