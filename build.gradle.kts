@@ -11,7 +11,7 @@ plugins {
 group = "no.nav.helse.flex"
 version = "1.0.0"
 description = "flex-joark-mottak"
-java.sourceCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 buildscript {
     repositories {
