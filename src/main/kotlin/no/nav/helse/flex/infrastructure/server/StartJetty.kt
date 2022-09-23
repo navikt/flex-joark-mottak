@@ -1,7 +1,7 @@
 package no.nav.helse.flex.infrastructure.server
 
-import io.prometheus.client.exporter.MetricsServlet
 import io.prometheus.client.hotspot.DefaultExports
+import io.prometheus.client.servlet.jakarta.exporter.MetricsServlet
 import no.nav.helse.flex.infrastructure.kafka.JfrGenerellKafkaService
 import org.eclipse.jetty.server.HttpConnectionFactory
 import org.eclipse.jetty.server.Server

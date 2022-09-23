@@ -1,9 +1,9 @@
 package no.nav.helse.flex.infrastructure.server
 
+import jakarta.servlet.http.HttpServlet
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.LoggerFactory
-import javax.servlet.http.HttpServlet
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
 
 class PrestopServlet : HttpServlet() {
     private val log = LoggerFactory.getLogger(PrestopServlet::class.java)
