@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
     id("com.github.johnrengelman.shadow") version "7.0.0"
-    kotlin("jvm") version "1.6.10"
+    kotlin("jvm") version "1.7.10"
 }
 
 group = "no.nav.helse.flex"
