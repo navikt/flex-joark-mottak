@@ -54,7 +54,7 @@ dependencies {
     implementation("io.prometheus:simpleclient_servlet_jakarta:$prometheusVersion")
     implementation("io.prometheus:simpleclient_hotspot:$prometheusVersion")
     implementation("io.prometheus:simpleclient_logback:$prometheusVersion")
-    implementation("org.json:json:20180813")
+    implementation("org.json:json:20220320")
     implementation("io.github.resilience4j:resilience4j-all:$resilience4jVersion")
     implementation("io.github.resilience4j:resilience4j-retry:$resilience4jVersion")
     implementation("io.github.resilience4j:resilience4j-circuitbreaker:$resilience4jVersion")
@@ -76,7 +76,7 @@ tasks {
     withType<KotlinCompile> {
         kotlinOptions {
             freeCompilerArgs = listOf("-Xjsr305=strict")
-            jvmTarget = "11"
+            jvmTarget = "17"
             if (System.getenv("CI") == "true") {
                 kotlinOptions.allWarningsAsErrors = true
             }
