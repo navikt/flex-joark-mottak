@@ -29,8 +29,9 @@ repositories {
     maven(url = "https://jitpack.io")
 }
 
-val kafkaVersion = "3.2.3"
-val confluentVersion = "7.2.1"
+val kafkaVersion = "3.1.2"
+val confluentVersion = "7.1.4"
+
 val jettyVersion = "11.0.11"
 val prometheusVersion = "0.16.0"
 val resilience4jVersion = "1.7.1"

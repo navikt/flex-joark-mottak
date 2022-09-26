@@ -6,7 +6,7 @@ metadata:
   labels:
     team: flex
 spec:
-  image: {{ image }}
+  image: {{image}}
   port: 8080
   liveness:
     path: internal/alive
@@ -14,6 +14,8 @@ spec:
   readiness:
     path: internal/ready
     initialDelay: 20
+  strategy:
+    type: Recreate
   replicas:
     min: 1
     max: 1
@@ -22,10 +24,10 @@ spec:
     path: internal/metrics
   resources:
     limits:
-      cpu: 500m
+      cpu: 1000m
       memory: 512Mi
     requests:
-      cpu: 500m
+      cpu: 100m
       memory: 256Mi
   kafka:
     pool: {{kafkaPool}}
@@ -43,7 +45,8 @@ spec:
         - host: flexFssProxyHost
   env:
   {{#each env}}
-     - name: {{@key}}
-       value: {{this}}
+    - name: {{@key}}
+      value: "{{this}}"
   {{/each}}
+
 
