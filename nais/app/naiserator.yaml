@@ -45,7 +45,8 @@ spec:
         - host: flexFssProxyHost
   env:
   {{#each env}}
-      - name: {{@key}}
-  value: {{this}}
+    - name: {{@key}}
+      value: "{{this}}"
   {{/each}}
+
 
