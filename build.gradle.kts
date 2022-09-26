@@ -36,7 +36,7 @@ val prometheusVersion = "0.16.0"
 val resilience4jVersion = "1.7.1"
 val gsonVersion = "2.8.9"
 val apacheCommonsVersion = "2.8.0"
-val logbackVersion = "1.2.10"
+val logbackVersion = "1.4.1"
 val logstashVersion = "7.2"
 
 val mockitoKotlinVersion = "2.2.0"
@@ -61,6 +61,7 @@ dependencies {
     implementation("io.github.resilience4j:resilience4j-circuitbreaker:$resilience4jVersion")
     implementation("com.google.code.gson:gson:$gsonVersion")
     implementation("org.apache.commons:commons-configuration2:$apacheCommonsVersion")
+
     implementation("ch.qos.logback:logback-core:$logbackVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashVersion")
