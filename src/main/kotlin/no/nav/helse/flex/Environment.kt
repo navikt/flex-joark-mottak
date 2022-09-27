@@ -2,19 +2,14 @@ package no.nav.helse.flex
 
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig
-import org.apache.commons.configuration2.BaseConfiguration
 import org.apache.commons.configuration2.CompositeConfiguration
-import org.apache.commons.configuration2.Configuration
 import org.apache.commons.configuration2.EnvironmentConfiguration
 import org.slf4j.LoggerFactory
-import java.nio.charset.StandardCharsets
-import java.nio.file.Files
-import java.nio.file.Path
 
 object Environment {
     private val log = LoggerFactory.getLogger(Environment::class.java)
 
-    private val compositeConfiguration = CompositeConfiguration()
+    private val compositeConfiguration = CompositeConfiguration(EnvironmentConfiguration())
 
     private const val KAFKA_BROKERS	= "KAFKA_BROKERS"
     private const val KAFKA_SCHEMA_REGISTRY = "KAFKA_SCHEMA_REGISTRY"
@@ -40,25 +35,6 @@ object Environment {
     private const val OPPGAVE_URL = "OPPGAVE_URL"
     private const val FKV_URL = "FKV_URL"
     private const val FLEX_FSS_PROXY_CLIENT_ID = "FLEX_FSS_PROXY_CLIENT_ID"
-
-    init {
-        compositeConfiguration.addConfiguration(EnvironmentConfiguration())
-        log.info("Konfigurasjon lastet fra system- og miljøvariabler")
-        try {
-            val baseConfig: Configuration = BaseConfiguration()
-            baseConfig.addProperty(
-                "AZURE_APP_CLIENT_ID",
-                getPropertyValueFromVault("/var/run/secrets/nais.io/azure/AZURE_APP_CLIENT_ID")
-            )
-            baseConfig.addProperty(
-                "AZURE_APP_CLIENT_SECRET",
-                getPropertyValueFromVault("/var/run/secrets/nais.io/azure/AZURE_APP_CLIENT_SECRET")
-            )
-            compositeConfiguration.addConfiguration(baseConfig)
-        } catch (e: Exception) {
-            log.error("Vault setup failed: $e")
-        }
-    }
 
     val bootstrapServersUrl get() = getEnvVar(KAFKA_BROKERS)
     val kafkaSchemaRegistryUrl get() = getEnvVar(KAFKA_SCHEMA_REGISTRY)
@@ -105,14 +81,5 @@ object Environment {
             throw IllegalArgumentException("Missing environment variable for $varName and default value is null")
         }
         return envVar
-    }
-
-    private fun getPropertyValueFromVault(path: String): String? {
-        try {
-            return Files.readString(Path.of(path), StandardCharsets.UTF_8)
-        } catch (e: Exception) {
-            log.error("Klarte ikke laste property for path {}", path)
-        }
-        return null
     }
 }
