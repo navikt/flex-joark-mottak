@@ -68,30 +68,34 @@ class EventEnricherTransformerSupplier(
                     MDC.put("CORRELATION_ID", enrichedKafkaEvent.correlationId)
                     eventEnricher.createEnrichedKafkaEvent(enrichedKafkaEvent)
                     true
-                } catch (e: InvalidJournalpostStatusException) {
-                    enrichedKafkaEvent.isToIgnore = true
-                    true
-                } catch (e: FunctionalRequirementException) {
-                    enrichedKafkaEvent.isToManuell = true
-                    true
-                } catch (e: TemporarilyUnavailableException) {
-                    enrichedKafkaEvent.incNumFailedAttempts()
-                    if (enrichedKafkaEvent.numFailedAttempts < MAX_NUM_RETRY) {
-                        incRetry(stateStoreName, enrichedKafkaEvent)
-                        log.info("Feilet under berikelse av journalpost ${enrichedKafkaEvent.journalpostId} for gang nummer ${enrichedKafkaEvent.numFailedAttempts}. Forsøker på nytt senere")
-                        false
-                    } else {
-                        log.info("Feilet under berikelse av journalpost ${enrichedKafkaEvent.journalpostId} for gang nummer ${enrichedKafkaEvent.numFailedAttempts}. Gir opp videre behandling")
-                        enrichedKafkaEvent.isToManuell = true
-                        true
-                    }
-                } catch (e: ExternalServiceException) {
-                    enrichedKafkaEvent.isToManuell = true
-                    true
                 } catch (e: Exception) {
-                    log.error("Uventet feil på journalpost ${enrichedKafkaEvent.journalpostId}", e)
-                    enrichedKafkaEvent.isToManuell = true
-                    true
+                    return when (e) {
+                        is InvalidJournalpostStatusException -> {
+                            enrichedKafkaEvent.isToIgnore = true
+                            true
+                        }
+                        is FunctionalRequirementException -> {
+                            enrichedKafkaEvent.isToManuell = true
+                            true
+                        }
+                        is ExternalServiceException,
+                        is TemporarilyUnavailableException -> {
+                            enrichedKafkaEvent.incNumFailedAttempts()
+                            if (enrichedKafkaEvent.numFailedAttempts < MAX_NUM_RETRY) {
+                                incRetry(stateStoreName, enrichedKafkaEvent)
+                                log.info("Feilet under berikelse av journalpost ${enrichedKafkaEvent.journalpostId} for gang nummer ${enrichedKafkaEvent.numFailedAttempts}. Forsøker på nytt senere")
+                                false
+                            } else {
+                                log.info("Feilet under berikelse av journalpost ${enrichedKafkaEvent.journalpostId} for gang nummer ${enrichedKafkaEvent.numFailedAttempts}. Gir opp videre behandling")
+                                enrichedKafkaEvent.isToManuell = true
+                                true
+                            }
+                        }
+                        else -> {
+                            log.error("Uventet feil på journalpost ${enrichedKafkaEvent.journalpostId}. Forsøker på nytt senere", e)
+                            false
+                        }
+                    }
                 } finally {
                     MDC.clear()
                 }
