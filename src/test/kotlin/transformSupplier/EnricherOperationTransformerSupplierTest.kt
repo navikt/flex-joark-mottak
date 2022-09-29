@@ -116,14 +116,13 @@ class EnricherOperationTransformerSupplierTest {
     }
 
     @Test
-    fun test_when_enricher_catch_unknownException_send_to_manuell() {
+    fun test_when_enricher_catch_unknownException_retry() {
         every { eventEnricher.createEnrichedKafkaEvent(any()) } throws Exception("Unknown Error")
 
         inputTopic.pipeInput("Test123", testEvent)
         val kafkaEvent = enricherKVStore["Test123"]
 
-        assertNull(kafkaEvent)
-        assertEquals("123456789", outputTopic.readValue().getJournalpostId())
+        assertEquals(kafkaEvent.journalpostId, "123456789")
     }
 
     @Test
@@ -157,22 +156,21 @@ class EnricherOperationTransformerSupplierTest {
     }
 
     @Test
-    fun test_journalpost_enricher_fail_SUE_then_unknown_exception_send_to_manuell() {
+    fun test_journalpost_enricher_fail_TUE_then_unknown_exception_retry() {
         every { eventEnricher.createEnrichedKafkaEvent(any()) } throws TemporarilyUnavailableException()
 
         inputTopic.pipeInput("Test123", testEvent)
 
-        // check store have journalpost staored after SUE
+        // check store have journalpost stored
         var kafkaEvent = enricherKVStore["Test123"]
         assertEquals(kafkaEvent.journalpostId, "123456789")
 
-        // after 30 min schedule retry - and throws UE Journlapost should send to manuell and store empty
+        // after 30 min schedule retry
         every { eventEnricher.createEnrichedKafkaEvent(any()) } throws Exception("Ukjent feil")
         testDriver.advanceWallClockTime(Duration.ofMinutes(30))
         kafkaEvent = enricherKVStore["Test123"]
 
-        assertNull(kafkaEvent)
-        assertEquals("123456789", outputTopic.readValue().getJournalpostId())
+        assertEquals(kafkaEvent.journalpostId, "123456789")
     }
 
     @Test
