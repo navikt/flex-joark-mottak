@@ -69,7 +69,7 @@ object TestUtils {
         val parser = Schema.Parser()
         val schema = parser.parse(journalHendelseSchema)
         val avroRecord: GenericRecord = GenericData.Record(schema)
-        avroRecord.put("journalpostId", 573783667)
+        avroRecord.put("journalpostId", 585308762)
         avroRecord.put("journalpostStatus", "M")
         avroRecord.put("hendelsesId", "1234234345")
         avroRecord.put("hendelsesType", "JournalpostMottatt")

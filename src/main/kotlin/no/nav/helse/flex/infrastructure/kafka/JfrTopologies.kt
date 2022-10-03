@@ -103,7 +103,7 @@ class JfrTopologies(
             .filter { _, genericRecord ->
                 genericRecord["temaNytt"].toString() == "SYK" &&
                     eventType.contains(genericRecord["hendelsesType"].toString()) &&
-                    genericRecord["journalpostId"].toString() == "573783667"
+                    genericRecord["journalpostId"].toString() == "585308762"
             }
     }
 
