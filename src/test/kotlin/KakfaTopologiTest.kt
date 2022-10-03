@@ -108,7 +108,7 @@ class KakfaTopologiTest {
         val mockedJournalpostEvent = mockJournalpostEvent("SYK")
         val event: KafkaEvent = objectMapper.readValue(mockedJournalpostEvent.toString())
         val enrichedKafkaEvent = EnrichedKafkaEvent(event)
-        enrichedKafkaEvent.journalpost = mockJournalpost("123456789", "ABC", "SYK", "M")
+        enrichedKafkaEvent.journalpost = mockJournalpost("573783667", "ABC", "SYK", "M")
 
         every { mockEnrichTransformer.transform(any(), any()) } returns KeyValue("Test123", enrichedKafkaEvent)
         inputTopic.pipeInput("Test123", mockedJournalpostEvent)
@@ -118,9 +118,9 @@ class KakfaTopologiTest {
 
     @Test
     fun test_toManuell_flag_from_enricher_is_true_expect_to_manuell() {
-        val event = KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 123456789, "SYK", "NAV_NO", "M")
+        val event = KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 573783667, "SYK", "NAV_NO", "M")
         val enrichedKafkaEvent = EnrichedKafkaEvent(event)
-        enrichedKafkaEvent.journalpost = mockJournalpost("123456789", "NAV 06-04.04", "SYK", "M")
+        enrichedKafkaEvent.journalpost = mockJournalpost("573783667", "NAV 06-04.04", "SYK", "M")
         enrichedKafkaEvent.isToManuell = true
 
         every { mockEnrichTransformer.transform(any(), any()) } returns KeyValue.pair("Test123", enrichedKafkaEvent)
@@ -131,9 +131,9 @@ class KakfaTopologiTest {
 
     @Test
     fun test_toIgnore_flag_from_enricher_is_true_expect_not_to_manuell() {
-        val event = KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 123456789, "SYK", "NAV_NO", "M")
+        val event = KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 573783667, "SYK", "NAV_NO", "M")
         val enrichedKafkaEvent = EnrichedKafkaEvent(event)
-        enrichedKafkaEvent.journalpost = mockJournalpost("123456789", "NAV 06-04.04", "SYK", "M")
+        enrichedKafkaEvent.journalpost = mockJournalpost("573783667", "NAV 06-04.04", "SYK", "M")
         enrichedKafkaEvent.isToIgnore = true
 
         every { mockEnrichTransformer.transform(any(), any()) } returns KeyValue("Test123", enrichedKafkaEvent)
@@ -144,9 +144,9 @@ class KakfaTopologiTest {
 
     @Test
     fun test_toIgnore_and_toManuell_flag_from_enricher_is_true_expect_not_to_manuell() {
-        val event = KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 123456789, "SYK", "NAV_NO", "M")
+        val event = KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 573783667, "SYK", "NAV_NO", "M")
         val enrichedKafkaEvent = EnrichedKafkaEvent(event)
-        enrichedKafkaEvent.journalpost = mockJournalpost("123456789", "NAV 06-04.04", "SYK", "M")
+        enrichedKafkaEvent.journalpost = mockJournalpost("573783667", "NAV 06-04.04", "SYK", "M")
         enrichedKafkaEvent.isToIgnore = true
         enrichedKafkaEvent.isToManuell = true
 
@@ -158,11 +158,11 @@ class KakfaTopologiTest {
 
     @Test
     fun test_toManuell_flag_is_true_expect_to_manuell() {
-        val event = KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 123456789, "SYK", "NAV_NO", "M")
+        val event = KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 573783667, "SYK", "NAV_NO", "M")
         val enrichedKafkaEvent = EnrichedKafkaEvent(event)
-        enrichedKafkaEvent.journalpost = mockJournalpost("123456789", "NAV 08-07.04D", "SYK", "M")
+        enrichedKafkaEvent.journalpost = mockJournalpost("573783667", "NAV 08-07.04D", "SYK", "M")
         val generellKafkaEvent = EnrichedKafkaEvent(event)
-        generellKafkaEvent.journalpost = mockJournalpost("123456789", "NAV 08-07.04D", "SYK", "M")
+        generellKafkaEvent.journalpost = mockJournalpost("573783667", "NAV 08-07.04D", "SYK", "M")
 
         every { mockEnrichTransformer.transform(any(), any()) } returns KeyValue("Test123", enrichedKafkaEvent)
         every { mockGenerellTransformer.transform(any(), any()) } returns KeyValue("Test123", generellKafkaEvent.withSetToManuell(true))
@@ -173,11 +173,11 @@ class KakfaTopologiTest {
 
     @Test
     fun test_toManuell_flag_from_journafoering_is_true_expect_to_manuall() {
-        val event = KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 123456789, "SYK", "NAV_NO", "M")
+        val event = KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 573783667, "SYK", "NAV_NO", "M")
         val enrichedKafkaEvent = EnrichedKafkaEvent(event)
-        enrichedKafkaEvent.journalpost = mockJournalpost("123456789", "NAV 08-07.04D", "SYK", "M")
+        enrichedKafkaEvent.journalpost = mockJournalpost("573783667", "NAV 08-07.04D", "SYK", "M")
         val postJournalfoeringKafkaEvent = EnrichedKafkaEvent(event)
-        postJournalfoeringKafkaEvent.journalpost = mockJournalpost("123456789", "NAV 08-07.04D", "SYK", "M")
+        postJournalfoeringKafkaEvent.journalpost = mockJournalpost("573783667", "NAV 08-07.04D", "SYK", "M")
 
         every { mockEnrichTransformer.transform(any(), any()) } returns KeyValue("Test123", enrichedKafkaEvent)
         every { mockGenerellTransformer.transform(any(), any()) } returns KeyValue("Test123", enrichedKafkaEvent)
@@ -190,11 +190,11 @@ class KakfaTopologiTest {
 
     @Test
     fun test_success_journafoering_expect_not_to_manuall() {
-        val event = KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 123456789, "SYK", "NAV_NO", "M")
+        val event = KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 573783667, "SYK", "NAV_NO", "M")
         val enrichedKafkaEvent = EnrichedKafkaEvent(event)
-        enrichedKafkaEvent.journalpost = mockJournalpost("123456789", "NAV 08-07.04D", "SYK", "M")
+        enrichedKafkaEvent.journalpost = mockJournalpost("573783667", "NAV 08-07.04D", "SYK", "M")
         val postJournalfoeringKafkaEvent = EnrichedKafkaEvent(event)
-        postJournalfoeringKafkaEvent.journalpost = mockJournalpost("123456789", "NAV 06-04.04", "SYK", "M")
+        postJournalfoeringKafkaEvent.journalpost = mockJournalpost("573783667", "NAV 06-04.04", "SYK", "M")
 
         every { mockEnrichTransformer.transform(any(), any()) } returns KeyValue("Test123", enrichedKafkaEvent)
         every { mockGenerellTransformer.transform(any(), any()) } returns KeyValue("Test123", enrichedKafkaEvent)
