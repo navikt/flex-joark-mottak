@@ -19,6 +19,10 @@ buildscript {
     }
 }
 
+tasks.withType<ShadowJar> {
+    archiveFileName.set("app.jar")
+}
+
 val githubUser: String by project
 val githubPassword: String by project
 
