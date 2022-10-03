@@ -13,11 +13,11 @@ echo context: $context
 [ -d ~/.config ] || mkdir ~/.config
 rm -f $configFile
 
-kubectl cp $pod:$(kubectl exec $pod -- sh -c 'readlink -f $KAFKA_TRUSTSTORE_PATH') $credstore/kafka.client.truststore.jks
-kubectl cp $pod:$(kubectl exec $pod -- sh -c 'readlink -f $KAFKA_KEYSTORE_PATH') $credstore/kafka.client.keystore.jks
-truststorePassword=$(kubectl exec $pod -- sh -c 'echo $KAFKA_CREDSTORE_PASSWORD')
-echo "bootstrap.servers="$(kubectl exec $pod -- sh -c 'echo $KAFKA_BROKERS') >> $configFile
-echo "security.protocol=ssl" >> $configFile
+kubectl exec $pod -c flex-joark-mottak -- sh -c 'cat $KAFKA_TRUSTSTORE_PATH' > $credstore/kafka.client.truststore.jks
+kubectl exec $pod -c flex-joark-mottak -- sh -c 'cat $KAFKA_KEYSTORE_PATH' > $credstore/kafka.client.keystore.jks
+truststorePassword=$(kubectl exec $pod -c flex-joark-mottak -- sh -c 'echo $KAFKA_CREDSTORE_PASSWORD')
+echo "bootstrap.servers="$(kubectl exec $pod -c flex-joark-mottak -- sh -c 'echo $KAFKA_BROKERS') >> $configFile
+echo "security.protocol=SSL" >> $configFile
 echo "ssl.truststore.location=$credstore/kafka.client.truststore.jks" >> $configFile
 echo "ssl.keystore.location=$credstore/kafka.client.keystore.jks" >> $configFile
 echo "ssl.truststore.password=$truststorePassword" >> $configFile
