@@ -43,7 +43,9 @@ Kafka må være innstalert på maskinen: `brew install kafka`. Kan verifiseres m
   ```
   kubectl scale --replicas=0 deployment/flex-joark-mottak
   ```
-**4. Sett offset** med kommando `kafka-consumer-groups --command-config ~/.config/aiven.conf --bootstrap-server nav-<context>-kafka-nav-<context>.aivencloud.com:26484 --group <gruppenavn> --topic <topic> --reset-offsets --to-datetime <YYYY-MM-DDTHH:mm:ss.sss> --dry-run`
+**4. Be om tilgang til aiven-prod i naisdevice**
+
+**5. Sett offset** med kommando `kafka-consumer-groups --command-config ~/.config/aiven.conf --bootstrap-server nav-<context>-kafka-nav-<context>.aivencloud.com:26484 --group <gruppenavn> --topic <topic> --reset-offsets --to-datetime <YYYY-MM-DDTHH:mm:ss.sss> --dry-run`
 
 Offsett kan også settes til earliest `--to-earliest` eller `--to-datetime 2022-02-03T08:00:00.000`
 
@@ -52,11 +54,11 @@ Offsett kan også settes til earliest `--to-earliest` eller `--to-datetime 2022-
   ```
 :exclamation: For faktisk å kjøre kallet må `--dry-run` byttes ut med `--execute` :exclamation:
 
-**5. Skaler opp antall pods** til samme antall som tidligere med samme kommando: `kubectl scale --replicas=<antall> deployment/<appnavn>`
+**6. Skaler opp antall pods** til samme antall som tidligere med samme kommando: `kubectl scale --replicas=<antall> deployment/<appnavn>`
   ```
   kubectl scale --replicas=1 deployment/flex-joark-mottak
   ```
-**6. Fjern keystore/trusstore** fra egen maskin med kommando`rm -rf ~/.config/kafka`
+**7. Fjern keystore/trusstore** fra egen maskin med kommando`rm -rf ~/.config/kafka`
   ```
   rm -rf ~/.config/kafka
   ```
