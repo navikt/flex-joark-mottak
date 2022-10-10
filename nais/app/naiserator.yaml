@@ -28,7 +28,7 @@ spec:
       memory: 512Mi
     requests:
       cpu: 100m
-      memory: 256Mi
+      memory: 350Mi
   kafka:
     pool: {{kafkaPool}}
     streams: true
