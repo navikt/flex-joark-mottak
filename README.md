@@ -4,7 +4,7 @@ Applikasjonen tar over for [jfr-generell](https://github.com/navikt/jfr-generell
 Beriker metadata og sender enten videre til manuell-oppretter eller forsøker automatisk journalføring.
 
 ## Testing i dev
-Her kan man opprette journalpost [syfomock](https://syfomock.dev-sbs.nais.io/opprett_papir_dokument)
+Her kan man opprette journalpost [flex-testdata-generator](https://flex-testdata-generator.dev.nav.no/papir-dokument)
 > Bruk denne testdataen:
 >
 > `Fødselsnummer: fnr i fra dolly` 
@@ -24,47 +24,52 @@ Består av `<brevkode>:<tema>` = `<tittel>;<brevkode>;<behandlingstema>;<behandl
 Listen finnes [her](https://kodeverk-web.nais.adeo.no/kodeverksoversikt/kodeverk/Krutkoder) hvis man filtrerer på `:SYK`
 
 ## Endre offsett
-Kafka må være innstalert på maskinen: `brew install kafka`. Kan verifiseres med å kjøre kommando: `kafka-consumer-group`.
+Kafka må være innstallert på maskinen: `brew install kafka`. Kan verifiseres med å kjøre kommando: `kafka-consumer-group`.
 
-**1. Logg inn på GCP** med kommando: `gcloud auth login` og gi deg nødvendige tilganger i naisdevice (aiven dev eller aiven prod)
+For å hente ut kafka secrets 
+
+**1. Logg inn på GCP** og gi deg nødvendige tilganger i naisdevice (aiven dev eller aiven prod)
   ```
   gcloud auth login
   ```
-**2. Sett namespace og context** med kommando: `kubens flex` og `kubectx dev-gcp` (prod-gcp)
+**2. Sett namespace og context**
   ```
     kubens flex
     kubectx dev-gcp
   ```
-**3. Hent keystore/truststore** med kommando `sh getConfig.sh <podnavn>` mens du står i rotmappen til applikasjonen.
+**3. Hent keystore/truststore**
   ```
   sh getConfig.sh flex-joark-mottak-c6f84444b-cw6ck
   ```
-**3. Skaler ned antall pods** til 0. Dette kan gjøres med kommando `kubectl scale --replicas=<antall> deployment/<appnavn>`
+**3. Skaler ned antall pods**
   ```
   kubectl scale --replicas=0 deployment/flex-joark-mottak
   ```
 **4. Be om tilgang til aiven-prod i naisdevice**
 
-**5. Sett offset** med kommando `kafka-consumer-groups --command-config ~/.config/aiven.conf --bootstrap-server nav-<context>-kafka-nav-<context>.aivencloud.com:26484 --group <gruppenavn> --topic <topic> --reset-offsets --to-datetime <YYYY-MM-DDTHH:mm:ss.sss> --dry-run`
+**5. Sett kafka offset**
 
-Offsett kan også settes til earliest `--to-earliest` eller `--to-datetime 2022-02-03T08:00:00.000`
+  Offsett kan settes til earliest `--to-earliest` eller `--to-datetime 2022-02-03T08:00:00.000`
+  
+  :exclamation: NB! Aiven tid er 2 timer forskjell fra vår tid. Sett timestamp minst to timer før det du tror du trenger!:exclamation:
 
   ```
   kafka-consumer-groups --command-config ~/.config/aiven.conf --bootstrap-server nav-prod-kafka-nav-prod.aivencloud.com:26484 --group flex.flex-joark-mottak --topic teamdokumenthandtering.aapen-dok-journalfoering --reset-offsets --to-earliest --dry-run
   ```
-:exclamation: For faktisk å kjøre kallet må `--dry-run` byttes ut med `--execute` :exclamation:
 
-**6. Skaler opp antall pods** til samme antall som tidligere med samme kommando: `kubectl scale --replicas=<antall> deployment/<appnavn>`
+  - Finn gruppenavn `kafka-consumer-groups --command-config ~/.config/aiven.conf --bootstrap-server nav-<context>-kafka-nav-<context>.aivencloud.com:26484 --list`
+  - Se current offset `kafka-consumer-groups --command-config ~/.config/aiven.conf --bootstrap-server nav-<context>-kafka-nav-<context>.aivencloud.com:26484 --describe --group <gruppenavn>`
+  
+  :exclamation: For faktisk å kjøre kallet må `--dry-run` byttes ut med `--execute` :exclamation:
+
+**6. Skaler opp antall pods**
   ```
   kubectl scale --replicas=1 deployment/flex-joark-mottak
   ```
-**7. Fjern keystore/trusstore** fra egen maskin med kommando`rm -rf ~/.config/kafka`
+**7. Fjern keystore/trusstore fra egen maskin**
   ```
   rm -rf ~/.config/kafka
   ```
-:exclamation: NB! Aiven tid er 2 timer forskjell fra vår tid. Sett timestamp minst to timer før det du tror du trenger!:exclamation:
-- Finn gruppenavn `kafka-consumer-groups --command-config ~/.config/aiven.conf --bootstrap-server nav-<context>-kafka-nav-<context>.aivencloud.com:26484 --list`
-- Se current offset `kafka-consumer-groups --command-config ~/.config/aiven.conf --bootstrap-server nav-<context>-kafka-nav-<context>.aivencloud.com:26484 --describe --group <gruppenavn>`
 
 
 ## Kontakt 
