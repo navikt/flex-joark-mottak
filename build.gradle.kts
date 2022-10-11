@@ -34,18 +34,18 @@ repositories {
 }
 
 val kafkaVersion = "3.1.2"
-val confluentVersion = "7.1.4"
+val confluentVersion = "7.2.2"
 
 val jettyVersion = "11.0.11"
 val prometheusVersion = "0.16.0"
 val resilience4jVersion = "1.7.1"
-val gsonVersion = "2.8.9"
+val gsonVersion = "2.9.1"
 val apacheCommonsVersion = "2.8.0"
-val logbackVersion = "1.4.1"
+val logbackVersion = "1.4.4"
 val logstashVersion = "7.2"
 
 val mockitoKotlinVersion = "2.2.0"
-val mockkVersion = "1.13.1"
+val mockkVersion = "1.13.2"
 val junitVersion = "5.9.1"
 
 dependencies {
@@ -60,7 +60,7 @@ dependencies {
     implementation("io.prometheus:simpleclient_servlet_jakarta:$prometheusVersion")
     implementation("io.prometheus:simpleclient_hotspot:$prometheusVersion")
     implementation("io.prometheus:simpleclient_logback:$prometheusVersion")
-    implementation("org.json:json:20220320")
+    implementation("org.json:json:20220924")
     implementation("io.github.resilience4j:resilience4j-all:$resilience4jVersion")
     implementation("io.github.resilience4j:resilience4j-retry:$resilience4jVersion")
     implementation("io.github.resilience4j:resilience4j-circuitbreaker:$resilience4jVersion")
