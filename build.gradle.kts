@@ -41,7 +41,7 @@ val prometheusVersion = "0.16.0"
 val resilience4jVersion = "1.7.1"
 val gsonVersion = "2.8.9"
 val apacheCommonsVersion = "2.8.0"
-val logbackVersion = "1.4.1"
+val logbackVersion = "1.4.4"
 val logstashVersion = "7.2"
 
 val mockitoKotlinVersion = "2.2.0"
