@@ -4,6 +4,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
 
 data class CreateOppgaveData(
     var aktoerId: String? = null,
@@ -32,18 +33,22 @@ data class CreateOppgaveData(
     private fun nextValidFrist(frist: Int): String {
         var oppgaveFrist = LocalDateTime.now().atZone(ZoneId.of("Europe/Oslo"))
 
-        var i = frist
-        while (i > 0) {
-            if (oppgaveFrist.dayOfWeek !in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) {
-                i--
-            }
-            oppgaveFrist = oppgaveFrist.plusDays(1)
+        repeat(frist) {
+            oppgaveFrist = oppgaveFrist.nesteUkedag()
         }
 
         if (oppgaveFrist.hour > 12) {
-            oppgaveFrist = oppgaveFrist.plusDays(1)
+            oppgaveFrist = oppgaveFrist.nesteUkedag()
         }
 
         return oppgaveFrist.toLocalDate().toString()
+    }
+
+    private fun ZonedDateTime.nesteUkedag(): ZonedDateTime {
+        return when (dayOfWeek) {
+            DayOfWeek.FRIDAY -> plusDays(3)
+            DayOfWeek.SATURDAY -> plusDays(2)
+            else -> plusDays(1)
+        }
     }
 }
