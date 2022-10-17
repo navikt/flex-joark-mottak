@@ -44,15 +44,19 @@ class GenerellOperationsTest {
     fun test_oppgave_frist() {
         val morning = LocalDateTime.parse("2021-10-18T10:49:35")
         val evening = LocalDateTime.parse("2021-10-18T14:49:35")
-        val fridayEvening = LocalDateTime.parse("2021-10-22T10:49:35")
-        val holiday = LocalDateTime.parse("2021-12-24T15:49:35")
+        val fridayMorning = LocalDateTime.parse("2021-10-22T10:49:35")
+        val fridayEvening = LocalDateTime.parse("2021-10-22T14:49:35")
+        val saturday = LocalDateTime.parse("2021-10-23T10:49:35")
+        val sunday = LocalDateTime.parse("2021-10-24T10:49:35")
 
         mockkStatic(LocalDateTime::class)
         every { LocalDateTime.now() } returnsMany listOf(
             morning,
             evening,
+            fridayMorning,
             fridayEvening,
-            holiday
+            saturday,
+            sunday
         )
 
         val cod1 = CreateOppgaveData(aktoerId = "123", journalpostId = "123", tema = "SYK", behandlingstema = "", behandlingstype = "", oppgavetype = "", frist = 3)
@@ -62,9 +66,15 @@ class GenerellOperationsTest {
         assertEquals("2021-10-22", cod2.fristFerdigstillelse, "Journalpost mottatt på kvelden")
 
         val cod3 = CreateOppgaveData(aktoerId = "123", journalpostId = "123", tema = "SYK", behandlingstema = "", behandlingstype = "", oppgavetype = "", frist = 3)
-        assertEquals("2021-10-27", cod3.fristFerdigstillelse, "Journalpost mottatt fredag")
+        assertEquals("2021-10-27", cod3.fristFerdigstillelse, "Journalpost mottatt fredag før kl 12")
 
         val cod4 = CreateOppgaveData(aktoerId = "123", journalpostId = "123", tema = "SYK", behandlingstema = "", behandlingstype = "", oppgavetype = "", frist = 3)
-        assertEquals("2021-12-30", cod4.fristFerdigstillelse, "Journalpost mottatt før helligdag")
+        assertEquals("2021-10-28", cod4.fristFerdigstillelse, "Journalpost mottatt fredag etter kl 12")
+
+        val cod5 = CreateOppgaveData(aktoerId = "123", journalpostId = "123", tema = "SYK", behandlingstema = "", behandlingstype = "", oppgavetype = "", frist = 3)
+        assertEquals("2021-10-27", cod5.fristFerdigstillelse, "Journalpost mottatt lørdag")
+
+        val cod6 = CreateOppgaveData(aktoerId = "123", journalpostId = "123", tema = "SYK", behandlingstema = "", behandlingstype = "", oppgavetype = "", frist = 3)
+        assertEquals("2021-10-27", cod6.fristFerdigstillelse, "Journalpost mottatt søndag")
     }
 }
