@@ -21,7 +21,7 @@ Logg inn med felles syfo Z992389 bruker, eller opprett egen i [IDA](https://conf
 ## Felles kodeverk - krutkoder
 Består av `<brevkode>:<tema>` = `<tittel>;<brevkode>;<behandlingstema>;<behandlingstype>;` og det er 49 forskjellige som gjelder for tema SYK
 
-Listen finnes [her](https://kodeverk-web.nais.adeo.no/kodeverksoversikt/kodeverk/Krutkoder) hvis man filtrerer på `:SYK`
+Listen finnes [her](https://kodeverk-web.dev.intern.nav.no/kodeverksoversikt/kodeverk/Krutkoder) hvis man logger inn med Z-bruker og her kan man filtrerer på `:SYK`
 
 ## Endre offsett
 Kafka må være innstallert på maskinen: `brew install kafka`. Kan verifiseres med å kjøre kommando: `kafka-consumer-group`.
