@@ -96,7 +96,7 @@ class JournalOperationsTransformerSupplier(
     }
 
     companion object {
-        private const val MAX_NUM_RETRY = 5
+        private const val MAX_NUM_RETRY = 48
         private val log = LoggerFactory.getLogger(JournalOperationsTransformerSupplier::class.java)
     }
 }

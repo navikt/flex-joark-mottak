@@ -40,7 +40,7 @@ import java.util.*
 class EnricherOperationTransformerSupplierTest {
     private val eventEnricher: EventEnricher = mockk(relaxed = true)
 
-    private val MAX_RETRY = 5
+    private val MAX_RETRY = 48
     private val INPUT_TOPIC = "source-topic"
     private val OUTPUT_TOPIC = "output-topic"
     private val props = Properties().apply {
