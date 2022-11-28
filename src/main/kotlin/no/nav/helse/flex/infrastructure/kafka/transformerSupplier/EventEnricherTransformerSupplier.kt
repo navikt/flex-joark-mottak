@@ -110,6 +110,6 @@ class EventEnricherTransformerSupplier(
 
     companion object {
         private val log = LoggerFactory.getLogger(EventEnricherTransformerSupplier::class.java)
-        private const val MAX_NUM_RETRY = 5
+        private const val MAX_NUM_RETRY = 48
     }
 }
