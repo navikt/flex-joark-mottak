@@ -97,12 +97,13 @@ class EventEnricher(
             journalpost.behandlingstype = behandlingsType
             log.info("Satt følgende verdier behandlingstema: '$behandlingsTema' og behandlingstype: '$behandlingsType' på journalpost ${journalpost.journalpostId}")
         } catch (e: Exception) {
-            enrichedKafkaEvent.toFordeling = true
             enrichedKafkaEvent.isToManuell = true
-            log.warn(
-                "Klarte ikke finne behandlingsverdier for journalpost ${journalpost.journalpostId} med tema ${journalpost.tema} og skjema ${journalpost.brevkode}",
-                e
-            )
+            if (journalpost.hasJournalforendeEnhet()) {
+                log.info("Klarte ikke finne behandlingsverdier for journalpost ${journalpost.journalpostId}, bruker journalforendeEnhet ${journalpost.journalforendeEnhet}")
+            } else {
+                enrichedKafkaEvent.toFordeling = true
+                log.warn("Klarte ikke finne behandlingsverdier for journalpost ${journalpost.journalpostId} med tema ${journalpost.tema} og skjema ${journalpost.brevkode}", e)
+            }
         }
     }
 

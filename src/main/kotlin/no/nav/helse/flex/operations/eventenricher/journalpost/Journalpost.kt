@@ -29,6 +29,10 @@ class Journalpost {
         sak = Sak()
     }
 
+    fun hasJournalforendeEnhet(): Boolean {
+        return journalforendeEnhet != null && journalforendeEnhet!!.isNotEmpty()
+    }
+
     fun toJson(): String {
         val builder = StringBuilder()
         return builder.append("{")
