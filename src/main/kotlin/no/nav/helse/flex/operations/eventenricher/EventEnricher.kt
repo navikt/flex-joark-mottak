@@ -101,8 +101,7 @@ class EventEnricher(
             if (journalpost.hasJournalforendeEnhet()) {
                 log.info("Klarte ikke finne behandlingsverdier for journalpost ${journalpost.journalpostId}, bruker journalforendeEnhet ${journalpost.journalforendeEnhet}")
             } else {
-                enrichedKafkaEvent.toFordeling = true
-                log.warn("Klarte ikke finne behandlingsverdier for journalpost ${journalpost.journalpostId} med tema ${journalpost.tema} og skjema ${journalpost.brevkode}", e)
+                log.info("Klarte ikke finne behandlingsverdier for journalpost ${journalpost.journalpostId} med tema ${journalpost.tema} og skjema ${journalpost.brevkode}", e)
             }
         }
     }

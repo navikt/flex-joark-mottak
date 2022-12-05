@@ -16,7 +16,6 @@ data class EnrichedKafkaEvent(
     var numFailedAttempts = 0
     var isToManuell = false
     var isToIgnore = false
-    var toFordeling = false
 
     fun incNumFailedAttempts() {
         numFailedAttempts += 1
