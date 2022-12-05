@@ -111,13 +111,19 @@ class ManuellOperations(
         return oppgaveClient.createOppgave(requestData)
     }
 
-    fun isJournalpostToFordeling(enrichedKafkaEvent: EnrichedKafkaEvent): Boolean {
+    private fun isJournalpostToFordeling(enrichedKafkaEvent: EnrichedKafkaEvent): Boolean {
         val journalpost = enrichedKafkaEvent.journalpost
+
         if (journalpost == null) {
             log.error("Journalpost ${enrichedKafkaEvent.journalpostId} er null men er ikke markert til fordeling - sendes til fordeling")
             return true
         }
-        return enrichedKafkaEvent.toFordeling || TEMA_UKJENT == journalpost.tema
+        if (journalpost.tema != "SYK") {
+            log.error("Journalpost ${journalpost.journalpostId} har tema ${journalpost.tema} og skal ikke skje, oppretter fordelingsoppgave")
+            return true
+        }
+
+        return false
     }
 
     private fun isErrorInvalidEnhet(feilmelding: String): Boolean {

@@ -7,7 +7,7 @@ flexFssProxyHost: flex-fss-proxy.dev-fss-pub.nais.io
 env:
   AIVEN_DOKUMENT_TOPIC: teamdokumenthandtering.aapen-dok-journalfoering-q1
     # SAF
-  SAF_CLIENT_ID: dev-fss.teamdokumenthandtering.saf
+  SAF_CLIENT_ID: dev-fss.teamdokumenthandtering.saf-q1
   SAF_URL: https://saf.dev-fss-pub.nais.io/graphql
     # Dokarkiv / JournlapostAPI
   DOKARKIV_CLIENT_ID: dev-fss.teamdokumenthandtering.dokarkiv-q1
