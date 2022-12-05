@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
     id("com.github.johnrengelman.shadow") version "7.1.2"
-    kotlin("jvm") version "1.7.21"
+    kotlin("jvm") version "1.7.22"
 }
 
 group = "no.nav.helse.flex"
@@ -33,19 +33,19 @@ repositories {
     maven(url = "https://jitpack.io")
 }
 
-val kafkaVersion = "3.1.2"
-val confluentVersion = "7.2.2"
+val kafkaVersion = "3.2.3"
+val confluentVersion = "7.3.0"
 
-val jettyVersion = "11.0.11"
+val jettyVersion = "11.0.12"
 val prometheusVersion = "0.16.0"
 val resilience4jVersion = "1.7.1"
-val gsonVersion = "2.9.1"
+val gsonVersion = "2.10"
 val apacheCommonsVersion = "2.8.0"
-val logbackVersion = "1.4.4"
+val logbackVersion = "1.4.5"
 val logstashVersion = "7.2"
 
 val mockitoKotlinVersion = "2.2.0"
-val mockkVersion = "1.13.2"
+val mockkVersion = "1.13.3"
 val junitVersion = "5.9.1"
 
 dependencies {
