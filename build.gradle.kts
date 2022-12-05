@@ -33,7 +33,7 @@ repositories {
     maven(url = "https://jitpack.io")
 }
 
-val kafkaVersion = "3.1.2"
+val kafkaVersion = "3.2.3"
 val confluentVersion = "7.3.0"
 
 val jettyVersion = "11.0.12"
