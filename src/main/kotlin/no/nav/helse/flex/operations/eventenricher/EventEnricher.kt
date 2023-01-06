@@ -35,7 +35,7 @@ class EventEnricher(
     fun createEnrichedKafkaEvent(enrichedKafkaEvent: EnrichedKafkaEvent) {
         enrichJournalpostInKafkaEvent(enrichedKafkaEvent)
         updateBehandlingValues(enrichedKafkaEvent)
-        if (enrichedKafkaEvent.isPersonbruker) {
+        if (enrichedKafkaEvent.isPersonbruker && enrichedKafkaEvent.journalpostId != "598421554") {
             enrichIdenterFromPDL(enrichedKafkaEvent)
         } else {
             log.info("Kaller ikke PDL da bruker på journalpost ${enrichedKafkaEvent.journalpostId} er ikke en person")
