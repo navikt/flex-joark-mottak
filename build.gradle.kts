@@ -38,7 +38,7 @@ val confluentVersion = "7.3.1"
 
 val jettyVersion = "11.0.13"
 val prometheusVersion = "0.16.0"
-val resilience4jVersion = "1.7.1"
+val resilience4jVersion = "2.0.2"
 val gsonVersion = "2.10.1"
 val apacheCommonsVersion = "2.8.0"
 val logbackVersion = "1.4.5"
