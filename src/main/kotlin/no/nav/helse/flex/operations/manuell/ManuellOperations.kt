@@ -18,7 +18,7 @@ class ManuellOperations(
             return
         }
         val oppgave: Oppgave = createOppgave(enrichedKafkaEvent)
-        log.info("Opprettet ${oppgave.oppgavetype}-oppgave: ${oppgave.id} på enhet ${oppgave.tildeltEnhetsnr} for journalpost: ${enrichedKafkaEvent.journalpostId}",)
+        log.info("Opprettet ${oppgave.oppgavetype}-oppgave: ${oppgave.id} på enhet ${oppgave.tildeltEnhetsnr} for journalpost: ${enrichedKafkaEvent.journalpostId}")
     }
 
     private fun createOppgave(enrichedKafkaEvent: EnrichedKafkaEvent): Oppgave {

@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit
 class EventEnricher(
     private val safClient: SafClient = SafClient(),
     private val pdlClient: PdlClient = PdlClient(),
-    private val fkvClient: FkvClient = FkvClient(),
+    private val fkvClient: FkvClient = FkvClient()
 ) {
     private val log = LoggerFactory.getLogger(EventEnricher::class.java)
     private val KRUT_KODER_REFRESH_INTERVAL_HOURS = 5L

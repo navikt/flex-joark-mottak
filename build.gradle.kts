@@ -3,7 +3,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransf
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.jlleitschuh.gradle.ktlint") version "11.1.0"
+    id("org.jlleitschuh.gradle.ktlint") version "11.2.0"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     kotlin("jvm") version "1.8.10"
 }
@@ -49,8 +49,9 @@ val mockkVersion = "1.13.4"
 val junitVersion = "5.9.2"
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
+    implementation(kotlin("stdlib"))
+    implementation(kotlin("reflect"))
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.apache.kafka:kafka-streams:$kafkaVersion")
     implementation("io.confluent:kafka-avro-serializer:$confluentVersion")

@@ -50,7 +50,7 @@ object Environment {
     val kafkaSerdeConfig get() = mapOf(
         AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG to kafkaSchemaRegistryUrl,
         SchemaRegistryClientConfig.USER_INFO_CONFIG to kafkaUserInfoConfig,
-        SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE to "USER_INFO",
+        SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE to "USER_INFO"
     )
 
     val dokumentEventTopic get() = getEnvVar(AIVEN_DOKUMENT_TOPIC)

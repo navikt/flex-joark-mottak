@@ -75,7 +75,7 @@ class KakfaTopologiTest {
             eventEnricherTransformerSupplier = eventEnricherTransformerSupplier,
             generellOperationsTransformerSupplier = generellOperationsTransformerSupplier,
             journalOperationsTransformerSupplier = journalOperationsTransformerSupplier,
-            oppgaveOperationsTransformerSupplier = oppgaveOperationsTransformerSupplier,
+            oppgaveOperationsTransformerSupplier = oppgaveOperationsTransformerSupplier
         )
         val topology = jfrTopologies.jfrTopologi
         val props = Properties()

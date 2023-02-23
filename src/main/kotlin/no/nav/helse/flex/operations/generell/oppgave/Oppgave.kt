@@ -10,7 +10,7 @@ data class Oppgave(
     var status: String? = null,
     var oppgavetype: String? = null,
     var tema: String? = null,
-    var tildeltEnhetsnr: String? = null,
+    var tildeltEnhetsnr: String? = null
 ) {
     var versjon = 0
 }

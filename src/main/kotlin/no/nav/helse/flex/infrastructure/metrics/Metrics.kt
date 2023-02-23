@@ -75,7 +75,11 @@ object Metrics {
             }
 
             jfrProcessCounter.labels(
-                MANUELL, desired, enrichedKafkaEvent.tema, enrichedKafkaEvent.kafkaEvent.mottaksKanal, skjema
+                MANUELL,
+                desired,
+                enrichedKafkaEvent.tema,
+                enrichedKafkaEvent.kafkaEvent.mottaksKanal,
+                skjema
             ).inc()
         } catch (e: Exception) {
             log.error("Klarte ikke å inkrementere metrikk incJfrManuallProcess", e)
@@ -86,7 +90,11 @@ object Metrics {
         try {
             MDC.put("CORRELATION_ID", enrichedKafkaEvent.correlationId)
             jfrProcessCounter.labels(
-                AUTO, AUTO, enrichedKafkaEvent.tema, enrichedKafkaEvent.kafkaEvent.mottaksKanal, enrichedKafkaEvent.skjema.toString()
+                AUTO,
+                AUTO,
+                enrichedKafkaEvent.tema,
+                enrichedKafkaEvent.kafkaEvent.mottaksKanal,
+                enrichedKafkaEvent.skjema.toString()
             ).inc()
         } catch (e: Exception) {
             log.error("Klarte ikke å inkrementere metrikk incJfrAutoProcess", e)

@@ -7,7 +7,7 @@ object SkjemaMetadata {
         "SYK" to TemaKodeverk(
             skjemaer = hashMapOf(
                 "NAV 08-07.04D" to SkjemaKodeverk("SOK", 3),
-                "NAV 08-07.04 D" to SkjemaKodeverk("SOK", 3),
+                "NAV 08-07.04 D" to SkjemaKodeverk("SOK", 3)
             ),
             ignoreSkjema = listOf(
                 "4936",

@@ -57,7 +57,7 @@ class SafClient {
             throw TemporarilyUnavailableException()
         } else {
             val safErrorMessage = objectMapper.readValue(response.body(), SafErrorMessage::class.java)
-            log.error("Ved behandling av Journalpost $journalpostId: Feil (${safErrorMessage.status}) $SERVICENAME_SAF; error: ${safErrorMessage.error}, message: ${safErrorMessage.message}",)
+            log.error("Ved behandling av Journalpost $journalpostId: Feil (${safErrorMessage.status}) $SERVICENAME_SAF; error: ${safErrorMessage.error}, message: ${safErrorMessage.message}")
             throw ExternalServiceException(safErrorMessage.message!!, safErrorMessage.status)
         }
     }

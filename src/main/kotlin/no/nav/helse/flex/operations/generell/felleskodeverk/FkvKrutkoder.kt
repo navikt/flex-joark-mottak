@@ -40,15 +40,19 @@ data class FkvKrutkoder(
     fun getBehandlingstype(tema: String?, skjema: String?): String? {
         return if (tema.isNullOrBlank() || skjema.isNullOrBlank()) {
             skjemaMangler
-        } else getTemaSkjema(lagTemaSkjemaNokkel(tema, skjema))?.behandlingstype
+        } else {
+            getTemaSkjema(lagTemaSkjemaNokkel(tema, skjema))?.behandlingstype
+        }
     }
 
     fun getBehandlingstema(tema: String?, skjema: String?): String? {
         return if (tema.isNullOrBlank() || skjema.isNullOrBlank()) {
             skjemaMangler
-        } else getTemaSkjema(
-            lagTemaSkjemaNokkel(tema, skjema)
-        )?.behandlingstema
+        } else {
+            getTemaSkjema(
+                lagTemaSkjemaNokkel(tema, skjema)
+            )?.behandlingstema
+        }
     }
 
     override fun toString(): String {

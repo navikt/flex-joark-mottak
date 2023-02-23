@@ -109,7 +109,8 @@ class GenerellOperationTransformerSupplierTest {
         testDriver = TopologyTestDriver(testTopology(), props)
         inputTopic = testDriver.createInputTopic(INPUT_TOPIC, StringSerializer(), JfrKafkaSerializer())
         outputTopic = testDriver.createOutputTopic(
-            OUTPUT_TOPIC, StringDeserializer(),
+            OUTPUT_TOPIC,
+            StringDeserializer(),
             JfrKafkaDeserializer(
                 KafkaEvent::class.java
             )

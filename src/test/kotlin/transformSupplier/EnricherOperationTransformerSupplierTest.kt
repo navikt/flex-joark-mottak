@@ -100,10 +100,14 @@ class EnricherOperationTransformerSupplierTest {
     fun setup() {
         testDriver = TopologyTestDriver(testEnricherTopology(), props)
         inputTopic = testDriver.createInputTopic(
-            INPUT_TOPIC, StringSerializer(), JfrKafkaSerializer()
+            INPUT_TOPIC,
+            StringSerializer(),
+            JfrKafkaSerializer()
         )
         outputTopic = testDriver.createOutputTopic(
-            OUTPUT_TOPIC, StringDeserializer(), JfrKafkaDeserializer(KafkaEvent::class.java)
+            OUTPUT_TOPIC,
+            StringDeserializer(),
+            JfrKafkaDeserializer(KafkaEvent::class.java)
         )
         enricherKVStore = testDriver.getKeyValueStore(ENRICHER_OPERATION_STORE)
     }

@@ -55,7 +55,10 @@ class EventEnricherTest {
             )
         )
         every { fkvKrutkoder.getTemaSkjema(any()) } returns TemaSkjemaData(
-            "test", "NAV 08-07.04D", "ab0434", ""
+            "test",
+            "NAV 08-07.04D",
+            "ab0434",
+            ""
         )
 
         val event = KafkaEvent(UUID.randomUUID().toString(), "Mottatt", 123456789, "SYK", "NAV_NO", "M")

@@ -79,7 +79,8 @@ class JfrTopologies(
             streamsBuilder.addStateStore(oppgaveOperationSupplier)
 
             val aapenDokStream = streamsBuilder.stream(
-                inputTopic, Consumed.with(Serdes.String(), valueGenericAvroSerde)
+                inputTopic,
+                Consumed.with(Serdes.String(), valueGenericAvroSerde)
             )
 
             // Pre-processing

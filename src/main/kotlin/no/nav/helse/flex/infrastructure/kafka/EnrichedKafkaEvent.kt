@@ -27,12 +27,16 @@ data class EnrichedKafkaEvent(
     val skjema: String?
         get() = if (journalpost != null) {
             journalpost!!.brevkode
-        } else null
+        } else {
+            null
+        }
 
     val tema: String
         get() = if (journalpost == null) {
             kafkaEvent.temaNytt
-        } else journalpost!!.tema
+        } else {
+            journalpost!!.tema
+        }
 
     val fnr: String?
         get() {
