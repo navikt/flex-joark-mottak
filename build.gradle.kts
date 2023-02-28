@@ -42,7 +42,7 @@ val resilience4jVersion = "1.7.1"
 val gsonVersion = "2.10.1"
 val apacheCommonsVersion = "2.8.0"
 val logbackVersion = "1.4.5"
-val logstashVersion = "7.2"
+val logstashVersion = "7.3"
 
 val mockitoKotlinVersion = "2.2.0"
 val mockkVersion = "1.13.4"
