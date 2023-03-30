@@ -1,9 +1,10 @@
 kafkaPool: nav-prod
-safHost: saf.prod-fss-pub.nais.io
-dokarkivHost: dokarkiv.prod-fss-pub.nais.io
-pdlHost: pdl-api.prod-fss-pub.nais.io
-oppgaveHost: oppgave.prod-fss-pub.nais.io
-flexFssProxyHost: flex-fss-proxy.prod-fss-pub.nais.io
+external-host:
+  - saf.prod-fss-pub.nais.io
+  - dokarkiv.prod-fss-pub.nais.io
+  - pdl-api.prod-fss-pub.nais.io
+  - oppgave.prod-fss-pub.nais.io
+  - flex-fss-proxy.prod-fss-pub.nais.io
 env:
   AIVEN_DOKUMENT_TOPIC: teamdokumenthandtering.aapen-dok-journalfoering
     # SAF
