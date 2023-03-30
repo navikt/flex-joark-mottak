@@ -38,11 +38,9 @@ spec:
   accessPolicy:
     outbound:
       external:
-        - host: {{safHost}}
-        - host: {{dokarkivHost}}
-        - host: {{pdlHost}}
-        - host: {{oppgaveHost}}
-        - host: {{flexFssProxyHost}}
+  {{#each external-host}}
+        - host: {{this}}
+  {{/each}}
   env:
   {{#each env}}
     - name: {{@key}}
