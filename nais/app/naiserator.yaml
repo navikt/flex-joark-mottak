@@ -9,9 +9,9 @@ spec:
   image: {{image}}
   port: 8080
   liveness:
-    path: internal/alive
+    path: /internal/alive
   readiness:
-    path: internal/ready
+    path: /internal/ready
   startup:
     path: /internal/alive
     initialDelay: 20
@@ -22,7 +22,7 @@ spec:
     max: 1
   prometheus:
     enabled: true
-    path: internal/metrics
+    path: /internal/metrics
   resources:
     limits:
       memory: {{memory}}
