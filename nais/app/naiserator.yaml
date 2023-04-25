@@ -10,9 +10,10 @@ spec:
   port: 8080
   liveness:
     path: internal/alive
-    initialDelay: 20
   readiness:
     path: internal/ready
+  startup:
+    path: /internal/alive
     initialDelay: 20
   strategy:
     type: Recreate
