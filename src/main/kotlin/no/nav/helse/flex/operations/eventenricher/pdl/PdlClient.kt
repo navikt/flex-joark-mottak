@@ -20,6 +20,8 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.util.*
 
+class FinnerIkkePersonException() : RuntimeException()
+
 class PdlClient {
     private val persondataUrl: String = Environment.persondataUrl
     private val client = HttpClient.newHttpClient()
@@ -82,8 +84,7 @@ query(${"$"}ident: ID!){
             if (identer != null) {
                 return identer
             } else {
-                log.error("Klarer ikke hente ut bruker i responsen fra PDL på journalpost $journalpostId - ${parsedResponse.hentErrors()}")
-                throw Exception("Klarer ikke hente ut bruker i responsen fra PDL på journalpost")
+                throw FinnerIkkePersonException()
             }
         }
 

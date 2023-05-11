@@ -9,6 +9,8 @@ import no.nav.helse.flex.infrastructure.kafka.KafkaEvent
 import no.nav.helse.flex.infrastructure.metrics.Metrics.incRetry
 import no.nav.helse.flex.infrastructure.metrics.Metrics.setRetrystoreGauge
 import no.nav.helse.flex.operations.eventenricher.EventEnricher
+import no.nav.helse.flex.operations.eventenricher.pdl.FinnerIkkePersonException
+import no.nav.helse.flex.operations.generell.oppgave.OppgaveClient
 import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.kstream.Transformer
 import org.apache.kafka.streams.kstream.TransformerSupplier
@@ -21,7 +23,8 @@ import java.time.Duration
 
 class EventEnricherTransformerSupplier(
     private val stateStoreName: String,
-    private val eventEnricher: EventEnricher = EventEnricher()
+    private val eventEnricher: EventEnricher = EventEnricher(),
+    private val oppgaveClient: OppgaveClient = OppgaveClient()
 ) : TransformerSupplier<String, KafkaEvent, KeyValue<String, EnrichedKafkaEvent>> {
 
     override fun get(): Transformer<String, KafkaEvent, KeyValue<String, EnrichedKafkaEvent>> {
@@ -74,10 +77,12 @@ class EventEnricherTransformerSupplier(
                             enrichedKafkaEvent.isToIgnore = true
                             true
                         }
+
                         is FunctionalRequirementException -> {
                             enrichedKafkaEvent.isToManuell = true
                             true
                         }
+
                         is ExternalServiceException,
                         is TemporarilyUnavailableException -> {
                             enrichedKafkaEvent.incNumFailedAttempts()
@@ -91,8 +96,24 @@ class EventEnricherTransformerSupplier(
                                 true
                             }
                         }
+
+                        is FinnerIkkePersonException -> {
+                            // TODO: Lag test som sjekker denne logikken.
+                            log.warn("Finner ikke person for journalpost ${enrichedKafkaEvent.journalpostId}. Sjekker om det finnes oppgave.")
+                            return if (oppgaveClient.checkIfJournapostHasOppgave(enrichedKafkaEvent.journalpostId)) {
+                                log.info("Journalpost ${enrichedKafkaEvent.journalpostId} har oppgave.")
+                                true
+                            } else {
+                                log.info("Journalpost ${enrichedKafkaEvent.journalpostId} har ikke oppgave. Forsøker på nytt senere")
+                                false
+                            }
+                        }
+
                         else -> {
-                            log.error("Uventet feil på journalpost ${enrichedKafkaEvent.journalpostId}. Forsøker på nytt senere", e)
+                            log.error(
+                                "Uventet feil på journalpost ${enrichedKafkaEvent.journalpostId}. Forsøker på nytt senere",
+                                e
+                            )
                             false
                         }
                     }

@@ -11,6 +11,7 @@ import no.nav.helse.flex.infrastructure.kafka.JfrKafkaSerializer
 import no.nav.helse.flex.infrastructure.kafka.KafkaEvent
 import no.nav.helse.flex.infrastructure.kafka.transformerSupplier.EventEnricherTransformerSupplier
 import no.nav.helse.flex.operations.eventenricher.EventEnricher
+import no.nav.helse.flex.operations.generell.oppgave.OppgaveClient
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
@@ -38,7 +39,8 @@ import java.util.*
 @ExtendWith(MockKExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class EnricherOperationTransformerSupplierTest {
-    private val eventEnricher: EventEnricher = mockk(relaxed = true)
+    private val eventEnricherMock: EventEnricher = mockk(relaxed = true)
+    private val oppgaveClientMock: OppgaveClient = mockk(relaxed = true)
 
     private val MAX_RETRY = 48
     private val INPUT_TOPIC = "source-topic"
@@ -74,7 +76,8 @@ class EnricherOperationTransformerSupplierTest {
         )
         val eventEnricherTransformerSupplier = EventEnricherTransformerSupplier(
             ENRICHER_OPERATION_STORE,
-            eventEnricher
+            eventEnricherMock,
+            oppgaveClientMock
         )
 
         val streamsBuilder = StreamsBuilder()
@@ -121,7 +124,7 @@ class EnricherOperationTransformerSupplierTest {
 
     @Test
     fun test_when_enricher_catch_unknownException_retry() {
-        every { eventEnricher.createEnrichedKafkaEvent(any()) } throws Exception("Unknown Error")
+        every { eventEnricherMock.createEnrichedKafkaEvent(any()) } throws Exception("Unknown Error")
 
         inputTopic.pipeInput("Test123", testEvent)
         val kafkaEvent = enricherKVStore["Test123"]
@@ -131,7 +134,7 @@ class EnricherOperationTransformerSupplierTest {
 
     @Test
     fun test_journalpost_get_sent_to_enricher_fail_send_to_keyValueStore() {
-        every { eventEnricher.createEnrichedKafkaEvent(any()) } throws TemporarilyUnavailableException()
+        every { eventEnricherMock.createEnrichedKafkaEvent(any()) } throws TemporarilyUnavailableException()
 
         inputTopic.pipeInput("Test123", testEvent)
         val enrichedKafkaEvent = enricherKVStore["Test123"]
@@ -141,7 +144,7 @@ class EnricherOperationTransformerSupplierTest {
 
     @Test
     fun test_journalpost_enricher_fail_more_than_max_retry_send_to_manuell() {
-        every { eventEnricher.createEnrichedKafkaEvent(any()) } throws TemporarilyUnavailableException()
+        every { eventEnricherMock.createEnrichedKafkaEvent(any()) } throws TemporarilyUnavailableException()
 
         inputTopic.pipeInput("Test123", testEvent)
 
@@ -161,7 +164,7 @@ class EnricherOperationTransformerSupplierTest {
 
     @Test
     fun test_journalpost_enricher_fail_TUE_then_unknown_exception_retry() {
-        every { eventEnricher.createEnrichedKafkaEvent(any()) } throws TemporarilyUnavailableException()
+        every { eventEnricherMock.createEnrichedKafkaEvent(any()) } throws TemporarilyUnavailableException()
 
         inputTopic.pipeInput("Test123", testEvent)
 
@@ -170,7 +173,7 @@ class EnricherOperationTransformerSupplierTest {
         assertEquals(kafkaEvent.journalpostId, "123456789")
 
         // after 30 min schedule retry
-        every { eventEnricher.createEnrichedKafkaEvent(any()) } throws Exception("Ukjent feil")
+        every { eventEnricherMock.createEnrichedKafkaEvent(any()) } throws Exception("Ukjent feil")
         testDriver.advanceWallClockTime(Duration.ofMinutes(30))
         kafkaEvent = enricherKVStore["Test123"]
 
@@ -179,7 +182,7 @@ class EnricherOperationTransformerSupplierTest {
 
     @Test
     fun test_journalpost_enricher_not_continiouProcess_if_SAF_status_is_J() {
-        every { eventEnricher.createEnrichedKafkaEvent(any()) } throws InvalidJournalpostStatusException()
+        every { eventEnricherMock.createEnrichedKafkaEvent(any()) } throws InvalidJournalpostStatusException()
 
         val event = testEvent
         inputTopic.pipeInput("Test123", event)

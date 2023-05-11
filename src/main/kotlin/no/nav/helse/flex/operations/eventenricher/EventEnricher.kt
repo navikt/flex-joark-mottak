@@ -75,11 +75,13 @@ class EventEnricher(
             throw FunctionalRequirementException()
         }
 
-        val identer = pdlClient.retrieveIdenterFromPDL(
-            journalpost.bruker!!.id,
-            journalpost.tema,
-            enrichedKafkaEvent.journalpostId
-        )
+        val identer =
+            pdlClient.retrieveIdenterFromPDL(
+                journalpost.bruker!!.id,
+                journalpost.tema,
+                enrichedKafkaEvent.journalpostId
+            )
+
         enrichedKafkaEvent.identer = identer
         log.info("Hentet alle id-nummer for bruker på journalpost: ${journalpost.journalpostId} fra PDL")
     }
@@ -101,7 +103,10 @@ class EventEnricher(
             if (journalpost.hasJournalforendeEnhet()) {
                 log.info("Klarte ikke finne behandlingsverdier for journalpost ${journalpost.journalpostId}, bruker journalforendeEnhet ${journalpost.journalforendeEnhet}")
             } else {
-                log.info("Klarte ikke finne behandlingsverdier for journalpost ${journalpost.journalpostId} med tema ${journalpost.tema} og skjema ${journalpost.brevkode}", e)
+                log.info(
+                    "Klarte ikke finne behandlingsverdier for journalpost ${journalpost.journalpostId} med tema ${journalpost.tema} og skjema ${journalpost.brevkode}",
+                    e
+                )
             }
         }
     }
