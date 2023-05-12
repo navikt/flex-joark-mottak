@@ -67,13 +67,6 @@ class JournalOperationsTransformerSupplier(
                     true
                 } catch (e: TemporarilyUnavailableException) {
                     enrichedKafkaEvent.incNumFailedAttempts()
-
-                    if (enrichedKafkaEvent.journalpostId == "613889401") {
-                        log.info("Journalpost mangler person og har oppgave, her lager ikke vi ny oppgave")
-                        enrichedKafkaEvent.isToIgnore = true
-                        return true
-                    }
-
                     if (enrichedKafkaEvent.numFailedAttempts < MAX_NUM_RETRY) {
                         incRetry(stateStoreName, enrichedKafkaEvent)
                         log.info("Feilet under oppdatering/ferdigstilling av journalpost ${enrichedKafkaEvent.journalpostId} for gang nummer ${enrichedKafkaEvent.numFailedAttempts}. Forsøker på nytt senere")
