@@ -193,4 +193,15 @@ class JournalfoeringOperationTransformerSupplierTest {
         assertNull(kafkaEvent)
         assertEquals("123456789", outputTopic.readValue().getJournalpostId())
     }
+
+    @Test
+    fun test() {
+        every { journalforingOperations.doAutomaticStuff(any()) } throws TemporarilyUnavailableException()
+        inputTopic.pipeInput("613889401", testEvent.copy(journalpostId = 613889401))
+
+        val kafkaEvent = journalforingOperationsKVStore["613889401"]
+
+        assertNull(kafkaEvent)
+        assertTrue(outputTopic.isEmpty)
+    }
 }
