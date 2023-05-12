@@ -11,6 +11,7 @@ import no.nav.helse.flex.infrastructure.kafka.JfrKafkaSerializer
 import no.nav.helse.flex.infrastructure.kafka.KafkaEvent
 import no.nav.helse.flex.infrastructure.kafka.transformerSupplier.EventEnricherTransformerSupplier
 import no.nav.helse.flex.operations.eventenricher.EventEnricher
+import no.nav.helse.flex.operations.eventenricher.pdl.FinnerIkkePersonException
 import no.nav.helse.flex.operations.generell.oppgave.OppgaveClient
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.common.serialization.StringDeserializer
@@ -183,6 +184,19 @@ class EnricherOperationTransformerSupplierTest {
     @Test
     fun test_journalpost_enricher_not_continiouProcess_if_SAF_status_is_J() {
         every { eventEnricherMock.createEnrichedKafkaEvent(any()) } throws InvalidJournalpostStatusException()
+
+        val event = testEvent
+        inputTopic.pipeInput("Test123", event)
+        val kafkaEvent = enricherKVStore["Test123"]
+
+        assertNull(kafkaEvent)
+        assertEquals(0, outputTopic.queueSize)
+    }
+
+    @Test
+    fun test_journalpost_enricher_person_not_found_and_existing_oppgave_is_ignored() {
+        every { eventEnricherMock.createEnrichedKafkaEvent(any()) } throws FinnerIkkePersonException()
+        every { oppgaveClientMock.checkIfJournapostHasOppgave(any()) } returns true
 
         val event = testEvent
         inputTopic.pipeInput("Test123", event)

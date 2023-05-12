@@ -98,10 +98,10 @@ class EventEnricherTransformerSupplier(
                         }
 
                         is FinnerIkkePersonException -> {
-                            // TODO: Lag test som sjekker denne logikken.
                             log.warn("Finner ikke person for journalpost ${enrichedKafkaEvent.journalpostId}. Sjekker om det finnes oppgave.")
                             return if (oppgaveClient.checkIfJournapostHasOppgave(enrichedKafkaEvent.journalpostId)) {
                                 log.info("Journalpost ${enrichedKafkaEvent.journalpostId} har oppgave.")
+                                enrichedKafkaEvent.isToIgnore = true
                                 true
                             } else {
                                 log.info("Journalpost ${enrichedKafkaEvent.journalpostId} har ikke oppgave. Forsøker på nytt senere")
