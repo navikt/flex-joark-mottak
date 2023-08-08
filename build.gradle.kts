@@ -46,7 +46,7 @@ val logstashVersion = "7.3"
 
 val mockitoKotlinVersion = "2.2.0"
 val mockkVersion = "1.13.5"
-val junitVersion = "5.9.3"
+val junitVersion = "5.10.0"
 
 dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
