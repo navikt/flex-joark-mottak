@@ -6,7 +6,7 @@ external-host:
   - dokarkiv.prod-fss-pub.nais.io
   - pdl-api.prod-fss-pub.nais.io
   - oppgave.prod-fss-pub.nais.io
-  - flex-fss-proxy.prod-fss-pub.nais.io
+  - kodeverk.prod-fss-pub.nais.io
 env:
   AIVEN_DOKUMENT_TOPIC: teamdokumenthandtering.aapen-dok-journalfoering
     # SAF
@@ -22,5 +22,4 @@ env:
   OPPGAVE_CLIENT_ID: 50346823-61a0-49e7-ad89-ea2b1a0e90f8
   OPPGAVE_URL: https://oppgave.prod-fss-pub.nais.io
     # Felleskodeverk
-  FLEX_FSS_PROXY_CLIENT_ID: prod-fss.flex.flex-fss-proxy
-  FKV_URL: https://flex-fss-proxy.prod-fss-pub.nais.io/api/v1/kodeverk/Krutkoder/koder/betydninger?spraak=nb
+  FKV_URL: https://kodeverk.prod-fss-pub.nais.io/api/v1/kodeverk/Krutkoder/koder/betydninger?spraak=nb
