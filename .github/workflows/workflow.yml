@@ -1,5 +1,7 @@
 name: Build, push, and deploy
-on: push
+on:
+  workflow_dispatch:
+  push:
 env:
   APP: flex-joark-mottak
 jobs:

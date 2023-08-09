@@ -34,7 +34,6 @@ object Environment {
     private const val OPPGAVE_CLIENT_ID = "OPPGAVE_CLIENT_ID"
     private const val OPPGAVE_URL = "OPPGAVE_URL"
     private const val FKV_URL = "FKV_URL"
-    private const val FLEX_FSS_PROXY_CLIENT_ID = "FLEX_FSS_PROXY_CLIENT_ID"
 
     val bootstrapServersUrl get() = getEnvVar(KAFKA_BROKERS)
     val kafkaSchemaRegistryUrl get() = getEnvVar(KAFKA_SCHEMA_REGISTRY)
@@ -65,7 +64,6 @@ object Environment {
     val safClientId get() = getEnvVar(SAF_CLIENT_ID)
     val safUrl get() = getEnvVar(SAF_URL)
 
-    val proxyClientid get() = getEnvVar(FLEX_FSS_PROXY_CLIENT_ID)
     val fkvUrl get() = getEnvVar(FKV_URL)
 
     val pdlClientid get() = getEnvVar(PDL_CLIENT_ID)
