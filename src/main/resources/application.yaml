@@ -25,3 +25,6 @@ spring:
       max-poll-records: 1
       auto-offset-reset: none
       enable-auto-commit: false
+
+aiven-kafka:
+  auto-offset-reset: latest
