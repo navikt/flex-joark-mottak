@@ -14,6 +14,8 @@ version = "1.0.0"
 description = "flex-joark-mottak"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
+ext["okhttp3.version"] = "4.9.3" // Token-support tester trenger Mockwebserver.
+
 repositories {
     mavenCentral()
 
@@ -26,6 +28,7 @@ repositories {
     }
 }
 
+val caffeineVersion = "3.1.8"
 val confluentVersion = "7.5.2"
 val syfoKafkaVersion = "2021.07.20-09.39-6be2c52c"
 val sykepengesoknadKafkaVersion = "2023.08.21-12.33-c161cca9"
@@ -33,8 +36,10 @@ val mockitoKotlinVersion = "2.2.0"
 val ojdbc8Version = "19.3.0.0"
 val avroVersion = "1.11.2"
 val logstashLogbackEncoderVersion = "7.4"
+val tokenSupportVersion = "3.1.5"
 val testContainersVersion = "1.19.0"
 val kluentVersion = "1.73"
+val jsonSchemaValidatorVersion = "1.0.87"
 
 dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
@@ -42,8 +47,11 @@ dependencies {
     implementation(kotlin("reflect"))
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.kafka:spring-kafka")
+    implementation("com.github.ben-manes.caffeine:caffeine:$caffeineVersion")
     implementation("org.slf4j:slf4j-api")
+    implementation("org.hibernate.validator:hibernate-validator")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.aspectj:aspectjrt")
     implementation("org.aspectj:aspectjweaver")
@@ -52,6 +60,8 @@ dependencies {
     implementation("io.confluent:kafka-schema-registry-client:$confluentVersion")
     implementation("org.apache.avro:avro:$avroVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashLogbackEncoderVersion")
+    implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
+    implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
 
     testImplementation(platform("org.testcontainers:testcontainers-bom:$testContainersVersion"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -60,6 +70,8 @@ dependencies {
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.awaitility:awaitility")
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlinVersion")
+    testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
+    testImplementation("com.networknt:json-schema-validator:$jsonSchemaValidatorVersion") // TODO: Trengs denne?
     testImplementation("org.amshove.kluent:kluent:$kluentVersion")
 }
 
