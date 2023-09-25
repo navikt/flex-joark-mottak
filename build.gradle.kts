@@ -45,7 +45,7 @@ val logbackVersion = "1.4.11"
 val logstashVersion = "7.4"
 
 val mockitoKotlinVersion = "2.2.0"
-val mockkVersion = "1.13.7"
+val mockkVersion = "1.13.8"
 val junitVersion = "5.10.0"
 
 dependencies {
