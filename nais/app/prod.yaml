@@ -1,6 +1,4 @@
 kafkaPool: nav-prod
-cpu: 100m
-memory: 300Mi
 external-host:
   - saf.prod-fss-pub.nais.io
   - dokarkiv.prod-fss-pub.nais.io

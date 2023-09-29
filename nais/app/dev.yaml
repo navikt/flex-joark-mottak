@@ -1,6 +1,4 @@
 kafkaPool: nav-dev
-cpu: 100m
-memory: 300Mi
 external-host:
   - saf.dev-fss-pub.nais.io
   - dokarkiv.dev-fss-pub.nais.io
