@@ -25,10 +25,10 @@ spec:
     path: /internal/metrics
   resources:
     limits:
-      memory: {{memory}}
+      memory: 400Mi
     requests:
-      cpu: {{cpu}}
-      memory: {{memory}}
+      cpu: 100m
+      memory: 400Mi
   kafka:
     pool: {{kafkaPool}}
     streams: true
