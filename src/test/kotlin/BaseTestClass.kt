@@ -1,12 +1,10 @@
 import config.KafkaConfig
-import mock.DokarkivMockDispatcher
-import mock.OppgaveMockDispatcher
-import mock.PdlMockDispatcher
-import mock.SafMockDispatcher
+import mock.*
 import no.nav.helse.flex.Application
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import okhttp3.mockwebserver.MockWebServer
 import org.apache.kafka.clients.producer.KafkaProducer
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
@@ -28,6 +26,7 @@ abstract class BaseTestClass {
         val dokarkivMockWebserver: MockWebServer
         val pdlMockWebserver: MockWebServer
         val oppgaveMockWebserver: MockWebServer
+        val kodeverkMockWebServer: MockWebServer
         val topic: String get() = System.getProperty("AIVEN_DOKUMENT_TOPIC")
 
         init {
@@ -60,6 +59,11 @@ abstract class BaseTestClass {
             oppgaveMockWebserver = MockWebServer().apply {
                 System.setProperty("OPPGAVE_URL", "http://localhost:$port")
                 dispatcher = OppgaveMockDispatcher
+            }
+
+            kodeverkMockWebServer = MockWebServer().apply {
+                System.setProperty("FKV_URL", "http://localhost:$port")
+                dispatcher = KodeverkMockDispatcher
             }
 
             threads.forEach { it.join() }

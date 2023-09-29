@@ -42,13 +42,7 @@ class FkvClient(
             String::class.java
         )
 
-        // TODO: Resttemplate kaster exception når status ikke er 2xx-ok
-        if (response.statusCode.value() == 200) {
-            return objectMapper.readValue<FkvKrutkoder>(response.body!!)
-        } else {
-            log.error("Feil ved henting/parsing av Krutkoder fra Felles kodeverk")
-            throw ServiceUnavailableException()
-        }
+        return objectMapper.readValue<FkvKrutkoder>(response.body!!)
     }
 }
 

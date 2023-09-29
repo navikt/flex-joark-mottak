@@ -21,7 +21,7 @@ data class Journalpost(
         return !(JOURNALSTATUS_MOTTATT == journalstatus || JOURNALSTATUS_MIDLERTIDIG_JOURNALFOERT == journalstatus)
     }
 
-    class Bruker(val id: String, private val type: String) {
+    class Bruker(val id: String, val type: String) {
         val isAktoerId
             get() = AKTOERID == type
         val isFNR

@@ -57,7 +57,7 @@ data class KafkaEvent(
     val mottaksKanal: String,
     val journalpostStatus: String,
     val versjon: Int = 0,
-    val temaGammelt: String? = null,
-    val kanalReferanseId: String? = null,
-    val behandlingstema: String? = null
+    val temaGammelt: String,
+    val kanalReferanseId: String,
+    val behandlingstema: String = ""
 )

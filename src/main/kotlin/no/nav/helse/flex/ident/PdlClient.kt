@@ -46,22 +46,11 @@ class PdlClient(
 
         val parsedResponse = responseEntity.body?.let { objectMapper.readValue<GraphQLResponse<HentIdenterData>>(it) }
 
-        if (responseEntity.statusCode.is2xxSuccessful) {
-            val identer = parsedResponse?.data?.let {
-                it.hentIdenter?.identer
-            }
+        val identer = parsedResponse?.data?.let {
+            it.hentIdenter?.identer
+        } ?: throw FinnerIkkePersonException()
 
-            if (identer != null) {
-                return identer
-            }
-
-            throw FinnerIkkePersonException()
-        }
-
-        // TODO: Resttemplate kaster exception når status ikke er 2xx-ok
-        val errorMessage = parsedResponse?.hentErrors()
-        log.error("Feil ved kall mot PDL på journalpost ${journalpost.journalpostId}. Status: ${responseEntity.statusCode.value()} og feilmelding $errorMessage")
-        throw ExternalServiceException(errorMessage!!, responseEntity.statusCode.value())
+        return identer
     }
 }
 

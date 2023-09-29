@@ -52,7 +52,7 @@ class SafClient(
         throw ExternalServiceException(errorMessage!!, responseEntity.statusCode.value())
     }
 
-    private data class ResponseData(
+    data class ResponseData(
         val journalpost: Journalpost
     )
 }

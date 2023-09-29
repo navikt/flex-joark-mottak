@@ -40,7 +40,7 @@ class OppgaveClient(
 
         val response = oppgaveRestTemplate.exchange(
             uri,
-            HttpMethod.PATCH,
+            HttpMethod.POST,
             HttpEntity(requestData.serialisertTilString(), headers),
             String::class.java
         )
@@ -82,15 +82,7 @@ class OppgaveClient(
             String::class.java
         )
 
-        // TODO: Resttemplate kaster exception når status ikke er 2xx-ok
-        if (response.statusCode.value() == 200) {
-            return objectMapper.readValue<OppgaveSearchResponse>(response.body!!).harTilknyttetOppgave()
-        } else if (response.statusCode.value() == 404 || response.statusCode.value() == 503) {
-            throw TemporarilyUnavailableException()
-        } else {
-            val errorText = hentFeilmelding(response)
-            throw ExternalServiceException(errorText, response.statusCode.value())
-        }
+        return objectMapper.readValue<OppgaveSearchResponse>(response.body!!).harTilknyttetOppgave()
     }
 
     private fun hentFeilmelding(response: HttpEntity<String>): String {
@@ -132,7 +124,7 @@ data class OppgaveRequest(
     val behandlingstema: String? = null,
     val behandlingstype: String? = null,
     val oppgavetype: String,
-    private val frist: Int,
+    val frist: Int,
     var tildeltEnhetsnr: String? = null,
     val beskrivelse: String? = null
 ) {

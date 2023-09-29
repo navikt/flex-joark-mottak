@@ -71,7 +71,7 @@ dependencies {
     testImplementation("org.awaitility:awaitility")
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlinVersion")
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
-    testImplementation("com.networknt:json-schema-validator:$jsonSchemaValidatorVersion") // TODO: Trengs denne?
+    testImplementation("com.networknt:json-schema-validator:$jsonSchemaValidatorVersion")
     testImplementation("org.amshove.kluent:kluent:$kluentVersion")
 }
 
