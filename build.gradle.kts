@@ -29,8 +29,6 @@ val githubPassword: String by project
 repositories {
     mavenCentral()
     maven(url = "https://packages.confluent.io/maven/")
-
-    maven(url = "https://jitpack.io")
 }
 
 val kafkaVersion = "3.2.3"
