@@ -59,7 +59,7 @@ dependencies {
     implementation("io.prometheus:simpleclient_servlet_jakarta:$prometheusVersion")
     implementation("io.prometheus:simpleclient_hotspot:$prometheusVersion")
     implementation("io.prometheus:simpleclient_logback:$prometheusVersion")
-    implementation("org.json:json:20230618")
+    implementation("org.json:json:20231013")
     implementation("io.github.resilience4j:resilience4j-all:$resilience4jVersion")
     implementation("io.github.resilience4j:resilience4j-retry:$resilience4jVersion")
     implementation("io.github.resilience4j:resilience4j-circuitbreaker:$resilience4jVersion")
