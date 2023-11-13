@@ -47,7 +47,9 @@ class OppgaveClient(
 
         // TODO: Resttemplate kaster exception når status ikke er 2xx-ok
         if (response.statusCode.value() == 201) {
-            return objectMapper.readValue<Oppgave>(response.body!!)
+            val oppgave = objectMapper.readValue<Oppgave>(response.body!!)
+            log.info("Opprettet ${oppgave.oppgavetype}-oppgave: ${oppgave.id} på enhet ${oppgave.tildeltEnhetsnr} for journalpost: ${requestData.journalpostId}")
+            return oppgave
         } else if (response.statusCode.value() == 404) {
             log.error("Klarte ikke opprette oppgave på journalpost ${requestData.journalpostId}, statuskode: ${response.statusCode.value()}")
             throw TemporarilyUnavailableException()

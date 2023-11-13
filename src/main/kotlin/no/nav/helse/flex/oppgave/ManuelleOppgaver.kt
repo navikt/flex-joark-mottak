@@ -1,5 +1,6 @@
 package no.nav.helse.flex.oppgave
 
+import no.nav.helse.flex.felleskodeverk.FkvClient
 import no.nav.helse.flex.ident.AKTORID
 import no.nav.helse.flex.ident.PdlClient
 import no.nav.helse.flex.ident.PdlIdent
@@ -18,7 +19,8 @@ private const val TEMA_GENERELL = "GEN"
 class ManuelleOppgaver(
     private val oppgaveClient: OppgaveClient,
     private val pdlClient: PdlClient,
-    private val safClient: SafClient
+    private val safClient: SafClient,
+    private val fkvClient: FkvClient
 ) {
     private val log = logger()
 
@@ -70,11 +72,16 @@ class ManuelleOppgaver(
     }
 
     private fun createManuellJournalfoeringsoppgave(journalpost: Journalpost, identer: List<PdlIdent>) {
+        val behandlingstema = fkvClient.hentKrutkoder().getBehandlingstema(journalpost.tema, journalpost.brevkode)
+        val behandlingstype = if (journalpost.behandlingstema.isNullOrEmpty()) fkvClient.hentKrutkoder().getBehandlingstype(journalpost.tema, journalpost.brevkode) else journalpost.behandlingstema
+
+        log.info("Setter følgende verdier behandlingstema: '$behandlingstema', behandlingstype: '$behandlingstype' på journalpost ${journalpost.journalpostId}")
+
         val requestData = OppgaveRequest(
             journalpostId = journalpost.journalpostId,
             tema = journalpost.tema,
-            behandlingstema = journalpost.behandlingstema,
-            behandlingstype = journalpost.behandlingstype,
+            behandlingstema = behandlingstema,
+            behandlingstype = behandlingstype,
             oppgavetype = JOURNALORINGSOPPGAVE,
             tildeltEnhetsnr = journalpost.journalforendeEnhet,
             beskrivelse = journalpost.tittel,

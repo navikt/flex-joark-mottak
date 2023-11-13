@@ -1,11 +1,5 @@
 package mock
 
-import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.helse.flex.objectMapper
-import no.nav.helse.flex.oppgave.Oppgave
-import no.nav.helse.flex.oppgave.OppgaveRequest
-import no.nav.helse.flex.oppgave.OppgaveSearchResponse
-import no.nav.helse.flex.serialisertTilString
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest

@@ -1,17 +1,8 @@
-import com.fasterxml.jackson.module.kotlin.readValue
-import mock.DigitalSoknadPerson
-import mock.InntektsmeldingPerson
-import mock.InntektsopplysningerPerson
-import mock.PapirSoknadPerson
-import no.nav.helse.flex.KafkaEvent
-import no.nav.helse.flex.objectMapper
-import no.nav.helse.flex.oppgave.OppgaveRequest
-import no.nav.helse.flex.serialisertTilString
+import mock.*
 import org.amshove.kluent.shouldBeEqualTo
 import org.apache.kafka.clients.producer.ProducerRecord
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Test
-import org.testcontainers.shaded.org.awaitility.Awaitility
-import util.fromKClassToGenericRecord
 import java.util.concurrent.TimeUnit
 
 class IntegrasjonTest : BaseTestClass() {
@@ -19,7 +10,8 @@ class IntegrasjonTest : BaseTestClass() {
     fun `Mottar journalpost som allerede er ferdig arkivert i sykepengesoknad-arkivering-oppgave`() {
         kafkaProducer.send(
             ProducerRecord(
-                topic, fromKClassToGenericRecord(DigitalSoknadPerson.kafkaEvent)
+                topic,
+                DigitalSoknadPerson.kafkaEvent
             )
         ).get()
 
@@ -27,61 +19,140 @@ class IntegrasjonTest : BaseTestClass() {
     }
 
     @Test
-    fun `Mottar journalpost som skal journalføres`() {
+    fun `Papir sykepengesøknad som skal journalføres`() {
         kafkaProducer.send(
             ProducerRecord(
-                topic, fromKClassToGenericRecord(PapirSoknadPerson.kafkaEvent)
+                topic,
+                PapirSoknadPerson.kafkaEvent
             )
         ).get()
 
         val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
-        requestHarOppgave.method shouldBeEqualTo "GET"
-        requestHarOppgave.requestUrl?.queryParameter("statuskategori") shouldBeEqualTo "AAPEN"
-        requestHarOppgave.requestUrl?.queryParameter("journalpostId") shouldBeEqualTo PapirSoknadPerson.journalpostId
-
         val requestOpprettOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
-        requestOpprettOppgave.method shouldBeEqualTo "POST"
-        /*
-        val body = objectMapper.readValue<OppgaveRequest>(requestOpprettOppgave.body.readUtf8())
+        val requestOppdaterJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
+        val requestFerdigstillJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
+
+        requestHarOppgave.requestLine shouldBeEqualTo "GET /api/v1/oppgaver?statuskategori=AAPEN&oppgavetype=JFR&oppgavetype=FDR&journalpostId=${PapirSoknadPerson.journalpostId} HTTP/1.1"
+
+        requestOpprettOppgave.requestLine shouldBeEqualTo "POST /api/v1/oppgaver HTTP/1.1"
+        val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
         body.journalpostId shouldBeEqualTo PapirSoknadPerson.journalpostId
         body.tema shouldBeEqualTo "SYK"
         body.behandlingstema shouldBeEqualTo "ab0434"
         body.behandlingstype shouldBeEqualTo ""
-        */
 
-        val requestOppdaterJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
         requestOppdaterJournalpost.method shouldBeEqualTo "PUT"
         requestOppdaterJournalpost.requestUrl?.encodedPath shouldBeEqualTo "/rest/journalpostapi/v1/journalpost/${PapirSoknadPerson.journalpostId}"
 
-        val requestFerdigstillJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
         requestFerdigstillJournalpost.method shouldBeEqualTo "PATCH"
         requestFerdigstillJournalpost.requestUrl?.encodedPath shouldBeEqualTo "/rest/journalpostapi/v1/journalpost/${PapirSoknadPerson.journalpostId}/ferdigstill"
     }
 
     @Test
-    fun `Mottar journalpost som skal ha JFR oppgave`() {
+    fun `Inntektsopplysninger journalpost som skal ha JFR oppgave`() {
         kafkaProducer.send(
             ProducerRecord(
-                topic, fromKClassToGenericRecord(InntektsopplysningerPerson.kafkaEvent)
+                topic,
+                InntektsopplysningerPerson.kafkaEvent
             )
         ).get()
 
         val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
+        val requestOpprettOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
+        val requestFerdigstillJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)
+
         requestHarOppgave.method shouldBeEqualTo "GET"
         requestHarOppgave.requestUrl?.queryParameter("statuskategori") shouldBeEqualTo "AAPEN"
         requestHarOppgave.requestUrl?.queryParameter("journalpostId") shouldBeEqualTo InntektsopplysningerPerson.journalpostId
 
-        val requestOpprettOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
         requestOpprettOppgave.method shouldBeEqualTo "POST"
-        /*
-        val body = objectMapper.readValue<OppgaveRequest>(requestOpprettOppgave.body.readUtf8())
-        body.journalpostId shouldBeEqualTo PapirSoknadPerson.journalpostId
+        val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
+        body.journalpostId shouldBeEqualTo InntektsopplysningerPerson.journalpostId
         body.tema shouldBeEqualTo "SYK"
-        body.behandlingstema shouldBeEqualTo "ae0004"
-        body.behandlingstype shouldBeEqualTo ""
-        */
+        body.behandlingstema shouldBeEqualTo ""
+        body.behandlingstype shouldBeEqualTo "ae0004"
 
+        requestFerdigstillJournalpost shouldBeEqualTo null
+    }
+
+    @Test
+    fun `Klage journalpost som skal ha JFR oppgave`() {
+        kafkaProducer.send(
+            ProducerRecord(
+                topic,
+                KlagePerson.kafkaEvent
+            )
+        ).get()
+
+        val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
+        val requestOpprettOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
         val requestFerdigstillJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)
+
+        requestHarOppgave.method shouldBeEqualTo "GET"
+        requestHarOppgave.requestUrl?.queryParameter("statuskategori") shouldBeEqualTo "AAPEN"
+        requestHarOppgave.requestUrl?.queryParameter("journalpostId") shouldBeEqualTo KlagePerson.journalpostId
+
+        requestOpprettOppgave.method shouldBeEqualTo "POST"
+        val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
+        body.journalpostId shouldBeEqualTo KlagePerson.journalpostId
+        body.tema shouldBeEqualTo "SYK"
+        body.behandlingstema shouldBeEqualTo ""
+        body.behandlingstype shouldBeEqualTo ""
+
+        requestFerdigstillJournalpost shouldBeEqualTo null
+    }
+
+    @Test
+    fun `Utlansk søknad om sykepenger som skal ha JFR oppgave`() {
+        kafkaProducer.send(
+            ProducerRecord(
+                topic,
+                UtlanskPerson.kafkaEvent
+            )
+        ).get()
+
+        val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
+        val requestOpprettOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
+        val requestFerdigstillJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)
+
+        requestHarOppgave.method shouldBeEqualTo "GET"
+        requestHarOppgave.requestUrl?.queryParameter("statuskategori") shouldBeEqualTo "AAPEN"
+        requestHarOppgave.requestUrl?.queryParameter("journalpostId") shouldBeEqualTo UtlanskPerson.journalpostId
+
+        requestOpprettOppgave.method shouldBeEqualTo "POST"
+        val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
+        body.journalpostId shouldBeEqualTo UtlanskPerson.journalpostId
+        body.tema shouldBeEqualTo "SYK"
+        body.behandlingstema shouldBeEqualTo ""
+        body.behandlingstype shouldBeEqualTo "ae0106"
+
+        requestFerdigstillJournalpost shouldBeEqualTo null
+    }
+
+    @Test
+    fun `Journalpost uten brevkode skal ha JFR oppgave`() {
+        kafkaProducer.send(
+            ProducerRecord(
+                topic,
+                BrevløsPerson.kafkaEvent
+            )
+        ).get()
+
+        val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
+        val requestOpprettOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
+        val requestFerdigstillJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)
+
+        requestHarOppgave.method shouldBeEqualTo "GET"
+        requestHarOppgave.requestUrl?.queryParameter("statuskategori") shouldBeEqualTo "AAPEN"
+        requestHarOppgave.requestUrl?.queryParameter("journalpostId") shouldBeEqualTo BrevløsPerson.journalpostId
+
+        requestOpprettOppgave.method shouldBeEqualTo "POST"
+        val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
+        body.journalpostId shouldBeEqualTo BrevløsPerson.journalpostId
+        body.tema shouldBeEqualTo "SYK"
+        body.behandlingstema shouldBeEqualTo ""
+        body.behandlingstype shouldBeEqualTo ""
+
         requestFerdigstillJournalpost shouldBeEqualTo null
     }
 
@@ -89,7 +160,8 @@ class IntegrasjonTest : BaseTestClass() {
     fun `Mottar journalpost som vi skal ingnorere`() {
         kafkaProducer.send(
             ProducerRecord(
-                topic, fromKClassToGenericRecord(InntektsmeldingPerson.kafkaEvent)
+                topic,
+                InntektsmeldingPerson.kafkaEvent
             )
         ).get()
 
@@ -100,7 +172,7 @@ class IntegrasjonTest : BaseTestClass() {
         requestFerdigstillJournalpost shouldBeEqualTo null
     }
 
-    @Test
+    @AfterAll
     fun `Kodeverket ble bare kalt en gang og resultatet ble chacet`() {
         val request = kodeverkMockWebServer.takeRequest(1, TimeUnit.SECONDS)!!
         request.requestUrl?.encodedPath shouldBeEqualTo "/api/v1/kodeverk/Krutkoder/koder/betydninger"

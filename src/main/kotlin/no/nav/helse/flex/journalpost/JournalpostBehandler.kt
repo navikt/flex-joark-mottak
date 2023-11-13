@@ -32,6 +32,7 @@ class JournalpostBehandler(
             if (!gyldigeDokumentTitler(journalpost)) {
                 throw OpprettManuellOppgaveException()
             }
+
             if (oppgaveClient.finnesOppgaveForJournalpost(journalpost.journalpostId)) {
                 log.info("Det finnes oppgave på journalpost ${journalpost.journalpostId}, avslutt videre behandling")
                 return

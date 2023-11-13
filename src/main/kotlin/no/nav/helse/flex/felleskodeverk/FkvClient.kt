@@ -11,7 +11,6 @@ import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
-import javax.naming.ServiceUnavailableException
 
 @Component
 class FkvClient(
