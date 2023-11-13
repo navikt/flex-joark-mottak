@@ -1,6 +1,7 @@
 package no.nav.helse.flex.journalpost
 
 import no.nav.helse.flex.KafkaEvent
+import no.nav.helse.flex.felleskodeverk.SkjemaMetadata
 import no.nav.helse.flex.logger
 import no.nav.helse.flex.oppgave.AutoOppgaver
 import no.nav.helse.flex.oppgave.ManuelleOppgaver

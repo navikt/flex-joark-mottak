@@ -1,12 +1,12 @@
 package no.nav.helse.flex.oppgave
 
 import no.nav.helse.flex.felleskodeverk.FkvClient
+import no.nav.helse.flex.felleskodeverk.SkjemaMetadata
 import no.nav.helse.flex.ident.AKTORID
 import no.nav.helse.flex.ident.FOLKEREGISTERIDENT
 import no.nav.helse.flex.ident.Identer
 import no.nav.helse.flex.journalpost.Journalpost
 import no.nav.helse.flex.logger
-import no.nav.helse.flex.refactor.SkjemaMetadata
 import org.springframework.stereotype.Component
 
 @Component

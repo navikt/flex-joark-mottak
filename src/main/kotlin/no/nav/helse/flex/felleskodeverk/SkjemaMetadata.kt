@@ -1,6 +1,6 @@
-package no.nav.helse.flex.refactor
+package no.nav.helse.flex.felleskodeverk
 
-import java.util.*
+import java.util.HashMap
 
 object SkjemaMetadata {
     private val temaMap: HashMap<String, TemaKodeverk> = hashMapOf(
