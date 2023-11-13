@@ -24,14 +24,15 @@ class DokumentConsumer(
         properties = ["auto.offset.reset = earliest"]
     )
     fun listen(cr: ConsumerRecord<String, GenericRecord>, acknowledgment: Acknowledgment) {
-        // TODO: Fjern meg
-        log.info("Key: ${cr.key()}, Value: ${cr.value()}")
-
         val genericRecord = cr.value()
 
         if (genericRecord["temaNytt"].toString() != "SYK") {
             return
         }
+
+        // TODO: Fjern meg
+        log.info("Key: ${cr.key()}, Value: ${cr.value()}")
+
         if (genericRecord["hendelsesType"].toString() !in listOf("MidlertidigJournalført", "Mottatt", "JournalpostMottatt")) {
             return
         }
