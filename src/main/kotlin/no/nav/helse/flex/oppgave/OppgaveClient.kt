@@ -33,13 +33,8 @@ class OppgaveClient(
         val headers = HttpHeaders()
         headers[CONTENT_TYPE_HEADER] = MediaType.APPLICATION_JSON_VALUE
 
-        val uri = UriComponentsBuilder.fromHttpUrl(oppgaveUrl)
-            .path("/api/v1/oppgaver")
-            .build()
-            .toUri()
-
         val response = oppgaveRestTemplate.exchange(
-            uri,
+            "$oppgaveUrl/api/v1/oppgaver",
             HttpMethod.POST,
             HttpEntity(requestData.serialisertTilString(), headers),
             String::class.java
@@ -73,15 +68,16 @@ class OppgaveClient(
             .queryParam("statuskategori", PARAM_STATUSKATEGORI_AAPEN)
             .queryParam("oppgavetype", PARAM_OPPGAVETYPE_JFR)
             .queryParam("oppgavetype", PARAM_OPPGAVETYPE_FDR)
-            .queryParam("journalpostId", journalpostId)
-            .build()
-            .toUri()
+            .queryParam("journalpostId", "{id}")
+            .encode()
+            .toUriString()
 
         val response = oppgaveRestTemplate.exchange(
             uri,
             HttpMethod.GET,
             HttpEntity<Any>(headers),
-            String::class.java
+            String::class.java,
+            mapOf("id" to journalpostId)
         )
 
         return objectMapper.readValue<OppgaveSearchResponse>(response.body!!).harTilknyttetOppgave()

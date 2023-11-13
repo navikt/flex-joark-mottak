@@ -8,7 +8,6 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
-import org.springframework.web.util.UriComponentsBuilder
 
 @Component
 class DokArkivClient(
@@ -20,15 +19,12 @@ class DokArkivClient(
         val headers = HttpHeaders()
         headers[CONTENT_TYPE_HEADER] = MediaType.APPLICATION_JSON_VALUE
 
-        val uri = UriComponentsBuilder.fromHttpUrl(dokarkivUrl)
-            .path("/rest/journalpostapi/v1/journalpost/{id}/ferdigstill")
-            .build(mapOf("id" to journalpostId))
-
         dokarkivRestTemplate.exchange(
-            uri,
+            "$dokarkivUrl/rest/journalpostapi/v1/journalpost/{id}/ferdigstill",
             HttpMethod.PATCH,
             HttpEntity(FerdigstillJournalpostRequest().serialisertTilString(), headers),
-            String::class.java
+            String::class.java,
+            mapOf("id" to journalpostId)
         )
     }
 
@@ -36,15 +32,12 @@ class DokArkivClient(
         val headers = HttpHeaders()
         headers[CONTENT_TYPE_HEADER] = MediaType.APPLICATION_JSON_VALUE
 
-        val uri = UriComponentsBuilder.fromHttpUrl(dokarkivUrl)
-            .path("/rest/journalpostapi/v1/journalpost/{id}")
-            .build(mapOf("id" to journalpost.journalpostId))
-
         dokarkivRestTemplate.exchange(
-            uri,
+            "$dokarkivUrl/rest/journalpostapi/v1/journalpost/{id}",
             HttpMethod.PUT,
             HttpEntity(journalpost.serialisertTilString(), headers),
-            String::class.java
+            String::class.java,
+            mapOf("id" to journalpost.journalpostId)
         )
     }
 }

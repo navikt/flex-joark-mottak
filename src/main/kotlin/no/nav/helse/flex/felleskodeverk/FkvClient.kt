@@ -31,8 +31,8 @@ class FkvClient(
         val uri = UriComponentsBuilder.fromHttpUrl(fkvUrl)
             .path("/api/v1/kodeverk/Krutkoder/koder/betydninger")
             .queryParam("spraak", "nb")
-            .build()
-            .toUri()
+            .encode()
+            .toUriString()
 
         val response = plainRestTemplate.exchange(
             uri,

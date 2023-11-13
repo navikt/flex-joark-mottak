@@ -13,7 +13,6 @@ import org.springframework.http.*
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
-import org.springframework.web.util.UriComponentsBuilder
 
 @Component
 class PdlClient(
@@ -29,13 +28,8 @@ class PdlClient(
         headers[CONTENT_TYPE_HEADER] = MediaType.APPLICATION_JSON_VALUE
         headers[TEMA] = TEMA_SYK
 
-        val uri = UriComponentsBuilder.fromHttpUrl(pdlApiUrl)
-            .path("/graphql")
-            .build()
-            .toUri()
-
         val responseEntity: ResponseEntity<String> = pdlRestTemplate.exchange(
-            uri,
+            "$pdlApiUrl/graphql",
             HttpMethod.POST,
             HttpEntity(
                 GraphQLRequest(HENT_IDENTER, mapOf(IDENT to journalpost.bruker!!.id)).serialisertTilString(),

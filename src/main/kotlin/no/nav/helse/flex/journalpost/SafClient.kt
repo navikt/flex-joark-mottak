@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.*
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
-import org.springframework.web.util.UriComponentsBuilder
 
 @Component
 class SafClient(
@@ -25,13 +24,8 @@ class SafClient(
         val headers = HttpHeaders()
         headers[CONTENT_TYPE_HEADER] = MediaType.APPLICATION_JSON_VALUE
 
-        val uri = UriComponentsBuilder.fromHttpUrl(safApiUrl)
-            .path("/graphql")
-            .build()
-            .toUri()
-
         val responseEntity = safRestTemplate.exchange(
-            uri,
+            "$safApiUrl/graphql",
             HttpMethod.POST,
             HttpEntity(
                 GraphQLRequest(SAF_QUERY_FIND_JOURNALPOST, mapOf("id" to journalpostId)).serialisertTilString(),
