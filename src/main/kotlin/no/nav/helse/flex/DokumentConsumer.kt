@@ -18,7 +18,7 @@ class DokumentConsumer(
 
     @KafkaListener(
         topics = ["#{environmentToggles.dokumentTopic()}"],
-        id = "flex-joark-mottak-test",
+        id = "flex-joark-mottak",
         idIsGroup = true,
         containerFactory = "kafkaAvroListenerContainerFactory",
         properties = ["auto.offset.reset = earliest"]
