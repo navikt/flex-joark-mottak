@@ -3,15 +3,11 @@ package no.nav.helse.flex.oppgave
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.helse.flex.logger
 import no.nav.helse.flex.objectMapper
-import no.nav.helse.flex.refactor.ExternalServiceException
-import no.nav.helse.flex.refactor.TemporarilyUnavailableException
 import no.nav.helse.flex.serialisertTilString
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
-import org.springframework.http.MediaType
+import org.springframework.http.*
 import org.springframework.stereotype.Component
+import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import java.time.*
@@ -29,34 +25,48 @@ class OppgaveClient(
 ) {
     private val log = logger()
 
-    fun createOppgave(requestData: OppgaveRequest): Oppgave {
+    fun opprettOppgave(requestData: OppgaveRequest): Oppgave {
+        val response = runCatching {
+            opprettOppgaveKall(requestData)
+        }.recover { httpException ->
+            if (httpException is HttpClientErrorException && httpException.statusCode.value() == 400) {
+                val oppgaveErrorResponse = try {
+                    objectMapper.readValue<OppgaveErrorResponse>(httpException.responseBodyAsByteArray)
+                } catch (e: Exception) {
+                    throw httpException
+                }
+
+                if (oppgaveErrorResponse.isErrorInvalidEnhet()) {
+                    log.warn("Klarte ikke opprette oppgave pga ugyldig enhet på journalpost ${requestData.journalpostId}", oppgaveErrorResponse.feilmelding)
+                    requestData.removeJournalforendeEnhet()
+                    return@recover opprettOppgaveKall(requestData)
+                }
+
+                if (oppgaveErrorResponse.isErrorInvalidOrgNr()) {
+                    log.warn("Klarte ikke opprette oppgave pga ugyldig OrgNr på journalpost ${requestData.journalpostId}", oppgaveErrorResponse.feilmelding)
+                    requestData.removeOrgNr()
+                    return@recover opprettOppgaveKall(requestData)
+                }
+            }
+            throw httpException
+        }.getOrThrow()
+
+        val oppgave = objectMapper.readValue<Oppgave>(response.body!!)
+        log.info("Opprettet ${oppgave.oppgavetype}-oppgave: ${oppgave.id} på enhet ${oppgave.tildeltEnhetsnr} for journalpost: ${requestData.journalpostId}")
+
+        return oppgave
+    }
+
+    private fun opprettOppgaveKall(requestData: OppgaveRequest): ResponseEntity<String> {
         val headers = HttpHeaders()
         headers[CONTENT_TYPE_HEADER] = MediaType.APPLICATION_JSON_VALUE
 
-        val response = oppgaveRestTemplate.exchange(
+        return oppgaveRestTemplate.exchange(
             "$oppgaveUrl/api/v1/oppgaver",
             HttpMethod.POST,
             HttpEntity(requestData.serialisertTilString(), headers),
             String::class.java
         )
-
-        // TODO: Resttemplate kaster exception når status ikke er 2xx-ok
-        if (response.statusCode.value() == 201) {
-            val oppgave = objectMapper.readValue<Oppgave>(response.body!!)
-            log.info("Opprettet ${oppgave.oppgavetype}-oppgave: ${oppgave.id} på enhet ${oppgave.tildeltEnhetsnr} for journalpost: ${requestData.journalpostId}")
-            return oppgave
-        } else if (response.statusCode.value() == 404) {
-            log.error("Klarte ikke opprette oppgave på journalpost ${requestData.journalpostId}, statuskode: ${response.statusCode.value()}")
-            throw TemporarilyUnavailableException()
-        } else if (response.statusCode.is5xxServerError) {
-            val errorText = hentFeilmelding(response)
-            log.error("Klarte ikke opprette oppgave på journalpost ${requestData.journalpostId}, statuskode: ${response.statusCode.value()}. $errorText")
-            throw TemporarilyUnavailableException()
-        } else {
-            val errorText = hentFeilmelding(response)
-            log.error("Klarte ikke opprette oppgave for journalpost ${requestData.journalpostId}, statuskode: ${response.statusCode}. $errorText")
-            throw ExternalServiceException(errorText, response.statusCode.value())
-        }
     }
 
     fun finnesOppgaveForJournalpost(journalpostId: String): Boolean {
@@ -82,11 +92,6 @@ class OppgaveClient(
 
         return objectMapper.readValue<OppgaveSearchResponse>(response.body!!).harTilknyttetOppgave()
     }
-
-    private fun hentFeilmelding(response: HttpEntity<String>): String {
-        val oppgaveErrorResponse: OppgaveErrorResponse = objectMapper.readValue(response.body!!)
-        return oppgaveErrorResponse.feilmelding
-    }
 }
 
 data class Oppgave(
@@ -103,7 +108,19 @@ data class Oppgave(
 data class OppgaveErrorResponse(
     val uuid: String,
     val feilmelding: String
-)
+) {
+    fun isErrorInvalidEnhet(): Boolean {
+        return (
+            feilmelding.contains("NAVEnheten '") && feilmelding.contains("' er av typen oppgavebehandler") ||
+                feilmelding.contains("NAVEnheten '") && feilmelding.contains("' har status: 'Nedlagt'") ||
+                feilmelding.contains("Enheten med nummeret '") && feilmelding.contains("' eksisterer ikke")
+            )
+    }
+
+    fun isErrorInvalidOrgNr(): Boolean {
+        return (feilmelding.contains("Organisasjonsnummer er ugyldig"))
+    }
+}
 
 data class OppgaveSearchResponse(
     val antallTreffTotalt: Int = 0,

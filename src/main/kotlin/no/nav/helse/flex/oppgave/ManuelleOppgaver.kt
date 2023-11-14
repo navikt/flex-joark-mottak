@@ -7,7 +7,6 @@ import no.nav.helse.flex.ident.PdlIdent
 import no.nav.helse.flex.journalpost.Journalpost
 import no.nav.helse.flex.journalpost.SafClient
 import no.nav.helse.flex.logger
-import no.nav.helse.flex.refactor.ExternalServiceException
 import org.springframework.stereotype.Component
 
 private const val FORDELINGSOPPGAVE = "FDR"
@@ -68,7 +67,7 @@ class ManuelleOppgaver(
             }
         }
 
-        oppgaveClient.createOppgave(requestData)
+        oppgaveClient.opprettOppgave(requestData)
     }
 
     private fun createManuellJournalfoeringsoppgave(journalpost: Journalpost, identer: List<PdlIdent>) {
@@ -94,32 +93,6 @@ class ManuelleOppgaver(
             }
         }
 
-        try {
-            oppgaveClient.createOppgave(requestData)
-        } catch (e: ExternalServiceException) {
-            if (isErrorInvalidEnhet(e.feilmelding)) {
-                log.warn("Klarte ikke opprette oppgave pga ugyldig enhet på journalpost ${journalpost.journalpostId}")
-                requestData.removeJournalforendeEnhet()
-                oppgaveClient.createOppgave(requestData)
-            } else if (isErrorInvalidOrgNr(e.feilmelding)) {
-                log.warn("Klarte ikke opprette oppgave pga ugyldig OrgNr på journalpost ${journalpost.journalpostId}")
-                requestData.removeOrgNr()
-                oppgaveClient.createOppgave(requestData)
-            } else {
-                throw e
-            }
-        }
-    }
-
-    private fun isErrorInvalidEnhet(feilmelding: String): Boolean {
-        return (
-            feilmelding.contains("NAVEnheten '") && feilmelding.contains("' er av typen oppgavebehandler") ||
-                feilmelding.contains("NAVEnheten '") && feilmelding.contains("' har status: 'Nedlagt'") ||
-                feilmelding.contains("Enheten med nummeret '") && feilmelding.contains("' eksisterer ikke")
-            )
-    }
-
-    private fun isErrorInvalidOrgNr(feilmelding: String?): Boolean {
-        return (feilmelding != null && feilmelding.contains("Organisasjonsnummer er ugyldig"))
+        oppgaveClient.opprettOppgave(requestData)
     }
 }

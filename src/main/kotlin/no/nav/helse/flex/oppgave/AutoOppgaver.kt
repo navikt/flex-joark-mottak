@@ -43,7 +43,7 @@ class AutoOppgaver(
         }
 
         log.info("Oppretter oppgave for journalpost: ${journalpost.journalpostId}")
-        oppgaveClient.createOppgave(requestData)
+        oppgaveClient.opprettOppgave(requestData)
 
         journalpost = journalpost.copy(sak = Journalpost.Sak("GENERELL_SAK"))
 
