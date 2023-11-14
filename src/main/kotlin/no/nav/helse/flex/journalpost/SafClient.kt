@@ -5,12 +5,12 @@ import no.nav.helse.flex.graphql.GraphQLRequest
 import no.nav.helse.flex.graphql.GraphQLResponse
 import no.nav.helse.flex.logger
 import no.nav.helse.flex.objectMapper
-import no.nav.helse.flex.refactor.ExternalServiceException
 import no.nav.helse.flex.serialisertTilString
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.*
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
+import java.lang.Exception
 
 @Component
 class SafClient(
@@ -34,16 +34,22 @@ class SafClient(
             String::class.java
         )
 
-        val parsedResponse = responseEntity.body?.let { objectMapper.readValue<GraphQLResponse<ResponseData>>(it) }
-
-        if (responseEntity.statusCode.is2xxSuccessful && parsedResponse != null) {
-            return parsedResponse.data.journalpost
+        if (responseEntity.body == null) {
+            throw Exception("Mangler body i response fra saf for journalpost $journalpostId, statuskode: ${responseEntity.statusCode.value()}")
         }
 
-        // TODO: Resttemplate kaster exception når status ikke er 2xx-ok
-        val errorMessage = parsedResponse?.hentErrors()
-        log.error("Feil ved kall mot PDL på journalpost $journalpostId. Status: ${responseEntity.statusCode.value()} og feilmelding $errorMessage")
-        throw ExternalServiceException(errorMessage!!, responseEntity.statusCode.value())
+        val parsedResponse = responseEntity.body!!.let { objectMapper.readValue<GraphQLResponse<ResponseData>>(it) }
+
+        parsedResponse.errors?.forEach {
+            log.error("Feil i response fra saf for journalpost $journalpostId", it.serialisertTilString())
+        }
+
+        if (!responseEntity.statusCode.is2xxSuccessful) {
+            // Tror denne aldri kan skje
+            throw Exception("Saf response for journalpost $journalpostId med statuskode ${responseEntity.statusCode.value()}")
+        }
+
+        return parsedResponse.data.journalpost
     }
 
     data class ResponseData(

@@ -13,6 +13,7 @@ import org.springframework.http.*
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
+import java.lang.Exception
 
 @Component
 class PdlClient(
@@ -38,13 +39,22 @@ class PdlClient(
             String::class.java
         )
 
-        val parsedResponse = responseEntity.body?.let { objectMapper.readValue<GraphQLResponse<HentIdenterData>>(it) }
+        if (responseEntity.body == null) {
+            throw Exception("Mangler body i response fra pdl for journalpost ${journalpost.journalpostId}, statuskode: ${responseEntity.statusCode.value()}")
+        }
 
-        val identer = parsedResponse?.data?.let {
-            it.hentIdenter?.identer
-        } ?: throw FinnerIkkePersonException()
+        val parsedResponse = responseEntity.body!!.let { objectMapper.readValue<GraphQLResponse<HentIdenterData>>(it) }
 
-        return identer
+        parsedResponse.errors?.forEach {
+            log.error("Feil i response fra pdl for journalpost ${journalpost.journalpostId}", it.serialisertTilString())
+        }
+
+        if (!responseEntity.statusCode.is2xxSuccessful) {
+            // Tror denne aldri kan skje
+            throw Exception("Pdl response for journalpost ${journalpost.journalpostId} med statuskode ${responseEntity.statusCode.value()}")
+        }
+
+        return parsedResponse.data.hentIdenter?.identer ?: throw FinnerIkkePersonException()
     }
 }
 
