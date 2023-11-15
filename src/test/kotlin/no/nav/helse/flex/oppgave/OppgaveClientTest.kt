@@ -1,6 +1,8 @@
 package no.nav.helse.flex.oppgave
 
 import BaseTestClass
+import io.micrometer.core.instrument.Tag
+import io.micrometer.prometheus.PrometheusMeterRegistry
 import no.nav.helse.flex.serialisertTilString
 import okhttp3.mockwebserver.MockResponse
 import org.amshove.kluent.shouldBeEqualTo
@@ -18,6 +20,9 @@ import java.util.*
 class OppgaveClientTest : BaseTestClass() {
     @Autowired
     private lateinit var oppgaveClient: OppgaveClient
+
+    @Autowired
+    private lateinit var prometheusMeterRegistry: PrometheusMeterRegistry
 
     val oppgaveRequest = OppgaveRequest(
         journalpostId = "x",
@@ -45,6 +50,8 @@ class OppgaveClientTest : BaseTestClass() {
         val request = oppgaveRequest.copy(journalpostId = "1")
         val oppgave = oppgaveClient.opprettOppgave(request)
         oppgave.tildeltEnhetsnr shouldBeEqualTo request.tildeltEnhetsnr
+
+        prometheusMeterRegistry.meters.find { it.id.name == "http.client.requests" && it.id.tags.contains(Tag.of("uri", "/api/v1/oppgaver")) } shouldNotBeEqualTo null
     }
 
     @Test
