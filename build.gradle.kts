@@ -31,7 +31,7 @@ repositories {
     maven(url = "https://packages.confluent.io/maven/")
 }
 
-val kafkaVersion = "3.2.3"
+val kafkaVersion = "7.5.2-ce"
 val confluentVersion = "7.5.2"
 
 val jettyVersion = "11.0.18"
