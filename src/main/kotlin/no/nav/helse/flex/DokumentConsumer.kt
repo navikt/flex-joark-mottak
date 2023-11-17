@@ -14,8 +14,6 @@ import java.util.*
 class DokumentConsumer(
     private val journalpostBehandler: JournalpostBehandler
 ) {
-    private val log = logger()
-
     @KafkaListener(
         topics = ["#{environmentToggles.dokumentTopic()}"],
         id = "flex-joark-mottak",
@@ -29,9 +27,6 @@ class DokumentConsumer(
         if (genericRecord["temaNytt"].toString() != "SYK") {
             return
         }
-
-        // TODO: Fjern meg
-        log.info("Key: ${cr.key()}, Value: ${cr.value()}")
 
         if (genericRecord["hendelsesType"].toString() !in listOf("MidlertidigJournalført", "Mottatt", "JournalpostMottatt")) {
             return
