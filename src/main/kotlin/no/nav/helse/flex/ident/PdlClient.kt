@@ -3,10 +3,10 @@ package no.nav.helse.flex.ident
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.helse.flex.graphql.GraphQLRequest
 import no.nav.helse.flex.graphql.GraphQLResponse
+import no.nav.helse.flex.journalpost.FinnerIkkePersonException
 import no.nav.helse.flex.journalpost.Journalpost
 import no.nav.helse.flex.logger
 import no.nav.helse.flex.objectMapper
-import no.nav.helse.flex.refactor.*
 import no.nav.helse.flex.serialisertTilString
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.*

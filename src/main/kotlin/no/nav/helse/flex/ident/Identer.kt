@@ -1,9 +1,10 @@
 package no.nav.helse.flex.ident
 
+import no.nav.helse.flex.journalpost.FinnerIkkePersonException
 import no.nav.helse.flex.journalpost.Journalpost
+import no.nav.helse.flex.journalpost.OpprettManuellOppgaveException
 import no.nav.helse.flex.logger
 import no.nav.helse.flex.oppgave.OppgaveClient
-import no.nav.helse.flex.refactor.*
 import org.springframework.stereotype.Component
 
 @Component

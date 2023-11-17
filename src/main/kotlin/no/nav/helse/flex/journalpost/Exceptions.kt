@@ -1,4 +1,4 @@
-package no.nav.helse.flex.refactor
+package no.nav.helse.flex.journalpost
 
 class InvalidJournalpostStatusException : Exception()
 class FinnerIkkePersonException : Exception()

@@ -6,7 +6,6 @@ import no.nav.helse.flex.logger
 import no.nav.helse.flex.oppgave.AutoOppgaver
 import no.nav.helse.flex.oppgave.ManuelleOppgaver
 import no.nav.helse.flex.oppgave.OppgaveClient
-import no.nav.helse.flex.refactor.*
 import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.HttpServerErrorException
