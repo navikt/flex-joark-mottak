@@ -65,14 +65,7 @@ class JournalpostBehandler(
                 is ResourceAccessException,
                 is HttpClientErrorException,
                 is HttpServerErrorException -> {
-                    // Resttemplate exceptions
                     // TODO: Max retry logikk?
-                    throw exception
-                }
-
-                is ExternalServiceException,
-                is TemporarilyUnavailableException -> {
-                    // TODO: Bruk heller default exceptions fra resttemplate
                     throw exception
                 }
 
