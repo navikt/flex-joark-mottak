@@ -1,11 +1,15 @@
 package mock
 
-import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.QueueDispatcher
 import okhttp3.mockwebserver.RecordedRequest
 
-object DokarkivMockDispatcher : Dispatcher() {
+object DokarkivMockDispatcher : QueueDispatcher() {
     override fun dispatch(request: RecordedRequest): MockResponse {
+        if (responseQueue.peek() != null) {
+            return responseQueue.take()
+        }
+
         return when {
             request.requestUrl!!.encodedPath.startsWith("/rest/journalpostapi/v1/journalpost/") -> MockResponse().setResponseCode(
                 200
