@@ -14,8 +14,6 @@ version = "1.0.0"
 description = "flex-joark-mottak"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
-ext["okhttp3.version"] = "4.9.3" // Token-support tester trenger Mockwebserver.
-
 repositories {
     mavenCentral()
 
