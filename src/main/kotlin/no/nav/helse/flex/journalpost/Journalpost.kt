@@ -21,7 +21,11 @@ data class Journalpost(
         return !(JOURNALSTATUS_MOTTATT == journalstatus || JOURNALSTATUS_MIDLERTIDIG_JOURNALFOERT == journalstatus)
     }
 
-    class Bruker(val id: String, val type: String) {
+    class Bruker(
+        val id: String,
+        private val type: String // Denne er tilstede når vi henter i fra Saf
+    ) {
+        val idType: String = type // Denne bruker vi når vi oppdaterer journalpost i DokArkiv
         val isAktoerId
             get() = AKTOERID == type
         val isFNR
