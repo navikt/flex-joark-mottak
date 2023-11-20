@@ -139,9 +139,9 @@ data class OppgaveRequest(
     val behandlingstema: String? = null,
     val behandlingstype: String? = null,
     val oppgavetype: String,
-    val frist: Int,
     var tildeltEnhetsnr: String? = null,
-    val beskrivelse: String? = null
+    val beskrivelse: String? = null,
+    private val frist: Int
 ) {
     val prioritet = "NORM"
     val aktivDato = LocalDate.now().toString()
