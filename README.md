@@ -6,7 +6,7 @@ Lytter på journalpost dokumenter som legges på topicet `teamdokumenthandtering
 Oppretter enten SOK oppgaver for sykepengesøknader sendt på papir eller JFR oppgaver for de fleste andre journalposter på tema SYK.
 
 ## Testing i dev
-Her kan man opprette journalpost [flex-testdata-generator](https://flex-testdata-generator.dev.nav.no/papir-dokument)
+Her kan man opprette journalpost [flex-testdata-generator](https://flex-testdata-generator.intern.dev.nav.no/papir-dokument)
 > Bruk denne testdataen:
 >
 > `Fødselsnummer: fnr i fra dolly` 
