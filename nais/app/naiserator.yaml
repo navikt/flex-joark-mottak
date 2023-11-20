@@ -9,11 +9,11 @@ spec:
   image: {{image}}
   port: 8080
   liveness:
-    path: /internal/alive
+    path: /internal/health/liveness
   readiness:
-    path: /internal/ready
+    path: /internal/health/readiness
   startup:
-    path: /internal/alive
+    path: /internal/health/liveness
     initialDelay: 20
   strategy:
     type: Recreate
@@ -22,7 +22,7 @@ spec:
     max: 1
   prometheus:
     enabled: true
-    path: /internal/metrics
+    path: /internal/prometheus
   resources:
     limits:
       memory: 400Mi
@@ -31,7 +31,6 @@ spec:
       memory: 400Mi
   kafka:
     pool: {{kafkaPool}}
-    streams: true
   azure:
     application:
       enabled: true

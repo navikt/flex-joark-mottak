@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="60 seconds">
 
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>[%d %level %logger %mdc] - %m%n</pattern>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%d, %-5p, %C:%L] - %msg %ex{5}%nopex%n</pattern>
         </encoder>
     </appender>
 
-
-    <logger name="no.nav" level="INFO" additivity="false">
-        <appender-ref ref="STDOUT" />
-    </logger>
-
-    <root level="OFF">
-        <appender-ref ref="STDOUT"/>
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
     </root>
 
-    <logger name="org.apache.kafka.streams.processor.internals.StreamThread" level="OFF"/>
+    <logger name="no.nav.helse.flex" level="DEBUG"/>
+    <logger name="org.testcontainers" level="INFO"/>
+    <logger name="org" level="ERROR"/>
+    <logger name="com" level="ERROR"/>
+    <logger name="io" level="ERROR"/>
 </configuration>
