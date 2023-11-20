@@ -43,6 +43,6 @@ class DokArkivClient(
 }
 
 private const val CONTENT_TYPE_HEADER = "Content-Type"
-private class FerdigstillJournalpostRequest {
-    private val journalfoerendeEnhet = "9999"
+class FerdigstillJournalpostRequest {
+    val journalfoerendeEnhet = "9999"
 }

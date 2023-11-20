@@ -1,4 +1,7 @@
+import com.fasterxml.jackson.module.kotlin.readValue
 import mock.*
+import no.nav.helse.flex.journalpost.FerdigstillJournalpostRequest
+import no.nav.helse.flex.objectMapper
 import org.amshove.kluent.shouldBeEqualTo
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.junit.jupiter.api.AfterAll
@@ -46,6 +49,7 @@ class IntegrasjonTest : BaseTestClass() {
 
         requestFerdigstillJournalpost.method shouldBeEqualTo "PATCH"
         requestFerdigstillJournalpost.requestUrl?.encodedPath shouldBeEqualTo "/rest/journalpostapi/v1/journalpost/${PapirSoknadPerson.journalpostId}/ferdigstill"
+        objectMapper.readValue<FerdigstillJournalpostRequest>(requestFerdigstillJournalpost.body.readUtf8()).journalfoerendeEnhet shouldBeEqualTo "9999"
     }
 
     @Test
