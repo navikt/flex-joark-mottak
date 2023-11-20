@@ -21,6 +21,10 @@ data class Journalpost(
         return !(JOURNALSTATUS_MOTTATT == journalstatus || JOURNALSTATUS_MIDLERTIDIG_JOURNALFOERT == journalstatus)
     }
 
+    override fun toString(): String {
+        return "[id=$journalpostId, tema=$tema, skjema=$brevkode, tittel=$tittel, journalforendeEnhet=$journalforendeEnhet, journalstatus=$journalstatus, behandlingstema=$behandlingstema, behandlingstype=$behandlingstype]"
+    }
+
     class Bruker(
         val id: String,
         private val type: String // Denne er tilstede når vi henter i fra Saf

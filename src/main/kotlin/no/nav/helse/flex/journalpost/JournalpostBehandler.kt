@@ -41,7 +41,7 @@ class JournalpostBehandler(
             journalpost = autoOppgaver.opprettOppgave(journalpost)
 
             dokArkivClient.updateJournalpost(journalpost)
-            log.info("Oppdatert $journalpost")
+            log.info("Oppdaterte journalpost: $journalpost")
 
             dokArkivClient.ferdigstillJournalpost(journalpost.journalpostId)
             log.info("Ferdigstilt og fullført behandling av journalpost ${journalpost.journalpostId}")
@@ -83,6 +83,8 @@ class JournalpostBehandler(
 
     private fun hentJournalpost(journalpostId: String): Journalpost {
         val journalpost: Journalpost = safClient.hentJournalpost(journalpostId)
+
+        log.info("Hentet journalpost: $journalpost")
 
         if (journalpost.invalidJournalpostStatus()) {
             log.info("Avslutter videre behandling da journalpost ${journalpost.journalpostId} har status ${journalpost.journalstatus}")
