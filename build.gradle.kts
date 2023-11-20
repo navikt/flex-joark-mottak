@@ -38,6 +38,7 @@ val tokenSupportVersion = "3.1.5"
 val testContainersVersion = "1.19.0"
 val kluentVersion = "1.73"
 val jsonSchemaValidatorVersion = "1.0.87"
+val httpclient5Version = "5.2.1"
 
 dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
@@ -47,6 +48,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.kafka:spring-kafka")
+    implementation("org.apache.httpcomponents.client5:httpclient5:$httpclient5Version")
     implementation("com.github.ben-manes.caffeine:caffeine:$caffeineVersion")
     implementation("org.slf4j:slf4j-api")
     implementation("org.hibernate.validator:hibernate-validator")
