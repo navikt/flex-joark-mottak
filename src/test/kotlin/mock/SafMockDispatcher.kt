@@ -1,12 +1,13 @@
 package mock
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility
+import com.fasterxml.jackson.annotation.PropertyAccessor
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.helse.flex.graphql.GraphQLRequest
 import no.nav.helse.flex.graphql.GraphQLResponse
 import no.nav.helse.flex.journalpost.Journalpost
 import no.nav.helse.flex.journalpost.SafClient
 import no.nav.helse.flex.objectMapper
-import no.nav.helse.flex.serialisertTilString
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
@@ -43,10 +44,14 @@ object SafMockDispatcher : Dispatcher() {
         }
     }
 
+    private val objectMapperWithVisibility = objectMapper.copy().setVisibility(PropertyAccessor.FIELD, Visibility.ANY)
+
     private fun response(journalpost: Journalpost) = MockResponse().setBody(
-        GraphQLResponse(
-            data = SafClient.ResponseData(journalpost),
-            errors = null
-        ).serialisertTilString()
+        objectMapperWithVisibility.writeValueAsString(
+            GraphQLResponse(
+                data = SafClient.ResponseData(journalpost),
+                errors = null
+            )
+        )
     )
 }
