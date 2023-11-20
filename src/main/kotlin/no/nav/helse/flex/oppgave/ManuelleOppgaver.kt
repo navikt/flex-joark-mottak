@@ -1,9 +1,9 @@
 package no.nav.helse.flex.oppgave
 
-import no.nav.helse.flex.felleskodeverk.FkvClient
 import no.nav.helse.flex.ident.AKTORID
 import no.nav.helse.flex.ident.PdlClient
 import no.nav.helse.flex.ident.PdlIdent
+import no.nav.helse.flex.journalpost.BrevkodeMapper
 import no.nav.helse.flex.journalpost.Journalpost
 import no.nav.helse.flex.journalpost.SafClient
 import no.nav.helse.flex.logger
@@ -19,7 +19,7 @@ class ManuelleOppgaver(
     private val oppgaveClient: OppgaveClient,
     private val pdlClient: PdlClient,
     private val safClient: SafClient,
-    private val fkvClient: FkvClient
+    private val brevkodeMapper: BrevkodeMapper
 ) {
     private val log = logger()
 
@@ -70,17 +70,15 @@ class ManuelleOppgaver(
         oppgaveClient.opprettOppgave(requestData)
     }
 
-    private fun createManuellJournalfoeringsoppgave(journalpost: Journalpost, identer: List<PdlIdent>) {
-        val behandlingstema = fkvClient.hentKrutkoder().getBehandlingstema(journalpost.tema, journalpost.brevkode)
-        val behandlingstype = if (journalpost.behandlingstema.isNullOrEmpty()) fkvClient.hentKrutkoder().getBehandlingstype(journalpost.tema, journalpost.brevkode) else journalpost.behandlingstema
-
-        log.info("Setter følgende verdier behandlingstema: '$behandlingstema', behandlingstype: '$behandlingstype' på journalpost ${journalpost.journalpostId}")
+    private fun createManuellJournalfoeringsoppgave(jp: Journalpost, identer: List<PdlIdent>) {
+        val journalpost = brevkodeMapper.mapBrevkodeTilTemaOgType(jp)
+        log.info("Setter følgende verdier behandlingstema: '${journalpost.behandlingstema}', behandlingstype: '${journalpost.behandlingstype}' på journalpost ${journalpost.journalpostId}")
 
         val requestData = OppgaveRequest(
             journalpostId = journalpost.journalpostId,
             tema = journalpost.tema,
-            behandlingstema = behandlingstema,
-            behandlingstype = behandlingstype,
+            behandlingstema = journalpost.behandlingstema,
+            behandlingstype = journalpost.behandlingstype,
             oppgavetype = JOURNALORINGSOPPGAVE,
             tildeltEnhetsnr = journalpost.journalforendeEnhet,
             beskrivelse = journalpost.tittel,

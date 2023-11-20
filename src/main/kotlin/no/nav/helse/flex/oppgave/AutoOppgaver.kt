@@ -1,10 +1,10 @@
 package no.nav.helse.flex.oppgave
 
-import no.nav.helse.flex.felleskodeverk.FkvClient
 import no.nav.helse.flex.felleskodeverk.SkjemaMetadata
 import no.nav.helse.flex.ident.AKTORID
 import no.nav.helse.flex.ident.FOLKEREGISTERIDENT
 import no.nav.helse.flex.ident.Identer
+import no.nav.helse.flex.journalpost.BrevkodeMapper
 import no.nav.helse.flex.journalpost.Journalpost
 import no.nav.helse.flex.logger
 import org.springframework.stereotype.Component
@@ -12,22 +12,18 @@ import org.springframework.stereotype.Component
 @Component
 class AutoOppgaver(
     private val identer: Identer,
-    private val fkvClient: FkvClient,
-    private val oppgaveClient: OppgaveClient
+    private val oppgaveClient: OppgaveClient,
+    private val brevkodeMapper: BrevkodeMapper
 ) {
     private val log = logger()
 
     fun opprettOppgave(jp: Journalpost): Journalpost {
-        var journalpost = jp
+        var journalpost = brevkodeMapper.mapBrevkodeTilTemaOgType(jp)
         val identer = identer.hentIdenterFraPDL(journalpost)
-
-        val behandlingstema = fkvClient.hentKrutkoder().getBehandlingstema(journalpost.tema, journalpost.brevkode)
-        val behandlingstype = if (journalpost.behandlingstema.isNullOrEmpty()) fkvClient.hentKrutkoder().getBehandlingstype(journalpost.tema, journalpost.brevkode) else journalpost.behandlingstema
         val oppgavetype = SkjemaMetadata.getOppgavetype(journalpost.tema, journalpost.brevkode)
         val frist = SkjemaMetadata.getFrist(journalpost.tema, journalpost.brevkode)
 
-        log.info("Setter følgende verdier behandlingstema: '$behandlingstema', behandlingstype: '$behandlingstype' og oppgavetype: '$oppgavetype' på journalpost ${journalpost.journalpostId}")
-        journalpost = journalpost.copy(behandlingstema = behandlingstema, behandlingstype = behandlingstype)
+        log.info("Setter følgende verdier behandlingstema: '${journalpost.behandlingstema}', behandlingstype: '${journalpost.behandlingstype}' og oppgavetype: '$oppgavetype' på journalpost ${journalpost.journalpostId}")
 
         val requestData = OppgaveRequest(
             aktoerId = identer.first { it.gruppe == AKTORID }.ident,
