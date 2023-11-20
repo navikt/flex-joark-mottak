@@ -40,7 +40,12 @@ data class Journalpost(
 
     class Sak(val sakstype: String)
 
-    class AvsenderMottaker(var id: String?, val idType: String)
+    class AvsenderMottaker(
+        var id: String?,
+        private val type: String // Denne er satt når vi henter journalpost og er ikke samme som vi bruker når vi oppdaterer journalpost
+    ) {
+        val idType: String = type // Brukes i oppdater Journalpost request
+    }
 
     class Dokument(val brevkode: String?, val tittel: String? = null, val dokumentInfoId: String)
 
