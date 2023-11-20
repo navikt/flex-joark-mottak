@@ -40,7 +40,7 @@ data class Journalpost(
 
     class Sak(val sakstype: String)
 
-    class AvsenderMottaker(var id: String?, val type: String)
+    class AvsenderMottaker(var id: String?, val idType: String)
 
     class Dokument(val brevkode: String?, val tittel: String? = null, val dokumentInfoId: String)
 
