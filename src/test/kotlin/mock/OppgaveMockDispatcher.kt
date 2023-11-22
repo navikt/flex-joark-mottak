@@ -20,6 +20,10 @@ object OppgaveMockDispatcher : QueueDispatcher() {
                 .setBody("Har ikke implemetert oppgave mock api for ${request.requestUrl}")
         }
 
+        if (request.headers["X-Correlation-ID"] == null) {
+            return MockResponse().setResponseCode(400).setBody("Påkrevd header mangler: X-Correlation-ID")
+        }
+
         if (responseQueue.peek() != null) {
             return withContentTypeApplicationJson { responseQueue.take() }
         }
