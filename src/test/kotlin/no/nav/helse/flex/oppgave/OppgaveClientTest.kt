@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.HttpServerErrorException
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class OppgaveClientTest : BaseTestClass() {
     @Autowired
@@ -52,6 +53,7 @@ class OppgaveClientTest : BaseTestClass() {
         oppgave.tildeltEnhetsnr shouldBeEqualTo request.tildeltEnhetsnr
 
         prometheusMeterRegistry.meters.find { it.id.name == "http.client.requests" && it.id.tags.contains(Tag.of("uri", "/api/v1/oppgaver")) } shouldNotBeEqualTo null
+        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo "POST /api/v1/oppgaver HTTP/1.1"
     }
 
     @Test
@@ -67,6 +69,8 @@ class OppgaveClientTest : BaseTestClass() {
         )
         val oppgave = oppgaveClient.opprettOppgave(request)
         oppgave.tildeltEnhetsnr shouldNotBeEqualTo request.tildeltEnhetsnr
+        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo "POST /api/v1/oppgaver HTTP/1.1"
+        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo "POST /api/v1/oppgaver HTTP/1.1"
     }
 
     @Test
@@ -81,6 +85,8 @@ class OppgaveClientTest : BaseTestClass() {
             )
         )
         oppgaveClient.opprettOppgave(request)
+        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo "POST /api/v1/oppgaver HTTP/1.1"
+        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo "POST /api/v1/oppgaver HTTP/1.1"
     }
 
     @Test
@@ -92,6 +98,7 @@ class OppgaveClientTest : BaseTestClass() {
         assertThrows<HttpClientErrorException> {
             oppgaveClient.opprettOppgave(request)
         }
+        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo "POST /api/v1/oppgaver HTTP/1.1"
     }
 
     @Test
@@ -101,6 +108,7 @@ class OppgaveClientTest : BaseTestClass() {
         assertThrows<HttpClientErrorException> {
             oppgaveClient.opprettOppgave(request)
         }
+        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo "POST /api/v1/oppgaver HTTP/1.1"
     }
 
     @Test
@@ -110,5 +118,6 @@ class OppgaveClientTest : BaseTestClass() {
         assertThrows<HttpServerErrorException> {
             oppgaveClient.opprettOppgave(request)
         }
+        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo "POST /api/v1/oppgaver HTTP/1.1"
     }
 }

@@ -2,18 +2,23 @@ package no.nav.helse.flex
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.helse.flex.journalpost.JournalpostBehandler
+import no.nav.helse.flex.retry.RetryProducer
 import org.apache.avro.generic.GenericRecord
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.MDC
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Component
+import java.time.OffsetDateTime
 import java.util.*
 
 @Component
 class DokumentConsumer(
-    private val journalpostBehandler: JournalpostBehandler
+    private val journalpostBehandler: JournalpostBehandler,
+    private val retryProducer: RetryProducer
 ) {
+    private val log = logger()
+
     @KafkaListener(
         topics = ["#{environmentToggles.dokumentTopic()}"],
         id = "flex-joark-mottak",
@@ -37,6 +42,9 @@ class DokumentConsumer(
         try {
             MDC.put(CORRELATION_ID, UUID.randomUUID().toString())
             journalpostBehandler.behandleJournalpost(kafkaEvent)
+        } catch (e: Exception) {
+            log.error("Feilet på journalpost ${kafkaEvent.journalpostId}, legger på retry-topic", e)
+            retryProducer.send(kafkaEvent, OffsetDateTime.now().plusSeconds(1))
         } finally {
             MDC.clear()
         }
