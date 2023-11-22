@@ -3,6 +3,7 @@ package no.nav.helse.flex.oppgave
 import BaseTestClass
 import io.micrometer.core.instrument.Tag
 import io.micrometer.prometheus.PrometheusMeterRegistry
+import no.nav.helse.flex.CORRELATION_ID
 import no.nav.helse.flex.serialisertTilString
 import okhttp3.mockwebserver.MockResponse
 import org.amshove.kluent.shouldBeEqualTo
@@ -38,12 +39,12 @@ class OppgaveClientTest : BaseTestClass() {
 
     @BeforeEach
     fun `Disse legges til i header`() {
-        MDC.put("X-Correlation-ID", UUID.randomUUID().toString())
+        MDC.put(CORRELATION_ID, UUID.randomUUID().toString())
     }
 
     @AfterEach
     fun opprydding() {
-        MDC.remove("X-Correlation-ID")
+        MDC.remove(CORRELATION_ID)
     }
 
     @Test

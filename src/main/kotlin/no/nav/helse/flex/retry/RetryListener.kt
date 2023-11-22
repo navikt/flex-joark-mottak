@@ -4,6 +4,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.helse.flex.*
 import no.nav.helse.flex.journalpost.JournalpostBehandler
 import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.slf4j.MDC
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Component
@@ -11,6 +12,7 @@ import java.nio.charset.StandardCharsets
 import java.time.Duration
 import java.time.Instant
 import java.time.OffsetDateTime
+import java.util.*
 import kotlin.math.min
 
 const val RETRY_TOPIC = "flex." + "flex-joark-mottak-retry"
@@ -44,6 +46,7 @@ class RetryListener(
                 log.info("Mottok rebehandling av journalpost ${kafkaEvent.journalpostId} med behandlingstidspunkt ${behandlingstidspunkt.tilOsloLocalDateTime()} sover i $sovetid millisekunder")
                 acknowledgment.nack(Duration.ofMillis(sovetid))
             } else {
+                MDC.put(CORRELATION_ID, UUID.randomUUID().toString())
                 journalpostBehandler.behandleJournalpost(kafkaEvent)
                 acknowledgment.acknowledge()
             }
@@ -51,6 +54,8 @@ class RetryListener(
             log.error("Rebehandling feilet for journalpost ${kafkaEvent.journalpostId}, legger tilbake på retry-topic", e)
             retryProducer.send(kafkaEvent, OffsetDateTime.now().plusMinutes(10))
             acknowledgment.acknowledge()
+        } finally {
+            MDC.clear()
         }
     }
 
