@@ -1,10 +1,11 @@
 package no.nav.helse.flex.oppgave
 
 import no.nav.helse.flex.ident.AKTORID
-import no.nav.helse.flex.ident.PdlClient
+import no.nav.helse.flex.ident.Identer
 import no.nav.helse.flex.ident.PdlIdent
 import no.nav.helse.flex.journalpost.BrevkodeMapper
 import no.nav.helse.flex.journalpost.Journalpost
+import no.nav.helse.flex.journalpost.OpprettManuellOppgaveException
 import no.nav.helse.flex.journalpost.SafClient
 import no.nav.helse.flex.logger
 import org.springframework.stereotype.Component
@@ -17,9 +18,9 @@ private const val TEMA_GENERELL = "GEN"
 @Component
 class ManuelleOppgaver(
     private val oppgaveClient: OppgaveClient,
-    private val pdlClient: PdlClient,
     private val safClient: SafClient,
-    private val brevkodeMapper: BrevkodeMapper
+    private val brevkodeMapper: BrevkodeMapper,
+    private val identerService: Identer
 ) {
     private val log = logger()
 
@@ -30,7 +31,11 @@ class ManuelleOppgaver(
         }
 
         val journalpost = safClient.hentJournalpost(journalpostId)
-        val identer = pdlClient.hentIdenterForJournalpost(journalpost)
+        val identer = try {
+            identerService.hentIdenterFraPDL(journalpost)
+        } catch (e: OpprettManuellOppgaveException) {
+            emptyList()
+        }
 
         if (isJournalpostToFordeling(journalpost)) {
             createFordelingsoppgave(journalpost, identer)
@@ -54,9 +59,9 @@ class ManuelleOppgaver(
             oppgavetype = FORDELINGSOPPGAVE,
             frist = 1
         ).apply {
-            if (journalpost.bruker?.isORGNR != true) {
+            if (journalpost.bruker?.isAktoerId == true || journalpost.bruker?.isFNR == true) {
                 aktoerId = identer.first { it.gruppe == AKTORID }.ident
-            } else {
+            } else if (journalpost.bruker?.isORGNR == true) {
                 orgnr = journalpost.bruker.id
             }
 
@@ -84,9 +89,9 @@ class ManuelleOppgaver(
             beskrivelse = journalpost.tittel,
             frist = 1
         ).apply {
-            if (journalpost.bruker?.isORGNR != true) {
+            if (journalpost.bruker?.isAktoerId == true || journalpost.bruker?.isFNR == true) {
                 aktoerId = identer.first { it.gruppe == AKTORID }.ident
-            } else {
+            } else if (journalpost.bruker?.isORGNR == true) {
                 orgnr = journalpost.bruker.id
             }
         }

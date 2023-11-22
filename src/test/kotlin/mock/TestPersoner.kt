@@ -144,6 +144,29 @@ object BrevløsPerson {
     val kafkaEvent = journalpost.tilAvroKafkaEvent()
 }
 
+// Journalpost som ikke er knyttet til en person
+object JournalpostUtenPerson {
+    const val journalpostId = "787359875"
+    const val fnr = "33333333333"
+    val journalpost = Journalpost(
+        journalpostId = journalpostId,
+        tittel = "NAV 08-09.06 Egenerklæring for utenlandske sykemeldinger",
+        journalstatus = "MOTTATT",
+        bruker = null,
+        dokumenter = listOf(
+            Journalpost.Dokument("NAV 08-09.06", "NAV 08-09.06 Egenerklæring for utenlandske sykemeldinger", "123")
+        ),
+        tema = "SYK",
+        journalforendeEnhet = null,
+        relevanteDatoer = null,
+        sak = null,
+        avsenderMottaker = null,
+        behandlingstema = null,
+        behandlingstype = null
+    )
+    val kafkaEvent = journalpost.tilAvroKafkaEvent()
+}
+
 // Dette er inntektsmelding som vi ikke skal gjøre noe med
 object InntektsmeldingPerson {
     const val journalpostId = "44444444444"

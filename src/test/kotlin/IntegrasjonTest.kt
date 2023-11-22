@@ -161,6 +161,33 @@ class IntegrasjonTest : BaseTestClass() {
     }
 
     @Test
+    fun `Journalpost uten person skal ha JFR oppgave`() {
+        kafkaProducer.send(
+            ProducerRecord(
+                topic,
+                JournalpostUtenPerson.kafkaEvent
+            )
+        ).get()
+
+        val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
+        val requestOpprettOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
+        val requestFerdigstillJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)
+
+        requestHarOppgave.method shouldBeEqualTo "GET"
+        requestHarOppgave.requestUrl?.queryParameter("statuskategori") shouldBeEqualTo "AAPEN"
+        requestHarOppgave.requestUrl?.queryParameter("journalpostId") shouldBeEqualTo JournalpostUtenPerson.journalpostId
+
+        requestOpprettOppgave.method shouldBeEqualTo "POST"
+        val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
+        body.journalpostId shouldBeEqualTo JournalpostUtenPerson.journalpostId
+        body.tema shouldBeEqualTo "SYK"
+        body.behandlingstema shouldBeEqualTo ""
+        body.behandlingstype shouldBeEqualTo "ae0106"
+
+        requestFerdigstillJournalpost shouldBeEqualTo null
+    }
+
+    @Test
     fun `Mottar journalpost som vi skal ingnorere`() {
         kafkaProducer.send(
             ProducerRecord(
