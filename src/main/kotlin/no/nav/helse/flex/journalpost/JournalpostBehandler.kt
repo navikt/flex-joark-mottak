@@ -7,9 +7,6 @@ import no.nav.helse.flex.oppgave.AutoOppgaver
 import no.nav.helse.flex.oppgave.ManuelleOppgaver
 import no.nav.helse.flex.oppgave.OppgaveClient
 import org.springframework.stereotype.Component
-import org.springframework.web.client.HttpClientErrorException
-import org.springframework.web.client.HttpServerErrorException
-import org.springframework.web.client.ResourceAccessException
 
 @Component
 class JournalpostBehandler(
@@ -60,24 +57,7 @@ class JournalpostBehandler(
                 }
             }
         }.onFailure { exception ->
-            when (exception) {
-                is ResourceAccessException,
-                is HttpClientErrorException,
-                is HttpServerErrorException -> {
-                    // TODO: Max retry logikk?
-                    throw exception
-                }
-
-                is FinnerIkkePersonException -> {
-                    log.warn("Finner ikke person for journalpost ${kafkaEvent.journalpostId}. Forsøker på nytt senere.")
-                    throw exception
-                }
-
-                else -> {
-                    log.error("Uventet feil på journalpost ${kafkaEvent.journalpostId}. Forsøker på nytt senere", exception)
-                    throw exception
-                }
-            }
+            throw exception
         }
     }
 
