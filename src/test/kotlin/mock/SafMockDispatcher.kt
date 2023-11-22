@@ -35,6 +35,8 @@ object SafMockDispatcher : Dispatcher() {
 
             BrevløsPerson.journalpostId -> response(BrevløsPerson.journalpost)
 
+            JournalpostUtenPerson.journalpostId -> response(JournalpostUtenPerson.journalpost)
+
             InntektsmeldingPerson.journalpostId -> response(InntektsmeldingPerson.journalpost)
 
             else -> {
