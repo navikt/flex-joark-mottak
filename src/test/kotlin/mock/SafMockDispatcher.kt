@@ -38,6 +38,8 @@ object SafMockDispatcher : QueueDispatcher() {
 
             BrevløsPerson.journalpostId -> response(BrevløsPerson.journalpost)
 
+            UkjentBrevkodePerson.journalpostId -> response(UkjentBrevkodePerson.journalpost)
+
             JournalpostUtenPerson.journalpostId -> response(JournalpostUtenPerson.journalpost)
 
             InntektsmeldingPerson.journalpostId -> response(InntektsmeldingPerson.journalpost)

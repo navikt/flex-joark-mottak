@@ -144,6 +144,29 @@ object BrevløsPerson {
     val kafkaEvent = journalpost.tilAvroKafkaEvent()
 }
 
+// Journalpost hvor vi ikke finner behandlings-tema og -type skal ha JFR oppgave
+object UkjentBrevkodePerson {
+    const val journalpostId = "984561332"
+    const val fnr = "33333333333"
+    val journalpost = Journalpost(
+        journalpostId = journalpostId,
+        tittel = "Annen post Utland",
+        journalstatus = "MOTTATT",
+        bruker = Journalpost.Bruker(fnr, "PERSONBRUKER"),
+        dokumenter = listOf(
+            Journalpost.Dokument("NAV 00-03.00 U", "Annen post Utland", "123")
+        ),
+        tema = "SYK",
+        journalforendeEnhet = null,
+        relevanteDatoer = null,
+        sak = null,
+        avsenderMottaker = null,
+        behandlingstema = null,
+        behandlingstype = null
+    )
+    val kafkaEvent = journalpost.tilAvroKafkaEvent()
+}
+
 // Journalpost som ikke er knyttet til en person
 object JournalpostUtenPerson {
     const val journalpostId = "787359875"

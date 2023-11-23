@@ -161,6 +161,33 @@ class IntegrasjonTest : BaseTestClass() {
     }
 
     @Test
+    fun `Journalpost med ukjent brevkode skal ha JFR oppgave`() {
+        kafkaProducer.send(
+            ProducerRecord(
+                topic,
+                UkjentBrevkodePerson.kafkaEvent
+            )
+        ).get()
+
+        val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
+        val requestOpprettOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
+        val requestFerdigstillJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)
+
+        requestHarOppgave.method shouldBeEqualTo "GET"
+        requestHarOppgave.requestUrl?.queryParameter("statuskategori") shouldBeEqualTo "AAPEN"
+        requestHarOppgave.requestUrl?.queryParameter("journalpostId") shouldBeEqualTo UkjentBrevkodePerson.journalpostId
+
+        requestOpprettOppgave.method shouldBeEqualTo "POST"
+        val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
+        body.journalpostId shouldBeEqualTo UkjentBrevkodePerson.journalpostId
+        body.tema shouldBeEqualTo "SYK"
+        body.behandlingstema shouldBeEqualTo null
+        body.behandlingstype shouldBeEqualTo null
+
+        requestFerdigstillJournalpost shouldBeEqualTo null
+    }
+
+    @Test
     fun `Journalpost uten person skal ha JFR oppgave`() {
         kafkaProducer.send(
             ProducerRecord(
