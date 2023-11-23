@@ -9,6 +9,7 @@ import no.nav.helse.flex.journalpost.OpprettManuellOppgaveException
 import no.nav.helse.flex.journalpost.SafClient
 import no.nav.helse.flex.logger
 import org.springframework.stereotype.Component
+import java.lang.IllegalArgumentException
 
 private const val FORDELINGSOPPGAVE = "FDR"
 private const val JOURNALORINGSOPPGAVE = "JFR"
@@ -76,8 +77,22 @@ class ManuelleOppgaver(
     }
 
     private fun createManuellJournalfoeringsoppgave(jp: Journalpost, identer: List<PdlIdent>) {
-        val journalpost = brevkodeMapper.mapBrevkodeTilTemaOgType(jp)
-        log.info("Setter følgende verdier behandlingstema: '${journalpost.behandlingstema}', behandlingstype: '${journalpost.behandlingstype}' på journalpost ${journalpost.journalpostId}")
+        val journalpost = runCatching {
+            val jpMedBehandlingsverdier = brevkodeMapper.mapBrevkodeTilTemaOgType(jp)
+            log.info("Setter følgende verdier behandlingstema: '${jpMedBehandlingsverdier.behandlingstema}', behandlingstype: '${jpMedBehandlingsverdier.behandlingstype}' på journalpost ${jpMedBehandlingsverdier.journalpostId}")
+            return@runCatching jpMedBehandlingsverdier
+        }.recover {
+            if (it is IllegalArgumentException) {
+                if (jp.journalforendeEnhet.isNullOrEmpty()) {
+                    log.info("Klarte ikke finne behandlingsverdier for journalpost ${jp.journalpostId} med tema ${jp.tema} og brevkode ${jp.brevkode}")
+                    return@recover jp
+                } else {
+                    log.info("Klarte ikke finne behandlingsverdier for journalpost ${jp.journalpostId} med tema ${jp.tema} og brevkode ${jp.brevkode}, bruker journalforendeEnhet ${jp.journalforendeEnhet}")
+                    return@recover jp
+                }
+            }
+            throw it
+        }.getOrThrow()
 
         val requestData = OppgaveRequest(
             journalpostId = journalpost.journalpostId,
