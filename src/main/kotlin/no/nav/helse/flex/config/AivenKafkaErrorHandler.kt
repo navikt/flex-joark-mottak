@@ -28,12 +28,12 @@ class AivenKafkaErrorHandler : DefaultErrorHandler(
     ) {
         records.forEach { record ->
             log.error(
-                "Feil i prossesseringen av record med offset: ${record.offset()}, key: ${record.key()} på topic ${record.topic()}",
-                thrownException
+                thrownException,
+                "Feil i prossesseringen av record med offset: ${record.offset()}, key: ${record.key()} på topic ${record.topic()}"
             )
         }
         if (records.isEmpty()) {
-            log.error("Feil i listener uten noen records", thrownException)
+            log.error(thrownException,"Feil i listener uten noen records")
         }
 
         super.handleRemaining(thrownException, records, consumer, container)
@@ -48,12 +48,12 @@ class AivenKafkaErrorHandler : DefaultErrorHandler(
     ) {
         data.forEach { record ->
             log.error(
-                "Feil i prossesseringen av record med offset: ${record.offset()}, key: ${record.key()} på topic ${record.topic()}",
-                thrownException
+                thrownException,
+                "Feil i prossesseringen av record med offset: ${record.offset()}, key: ${record.key()} på topic ${record.topic()}"
             )
         }
         if (data.isEmpty()) {
-            log.error("Feil i listener uten noen records", thrownException)
+            log.error(thrownException, "Feil i listener uten noen records")
         }
         super.handleBatch(thrownException, data, consumer, container, invokeListener)
     }
