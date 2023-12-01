@@ -33,7 +33,7 @@ class AivenKafkaErrorHandler : DefaultErrorHandler(
             )
         }
         if (records.isEmpty()) {
-            log.error(thrownException,"Feil i listener uten noen records")
+            log.error(thrownException, "Feil i listener uten noen records")
         }
 
         super.handleRemaining(thrownException, records, consumer, container)
