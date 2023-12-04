@@ -38,7 +38,7 @@ val tokenSupportVersion = "3.2.0"
 val testContainersVersion = "1.19.3"
 val kluentVersion = "1.73"
 val jsonSchemaValidatorVersion = "1.0.87"
-val httpclient5Version = "5.2.1"
+val httpclient5Version = "5.2.3"
 
 dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
