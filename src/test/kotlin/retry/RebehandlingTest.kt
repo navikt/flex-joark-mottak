@@ -37,7 +37,7 @@ class RebehandlingTest : BaseTestClass() {
         body.journalpostId shouldBeEqualTo PapirSoknadPerson.journalpostId
         body.tema shouldBeEqualTo "SYK"
         body.behandlingstema shouldBeEqualTo "ab0434"
-        body.behandlingstype shouldBeEqualTo ""
+        body.behandlingstype shouldBeEqualTo null
 
         requestOppdaterJournalpost.method shouldBeEqualTo "PUT"
         requestOppdaterJournalpost.requestUrl?.encodedPath shouldBeEqualTo "/rest/journalpostapi/v1/journalpost/${PapirSoknadPerson.journalpostId}"

@@ -18,10 +18,12 @@ class KodeverkBrevkoder(
     }
 
     fun getBehandlingstema(journalpostTema: String, journalpostBrevkode: String?): String? {
-        return noder[journalpostTema]?.undernoder?.get(journalpostBrevkode)?.behandlingstema
+        val brevkodeNode = noder[journalpostTema]?.undernoder?.get(journalpostBrevkode) ?: return null
+        return brevkodeNode.behandlingstema.takeUnless { it.isNullOrBlank() }
     }
 
     fun getBehandlingstype(journalpostTema: String, journalpostBrevkode: String?): String? {
-        return noder[journalpostTema]?.undernoder?.get(journalpostBrevkode)?.behandlingstype
+        val brevkodeNode = noder[journalpostTema]?.undernoder?.get(journalpostBrevkode) ?: return null
+        return brevkodeNode.behandlingstype.takeUnless { it.isNullOrBlank() }
     }
 }
