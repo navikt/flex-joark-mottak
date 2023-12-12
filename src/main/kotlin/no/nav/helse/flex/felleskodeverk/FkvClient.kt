@@ -21,7 +21,7 @@ class FkvClient(
     private val log = logger()
 
     @Cacheable("krutkoder")
-    fun hentKrutkoder(): FkvKrutkoder {
+    fun hentKrutkoder(): KodeverkBrevkoder {
         log.info("Henter og cacher [krutkoder]")
 
         val headers = HttpHeaders()
@@ -29,7 +29,7 @@ class FkvClient(
         headers[NAV_CONSUMER_ID] = "flex-joark-mottak"
 
         val uri = UriComponentsBuilder.fromHttpUrl(fkvUrl)
-            .path("/api/v1/kodeverk/Krutkoder/koder/betydninger")
+            .path("/api/v1/hierarki/TemaSkjemaGjelder/noder")
             .queryParam("spraak", "nb")
             .encode()
             .toUriString()
@@ -41,7 +41,7 @@ class FkvClient(
             String::class.java
         )
 
-        return objectMapper.readValue<FkvKrutkoder>(response.body!!)
+        return objectMapper.readValue<KodeverkBrevkoder>(response.body!!)
     }
 }
 

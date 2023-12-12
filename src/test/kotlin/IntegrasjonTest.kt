@@ -42,7 +42,7 @@ class IntegrasjonTest : BaseTestClass() {
         body.journalpostId shouldBeEqualTo PapirSoknadPerson.journalpostId
         body.tema shouldBeEqualTo "SYK"
         body.behandlingstema shouldBeEqualTo "ab0434"
-        body.behandlingstype shouldBeEqualTo ""
+        body.behandlingstype shouldBeEqualTo null
 
         requestOppdaterJournalpost.method shouldBeEqualTo "PUT"
         requestOppdaterJournalpost.requestUrl?.encodedPath shouldBeEqualTo "/rest/journalpostapi/v1/journalpost/${PapirSoknadPerson.journalpostId}"
@@ -73,7 +73,7 @@ class IntegrasjonTest : BaseTestClass() {
         val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
         body.journalpostId shouldBeEqualTo InntektsopplysningerPerson.journalpostId
         body.tema shouldBeEqualTo "SYK"
-        body.behandlingstema shouldBeEqualTo ""
+        body.behandlingstema shouldBeEqualTo null
         body.behandlingstype shouldBeEqualTo "ae0004"
 
         requestFerdigstillJournalpost shouldBeEqualTo null
@@ -100,8 +100,8 @@ class IntegrasjonTest : BaseTestClass() {
         val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
         body.journalpostId shouldBeEqualTo KlagePerson.journalpostId
         body.tema shouldBeEqualTo "SYK"
-        body.behandlingstema shouldBeEqualTo ""
-        body.behandlingstype shouldBeEqualTo ""
+        body.behandlingstema shouldBeEqualTo null
+        body.behandlingstype shouldBeEqualTo null
 
         requestFerdigstillJournalpost shouldBeEqualTo null
     }
@@ -127,7 +127,7 @@ class IntegrasjonTest : BaseTestClass() {
         val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
         body.journalpostId shouldBeEqualTo UtlanskPerson.journalpostId
         body.tema shouldBeEqualTo "SYK"
-        body.behandlingstema shouldBeEqualTo ""
+        body.behandlingstema shouldBeEqualTo null
         body.behandlingstype shouldBeEqualTo "ae0106"
 
         requestFerdigstillJournalpost shouldBeEqualTo null
@@ -154,8 +154,8 @@ class IntegrasjonTest : BaseTestClass() {
         val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
         body.journalpostId shouldBeEqualTo BrevløsPerson.journalpostId
         body.tema shouldBeEqualTo "SYK"
-        body.behandlingstema shouldBeEqualTo ""
-        body.behandlingstype shouldBeEqualTo ""
+        body.behandlingstema shouldBeEqualTo null
+        body.behandlingstype shouldBeEqualTo null
 
         requestFerdigstillJournalpost shouldBeEqualTo null
     }
@@ -208,7 +208,7 @@ class IntegrasjonTest : BaseTestClass() {
         val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
         body.journalpostId shouldBeEqualTo JournalpostUtenPerson.journalpostId
         body.tema shouldBeEqualTo "SYK"
-        body.behandlingstema shouldBeEqualTo ""
+        body.behandlingstema shouldBeEqualTo null
         body.behandlingstype shouldBeEqualTo "ae0106"
 
         requestFerdigstillJournalpost shouldBeEqualTo null
@@ -233,7 +233,7 @@ class IntegrasjonTest : BaseTestClass() {
     @AfterAll
     fun `Kodeverket ble bare kalt en gang og resultatet ble chacet`() {
         val request = kodeverkMockWebServer.takeRequest(1, TimeUnit.SECONDS)!!
-        request.requestUrl?.encodedPath shouldBeEqualTo "/api/v1/kodeverk/Krutkoder/koder/betydninger"
+        request.requestUrl?.encodedPath shouldBeEqualTo "/api/v1/hierarki/TemaSkjemaGjelder/noder"
 
         kodeverkMockWebServer.requestCount shouldBeEqualTo 1
     }
