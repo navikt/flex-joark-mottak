@@ -233,7 +233,7 @@ class IntegrasjonTest : BaseTestClass() {
     @AfterAll
     fun `Kodeverket ble bare kalt en gang og resultatet ble chacet`() {
         val request = kodeverkMockWebServer.takeRequest(1, TimeUnit.SECONDS)!!
-        request.requestUrl?.encodedPath shouldBeEqualTo "/api/v1/kodeverk/Krutkoder/koder/betydninger"
+        request.requestUrl?.encodedPath shouldBeEqualTo "/api/v1/hierarki/TemaSkjemaGjelder/noder"
 
         kodeverkMockWebServer.requestCount shouldBeEqualTo 1
     }
