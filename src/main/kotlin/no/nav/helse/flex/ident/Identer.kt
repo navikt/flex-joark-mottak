@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 @Component
 class Identer(
     private val pdlClient: PdlClient,
-    private val oppgaveClient: OppgaveClient
+    private val oppgaveClient: OppgaveClient,
 ) {
     private val log = logger()
 

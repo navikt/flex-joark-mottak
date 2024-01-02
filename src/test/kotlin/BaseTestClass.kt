@@ -40,30 +40,35 @@ abstract class BaseTestClass {
                 }
             }.also { threads.add(it) }
 
-            safMockWebserver = MockWebServer().apply {
-                System.setProperty("SAF_URL", "http://localhost:$port")
-                dispatcher = SafMockDispatcher
-            }
+            safMockWebserver =
+                MockWebServer().apply {
+                    System.setProperty("SAF_URL", "http://localhost:$port")
+                    dispatcher = SafMockDispatcher
+                }
 
-            dokarkivMockWebserver = MockWebServer().apply {
-                System.setProperty("DOKARKIV_URL", "http://localhost:$port")
-                dispatcher = DokarkivMockDispatcher
-            }
+            dokarkivMockWebserver =
+                MockWebServer().apply {
+                    System.setProperty("DOKARKIV_URL", "http://localhost:$port")
+                    dispatcher = DokarkivMockDispatcher
+                }
 
-            pdlMockWebserver = MockWebServer().apply {
-                System.setProperty("PDL_URL", "http://localhost:$port")
-                dispatcher = PdlMockDispatcher
-            }
+            pdlMockWebserver =
+                MockWebServer().apply {
+                    System.setProperty("PDL_URL", "http://localhost:$port")
+                    dispatcher = PdlMockDispatcher
+                }
 
-            oppgaveMockWebserver = MockWebServer().apply {
-                System.setProperty("OPPGAVE_URL", "http://localhost:$port")
-                dispatcher = OppgaveMockDispatcher
-            }
+            oppgaveMockWebserver =
+                MockWebServer().apply {
+                    System.setProperty("OPPGAVE_URL", "http://localhost:$port")
+                    dispatcher = OppgaveMockDispatcher
+                }
 
-            kodeverkMockWebServer = MockWebServer().apply {
-                System.setProperty("FKV_URL", "http://localhost:$port")
-                dispatcher = KodeverkMockDispatcher
-            }
+            kodeverkMockWebServer =
+                MockWebServer().apply {
+                    System.setProperty("FKV_URL", "http://localhost:$port")
+                    dispatcher = KodeverkMockDispatcher
+                }
 
             threads.forEach { it.join() }
         }

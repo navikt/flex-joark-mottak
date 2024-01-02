@@ -15,7 +15,7 @@ import java.util.*
 @Component
 class DokumentConsumer(
     private val journalpostBehandler: JournalpostBehandler,
-    private val retryProducer: RetryProducer
+    private val retryProducer: RetryProducer,
 ) {
     private val log = logger()
 
@@ -25,9 +25,12 @@ class DokumentConsumer(
         idIsGroup = true,
         concurrency = "3",
         containerFactory = "kafkaAvroListenerContainerFactory",
-        properties = ["auto.offset.reset = earliest"]
+        properties = ["auto.offset.reset = earliest"],
     )
-    fun listen(cr: ConsumerRecord<String, GenericRecord>, acknowledgment: Acknowledgment) {
+    fun listen(
+        cr: ConsumerRecord<String, GenericRecord>,
+        acknowledgment: Acknowledgment,
+    ) {
         val genericRecord = cr.value()
 
         if (genericRecord["temaNytt"].toString() != "SYK") {
@@ -64,5 +67,5 @@ data class KafkaEvent(
     val versjon: Int = 0,
     val temaGammelt: String,
     val kanalReferanseId: String,
-    val behandlingstema: String = ""
+    val behandlingstema: String = "",
 )

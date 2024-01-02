@@ -39,8 +39,17 @@ class DokArkivClientTest : BaseTestClass() {
     @Test
     fun `update journalpost happycase`() {
         dokArkivClient.updateJournalpost(DigitalSoknadPerson.journalpost)
-        prometheusMeterRegistry.meters.find { it.id.name == "http.client.requests" && it.id.tags.contains(Tag.of("uri", "/rest/journalpostapi/v1/journalpost/{id}")) } shouldNotBeEqualTo null
-        dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo "PUT /rest/journalpostapi/v1/journalpost/${DigitalSoknadPerson.journalpostId} HTTP/1.1"
+        prometheusMeterRegistry.meters.find {
+            it.id.name == "http.client.requests" &&
+                it.id.tags.contains(
+                    Tag.of(
+                        "uri",
+                        "/rest/journalpostapi/v1/journalpost/{id}",
+                    ),
+                )
+        } shouldNotBeEqualTo null
+        dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo
+            "PUT /rest/journalpostapi/v1/journalpost/${DigitalSoknadPerson.JOURNALPOST_ID} HTTP/1.1"
     }
 
     @Test
@@ -49,7 +58,8 @@ class DokArkivClientTest : BaseTestClass() {
         assertThrows<HttpClientErrorException> {
             dokArkivClient.updateJournalpost(DigitalSoknadPerson.journalpost)
         }
-        dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo "PUT /rest/journalpostapi/v1/journalpost/${DigitalSoknadPerson.journalpostId} HTTP/1.1"
+        dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo
+            "PUT /rest/journalpostapi/v1/journalpost/${DigitalSoknadPerson.JOURNALPOST_ID} HTTP/1.1"
     }
 
     @Test
@@ -58,6 +68,7 @@ class DokArkivClientTest : BaseTestClass() {
         assertThrows<HttpServerErrorException> {
             dokArkivClient.updateJournalpost(DigitalSoknadPerson.journalpost)
         }
-        dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo "PUT /rest/journalpostapi/v1/journalpost/${DigitalSoknadPerson.journalpostId} HTTP/1.1"
+        dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo
+            "PUT /rest/journalpostapi/v1/journalpost/${DigitalSoknadPerson.JOURNALPOST_ID} HTTP/1.1"
     }
 }

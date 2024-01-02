@@ -35,13 +35,14 @@ object OppgaveMockDispatcher : QueueDispatcher() {
             "POST" -> {
                 oppgaveRequestBodyListe.add(objectMapper.readValue<OppgaveRequest>(request.body.readByteArray()))
                 val requestBody = oppgaveRequestBodyListe.last()
-                val oppgave = Oppgave(
-                    id = "123123",
-                    beskrivelse = requestBody.beskrivelse,
-                    oppgavetype = requestBody.oppgavetype,
-                    tema = requestBody.tema,
-                    tildeltEnhetsnr = requestBody.tildeltEnhetsnr ?: "4488"
-                )
+                val oppgave =
+                    Oppgave(
+                        id = "123123",
+                        beskrivelse = requestBody.beskrivelse,
+                        oppgavetype = requestBody.oppgavetype,
+                        tema = requestBody.tema,
+                        tildeltEnhetsnr = requestBody.tildeltEnhetsnr ?: "4488",
+                    )
                 return withContentTypeApplicationJson {
                     MockResponse().setBody(oppgave.serialisertTilString()).setResponseCode(201)
                 }

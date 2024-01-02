@@ -26,16 +26,17 @@ class OppgaveClientTest : BaseTestClass() {
     @Autowired
     private lateinit var prometheusMeterRegistry: PrometheusMeterRegistry
 
-    val oppgaveRequest = OppgaveRequest(
-        journalpostId = "x",
-        aktoerId = "1919191919191",
-        orgnr = "99999999",
-        tema = "SYK",
-        oppgavetype = "SOK",
-        frist = 1,
-        beskrivelse = "Test",
-        tildeltEnhetsnr = "1234"
-    )
+    val oppgaveRequest =
+        OppgaveRequest(
+            journalpostId = "x",
+            aktoerId = "1919191919191",
+            orgnr = "99999999",
+            tema = "SYK",
+            oppgavetype = "SOK",
+            frist = 1,
+            beskrivelse = "Test",
+            tildeltEnhetsnr = "1234",
+        )
 
     @BeforeEach
     fun `Disse legges til i header`() {
@@ -53,7 +54,9 @@ class OppgaveClientTest : BaseTestClass() {
         val oppgave = oppgaveClient.opprettOppgave(request)
         oppgave.tildeltEnhetsnr shouldBeEqualTo request.tildeltEnhetsnr
 
-        prometheusMeterRegistry.meters.find { it.id.name == "http.client.requests" && it.id.tags.contains(Tag.of("uri", "/api/v1/oppgaver")) } shouldNotBeEqualTo null
+        prometheusMeterRegistry.meters.find {
+            it.id.name == "http.client.requests" && it.id.tags.contains(Tag.of("uri", "/api/v1/oppgaver"))
+        } shouldNotBeEqualTo null
         oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo "POST /api/v1/oppgaver HTTP/1.1"
     }
 
@@ -64,9 +67,9 @@ class OppgaveClientTest : BaseTestClass() {
             MockResponse().setResponseCode(400).setBody(
                 OppgaveErrorResponse(
                     UUID.randomUUID().toString(),
-                    "NAVEnheten 'xxxx' har status: 'Nedlagt'"
-                ).serialisertTilString()
-            )
+                    "NAVEnheten 'xxxx' har status: 'Nedlagt'",
+                ).serialisertTilString(),
+            ),
         )
         val oppgave = oppgaveClient.opprettOppgave(request)
         oppgave.tildeltEnhetsnr shouldNotBeEqualTo request.tildeltEnhetsnr
@@ -81,9 +84,9 @@ class OppgaveClientTest : BaseTestClass() {
             MockResponse().setResponseCode(400).setBody(
                 OppgaveErrorResponse(
                     UUID.randomUUID().toString(),
-                    "Organisasjonsnummer er ugyldig"
-                ).serialisertTilString()
-            )
+                    "Organisasjonsnummer er ugyldig",
+                ).serialisertTilString(),
+            ),
         )
         oppgaveClient.opprettOppgave(request)
         oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo "POST /api/v1/oppgaver HTTP/1.1"
@@ -94,7 +97,7 @@ class OppgaveClientTest : BaseTestClass() {
     fun `opprett oppgave returnerer 400 med uleselig response, kaster da http exception`() {
         val request = oppgaveRequest.copy(journalpostId = "4")
         oppgaveMockWebserver.enqueue(
-            MockResponse().setResponseCode(400).setBody("Dette er en uleselig response")
+            MockResponse().setResponseCode(400).setBody("Dette er en uleselig response"),
         )
         assertThrows<HttpClientErrorException> {
             oppgaveClient.opprettOppgave(request)

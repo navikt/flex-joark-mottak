@@ -14,7 +14,7 @@ class JournalpostBehandler(
     private val safClient: SafClient,
     private val oppgaveClient: OppgaveClient,
     private val autoOppgaver: AutoOppgaver,
-    private val dokArkivClient: DokArkivClient
+    private val dokArkivClient: DokArkivClient,
 ) {
     private val log = logger()
 
@@ -71,7 +71,10 @@ class JournalpostBehandler(
             throw InvalidJournalpostStatusException()
         }
         if (SkjemaMetadata.isIgnoreskjema(journalpost.tema, journalpost.brevkode)) {
-            log.info("Avslutter videre behandling da journalpost ${journalpost.journalpostId} har brevkode ${journalpost.brevkode} på tema ${journalpost.tema} som eksplisitt skal ignoreres!")
+            log.info(
+                "Avslutter videre behandling da journalpost ${journalpost.journalpostId} har brevkode " +
+                    "${journalpost.brevkode} på tema ${journalpost.tema} som eksplisitt skal ignoreres!",
+            )
             throw InvalidJournalpostStatusException()
         }
 
@@ -81,7 +84,10 @@ class JournalpostBehandler(
     private fun gyldigeDokumentTitler(journalpost: Journalpost): Boolean {
         for (dokument in journalpost.dokumenter) {
             if (dokument.tittel.isNullOrEmpty()) {
-                log.info("Avbryter automatisk behandling. Journalpost ${journalpost.journalpostId} har dokument ${dokument.dokumentInfoId} uten tittel")
+                log.info(
+                    "Avbryter automatisk behandling. Journalpost ${journalpost.journalpostId} har dokument " +
+                        "${dokument.dokumentInfoId} uten tittel",
+                )
                 return false
             }
         }

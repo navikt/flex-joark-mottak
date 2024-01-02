@@ -11,11 +11,14 @@ import java.time.OffsetDateTime
 
 @Component
 class RetryProducer(
-    private val kafkaStringProducer: KafkaProducer<String, String>
+    private val kafkaStringProducer: KafkaProducer<String, String>,
 ) {
     val log = logger()
 
-    fun send(kafkaEvent: KafkaEvent, behandlingstidspunkt: OffsetDateTime) {
+    fun send(
+        kafkaEvent: KafkaEvent,
+        behandlingstidspunkt: OffsetDateTime,
+    ) {
         kafkaStringProducer.send(
             ProducerRecord(
                 RETRY_TOPIC,
@@ -25,10 +28,10 @@ class RetryProducer(
                 listOf(
                     RecordHeader(
                         BEHANDLINGSTIDSPUNKT,
-                        behandlingstidspunkt.toInstant().toEpochMilli().toString().toByteArray()
-                    )
-                )
-            )
+                        behandlingstidspunkt.toInstant().toEpochMilli().toString().toByteArray(),
+                    ),
+                ),
+            ),
         ).get()
     }
 }
