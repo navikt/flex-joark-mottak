@@ -19,7 +19,7 @@ import java.lang.Exception
 class PdlClient(
     @Value("\${PDL_URL}")
     private val pdlApiUrl: String,
-    private val pdlRestTemplate: RestTemplate
+    private val pdlRestTemplate: RestTemplate,
 ) {
     private val log = logger()
 
@@ -29,18 +29,22 @@ class PdlClient(
         headers[CONTENT_TYPE_HEADER] = MediaType.APPLICATION_JSON_VALUE
         headers[TEMA] = TEMA_SYK
 
-        val responseEntity: ResponseEntity<String> = pdlRestTemplate.exchange(
-            "$pdlApiUrl/graphql",
-            HttpMethod.POST,
-            HttpEntity(
-                GraphQLRequest(HENT_IDENTER, mapOf(IDENT to journalpost.bruker!!.id)).serialisertTilString(),
-                headers
-            ),
-            String::class.java
-        )
+        val responseEntity: ResponseEntity<String> =
+            pdlRestTemplate.exchange(
+                "$pdlApiUrl/graphql",
+                HttpMethod.POST,
+                HttpEntity(
+                    GraphQLRequest(HENT_IDENTER, mapOf(IDENT to journalpost.bruker!!.id)).serialisertTilString(),
+                    headers,
+                ),
+                String::class.java,
+            )
 
         if (responseEntity.body == null) {
-            throw Exception("Mangler body i response fra pdl for journalpost ${journalpost.journalpostId}, statuskode: ${responseEntity.statusCode.value()}")
+            throw Exception(
+                "Mangler body i response fra pdl for journalpost ${journalpost.journalpostId}, statuskode: " +
+                    "${responseEntity.statusCode.value()}",
+            )
         }
 
         val parsedResponse = responseEntity.body!!.let { objectMapper.readValue<GraphQLResponse<HentIdenterData>>(it) }
@@ -59,11 +63,11 @@ class PdlClient(
 }
 
 data class HentIdenterData(
-    val hentIdenter: HentIdenter? = null
+    val hentIdenter: HentIdenter? = null,
 )
 
 data class HentIdenter(
-    val identer: List<PdlIdent>
+    val identer: List<PdlIdent>,
 )
 
 data class PdlIdent(val gruppe: String, val ident: String)

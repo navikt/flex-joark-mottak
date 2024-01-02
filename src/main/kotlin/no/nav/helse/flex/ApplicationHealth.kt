@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class ApplicationHealth(
-    private val applicationAvailability: ApplicationAvailability
+    private val applicationAvailability: ApplicationAvailability,
 ) {
     val log = logger()
 
@@ -22,6 +22,4 @@ class ApplicationHealth(
     fun onReadinessEvent(event: AvailabilityChangeEvent<ReadinessState>) {
         log.info("ReadinessState ${event.state} source ${event.source.javaClass.name}")
     }
-
-    fun ok() = applicationAvailability.readinessState == ReadinessState.ACCEPTING_TRAFFIC && applicationAvailability.livenessState == LivenessState.CORRECT
 }

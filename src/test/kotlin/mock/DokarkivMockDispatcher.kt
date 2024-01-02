@@ -11,12 +11,14 @@ object DokarkivMockDispatcher : QueueDispatcher() {
         }
 
         return when {
-            request.requestUrl!!.encodedPath.startsWith("/rest/journalpostapi/v1/journalpost/") -> MockResponse().setResponseCode(
-                200
-            )
+            request.requestUrl!!.encodedPath.startsWith("/rest/journalpostapi/v1/journalpost/") ->
+                MockResponse().setResponseCode(
+                    200,
+                )
 
-            else -> MockResponse().setResponseCode(404)
-                .setBody("Har ikke implemetert dokarkiv mock api for ${request.requestUrl}")
+            else ->
+                MockResponse().setResponseCode(404)
+                    .setBody("Har ikke implemetert dokarkiv mock api for ${request.requestUrl}")
         }
     }
 }

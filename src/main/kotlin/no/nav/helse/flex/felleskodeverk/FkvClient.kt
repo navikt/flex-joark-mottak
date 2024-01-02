@@ -16,7 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder
 class FkvClient(
     @Value("\${FKV_URL}")
     private val fkvUrl: String,
-    private val plainRestTemplate: RestTemplate
+    private val plainRestTemplate: RestTemplate,
 ) {
     private val log = logger()
 
@@ -28,18 +28,20 @@ class FkvClient(
         headers[CORRELATION_HEADER] = "flex-joark-mottak"
         headers[NAV_CONSUMER_ID] = "flex-joark-mottak"
 
-        val uri = UriComponentsBuilder.fromHttpUrl(fkvUrl)
-            .path("/api/v1/hierarki/TemaSkjemaGjelder/noder")
-            .queryParam("spraak", "nb")
-            .encode()
-            .toUriString()
+        val uri =
+            UriComponentsBuilder.fromHttpUrl(fkvUrl)
+                .path("/api/v1/hierarki/TemaSkjemaGjelder/noder")
+                .queryParam("spraak", "nb")
+                .encode()
+                .toUriString()
 
-        val response = plainRestTemplate.exchange(
-            uri,
-            HttpMethod.GET,
-            HttpEntity<Any>(headers),
-            String::class.java
-        )
+        val response =
+            plainRestTemplate.exchange(
+                uri,
+                HttpMethod.GET,
+                HttpEntity<Any>(headers),
+                String::class.java,
+            )
 
         return objectMapper.readValue<KodeverkBrevkoder>(response.body!!)
     }

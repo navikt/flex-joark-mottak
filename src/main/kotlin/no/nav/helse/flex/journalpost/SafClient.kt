@@ -16,7 +16,7 @@ import java.lang.Exception
 class SafClient(
     @Value("\${SAF_URL}")
     private val safApiUrl: String,
-    private val safRestTemplate: RestTemplate
+    private val safRestTemplate: RestTemplate,
 ) {
     private val log = logger()
 
@@ -24,18 +24,21 @@ class SafClient(
         val headers = HttpHeaders()
         headers[CONTENT_TYPE_HEADER] = MediaType.APPLICATION_JSON_VALUE
 
-        val responseEntity = safRestTemplate.exchange(
-            "$safApiUrl/graphql",
-            HttpMethod.POST,
-            HttpEntity(
-                GraphQLRequest(SAF_QUERY_FIND_JOURNALPOST, mapOf("id" to journalpostId)).serialisertTilString(),
-                headers
-            ),
-            String::class.java
-        )
+        val responseEntity =
+            safRestTemplate.exchange(
+                "$safApiUrl/graphql",
+                HttpMethod.POST,
+                HttpEntity(
+                    GraphQLRequest(SAF_QUERY_FIND_JOURNALPOST, mapOf("id" to journalpostId)).serialisertTilString(),
+                    headers,
+                ),
+                String::class.java,
+            )
 
         if (responseEntity.body == null) {
-            throw Exception("Mangler body i response fra saf for journalpost $journalpostId, statuskode: ${responseEntity.statusCode.value()}")
+            throw Exception(
+                "Mangler body i response fra saf for journalpost $journalpostId, statuskode: ${responseEntity.statusCode.value()}",
+            )
         }
 
         val parsedResponse = responseEntity.body!!.let { objectMapper.readValue<GraphQLResponse<ResponseData>>(it) }
@@ -53,7 +56,7 @@ class SafClient(
     }
 
     data class ResponseData(
-        val journalpost: Journalpost
+        val journalpost: Journalpost,
     )
 }
 

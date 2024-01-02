@@ -21,7 +21,7 @@ const val BEHANDLINGSTIDSPUNKT = "behandlingstidspunkt"
 @Component
 class RetryListener(
     private val journalpostBehandler: JournalpostBehandler,
-    private val retryProducer: RetryProducer
+    private val retryProducer: RetryProducer,
 ) {
     val log = logger()
 
@@ -30,20 +30,27 @@ class RetryListener(
         id = "flex-joark-mottak-retry",
         idIsGroup = true,
         containerFactory = "aivenKafkaListenerContainerFactory",
-        properties = [ "auto.offset.reset=earliest" ]
+        properties = [ "auto.offset.reset=earliest" ],
     )
-    fun listen(cr: ConsumerRecord<String, String>, acknowledgment: Acknowledgment) {
+    fun listen(
+        cr: ConsumerRecord<String, String>,
+        acknowledgment: Acknowledgment,
+    ) {
         val kafkaEvent = objectMapper.readValue<KafkaEvent>(cr.value())
-        val behandlingstidspunkt = cr.headers().lastHeader(BEHANDLINGSTIDSPUNKT)
-            ?.value()
-            ?.let { String(it, StandardCharsets.UTF_8) }
-            ?.let { Instant.ofEpochMilli(it.toLong()) }
-            ?: Instant.now()
+        val behandlingstidspunkt =
+            cr.headers().lastHeader(BEHANDLINGSTIDSPUNKT)
+                ?.value()
+                ?.let { String(it, StandardCharsets.UTF_8) }
+                ?.let { Instant.ofEpochMilli(it.toLong()) }
+                ?: Instant.now()
 
         try {
             val sovetid = behandlingstidspunkt.sovetid()
             if (sovetid > 0) {
-                log.info("Mottok rebehandling av journalpost ${kafkaEvent.journalpostId} med behandlingstidspunkt ${behandlingstidspunkt.tilOsloLocalDateTime()} sover i $sovetid millisekunder")
+                log.info(
+                    "Mottok rebehandling av journalpost ${kafkaEvent.journalpostId} med behandlingstidspunkt " +
+                        "${behandlingstidspunkt.tilOsloLocalDateTime()} sover i $sovetid millisekunder",
+                )
                 acknowledgment.nack(Duration.ofMillis(sovetid))
             } else {
                 MDC.put(CORRELATION_ID, UUID.randomUUID().toString())

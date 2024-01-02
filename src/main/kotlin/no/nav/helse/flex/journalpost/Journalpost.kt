@@ -12,7 +12,7 @@ data class Journalpost(
     val tema: String,
     val avsenderMottaker: AvsenderMottaker? = null,
     val behandlingstema: String? = null,
-    val behandlingstype: String? = null
+    val behandlingstype: String? = null,
 ) {
     val brevkode: String?
         get() = if (dokumenter.isNotEmpty()) dokumenter[0].brevkode else null
@@ -22,14 +22,18 @@ data class Journalpost(
     }
 
     override fun toString(): String {
-        return "[id=$journalpostId, tema=$tema, skjema=$brevkode, tittel=$tittel, journalforendeEnhet=$journalforendeEnhet, journalstatus=$journalstatus, behandlingstema=$behandlingstema, behandlingstype=$behandlingstype]"
+        return "[id=$journalpostId, tema=$tema, skjema=$brevkode, tittel=$tittel, " +
+            "journalforendeEnhet=$journalforendeEnhet, journalstatus=$journalstatus, " +
+            "behandlingstema=$behandlingstema, behandlingstype=$behandlingstype]"
     }
 
     class Bruker(
         val id: String,
-        private val type: String // Denne er tilstede når vi henter i fra Saf
+        // Denne er tilstede når vi henter i fra Saf.
+        private val type: String,
     ) {
-        val idType: String = type // Denne bruker vi når vi oppdaterer journalpost i DokArkiv
+        // Denne bruker vi når vi oppdaterer journalpost i DokArkiv.
+        val idType: String = type
         val isAktoerId
             get() = AKTOERID == type
         val isFNR
@@ -50,9 +54,11 @@ data class Journalpost(
 
     class AvsenderMottaker(
         var id: String?,
-        private val type: String // Denne er satt når vi henter journalpost og er ikke samme som vi bruker når vi oppdaterer journalpost
+        // Denne er satt når vi henter journalpost og er ikke samme som vi bruker når vi oppdaterer journalpost.
+        private val type: String,
     ) {
-        val idType: String = type // Brukes i oppdater Journalpost request
+        // Brukes i oppdater Journalpost request.
+        val idType: String = type
     }
 
     class Dokument(val brevkode: String?, val tittel: String? = null, val dokumentInfoId: String)

@@ -21,38 +21,49 @@ private const val PARAM_OPPGAVETYPE_FDR = "FDR"
 class OppgaveClient(
     @Value("\${OPPGAVE_URL}")
     private val oppgaveUrl: String,
-    private val oppgaveRestTemplate: RestTemplate
+    private val oppgaveRestTemplate: RestTemplate,
 ) {
     private val log = logger()
 
     fun opprettOppgave(requestData: OppgaveRequest): Oppgave {
-        val response = runCatching {
-            opprettOppgaveKall(requestData)
-        }.recover { httpException ->
-            if (httpException is HttpClientErrorException && httpException.statusCode.value() == 400) {
-                val oppgaveErrorResponse = try {
-                    objectMapper.readValue<OppgaveErrorResponse>(httpException.responseBodyAsByteArray)
-                } catch (e: Exception) {
-                    throw httpException
-                }
+        val response =
+            runCatching {
+                opprettOppgaveKall(requestData)
+            }.recover { httpException ->
+                if (httpException is HttpClientErrorException && httpException.statusCode.value() == 400) {
+                    val oppgaveErrorResponse =
+                        try {
+                            objectMapper.readValue<OppgaveErrorResponse>(httpException.responseBodyAsByteArray)
+                        } catch (e: Exception) {
+                            throw httpException
+                        }
 
-                if (oppgaveErrorResponse.isErrorInvalidEnhet()) {
-                    log.warn("Klarte ikke opprette oppgave pga ugyldig enhet på journalpost ${requestData.journalpostId}", oppgaveErrorResponse.feilmelding)
-                    requestData.removeJournalforendeEnhet()
-                    return@recover opprettOppgaveKall(requestData)
-                }
+                    if (oppgaveErrorResponse.isErrorInvalidEnhet()) {
+                        log.warn(
+                            "Klarte ikke opprette oppgave pga ugyldig enhet på journalpost ${requestData.journalpostId}",
+                            oppgaveErrorResponse.feilmelding,
+                        )
+                        requestData.removeJournalforendeEnhet()
+                        return@recover opprettOppgaveKall(requestData)
+                    }
 
-                if (oppgaveErrorResponse.isErrorInvalidOrgNr()) {
-                    log.warn("Klarte ikke opprette oppgave pga ugyldig OrgNr på journalpost ${requestData.journalpostId}", oppgaveErrorResponse.feilmelding)
-                    requestData.removeOrgNr()
-                    return@recover opprettOppgaveKall(requestData)
+                    if (oppgaveErrorResponse.isErrorInvalidOrgNr()) {
+                        log.warn(
+                            "Klarte ikke opprette oppgave pga ugyldig OrgNr på journalpost ${requestData.journalpostId}",
+                            oppgaveErrorResponse.feilmelding,
+                        )
+                        requestData.removeOrgNr()
+                        return@recover opprettOppgaveKall(requestData)
+                    }
                 }
-            }
-            throw httpException
-        }.getOrThrow()
+                throw httpException
+            }.getOrThrow()
 
         val oppgave = objectMapper.readValue<Oppgave>(response.body!!)
-        log.info("Opprettet ${oppgave.oppgavetype}-oppgave: ${oppgave.id} på enhet ${oppgave.tildeltEnhetsnr} for journalpost: ${requestData.journalpostId}")
+        log.info(
+            "Opprettet ${oppgave.oppgavetype}-oppgave: ${oppgave.id} på enhet ${oppgave.tildeltEnhetsnr} for " +
+                "journalpost: ${requestData.journalpostId}",
+        )
 
         return oppgave
     }
@@ -65,7 +76,7 @@ class OppgaveClient(
             "$oppgaveUrl/api/v1/oppgaver",
             HttpMethod.POST,
             HttpEntity(requestData.serialisertTilString(), headers),
-            String::class.java
+            String::class.java,
         )
     }
 
@@ -73,22 +84,24 @@ class OppgaveClient(
         val headers = HttpHeaders()
         headers[CONTENT_TYPE_HEADER] = MediaType.APPLICATION_JSON_VALUE
 
-        val uri = UriComponentsBuilder.fromHttpUrl(oppgaveUrl)
-            .path("/api/v1/oppgaver")
-            .queryParam("statuskategori", PARAM_STATUSKATEGORI_AAPEN)
-            .queryParam("oppgavetype", PARAM_OPPGAVETYPE_JFR)
-            .queryParam("oppgavetype", PARAM_OPPGAVETYPE_FDR)
-            .queryParam("journalpostId", "{id}")
-            .encode()
-            .toUriString()
+        val uri =
+            UriComponentsBuilder.fromHttpUrl(oppgaveUrl)
+                .path("/api/v1/oppgaver")
+                .queryParam("statuskategori", PARAM_STATUSKATEGORI_AAPEN)
+                .queryParam("oppgavetype", PARAM_OPPGAVETYPE_JFR)
+                .queryParam("oppgavetype", PARAM_OPPGAVETYPE_FDR)
+                .queryParam("journalpostId", "{id}")
+                .encode()
+                .toUriString()
 
-        val response = oppgaveRestTemplate.exchange(
-            uri,
-            HttpMethod.GET,
-            HttpEntity<Any>(headers),
-            String::class.java,
-            mapOf("id" to journalpostId)
-        )
+        val response =
+            oppgaveRestTemplate.exchange(
+                uri,
+                HttpMethod.GET,
+                HttpEntity<Any>(headers),
+                String::class.java,
+                mapOf("id" to journalpostId),
+            )
 
         return objectMapper.readValue<OppgaveSearchResponse>(response.body!!).harTilknyttetOppgave()
     }
@@ -102,19 +115,19 @@ data class Oppgave(
     var oppgavetype: String? = null,
     var tema: String? = null,
     var tildeltEnhetsnr: String? = null,
-    var versjon: Int = 0
+    var versjon: Int = 0,
 )
 
 data class OppgaveErrorResponse(
     val uuid: String,
-    val feilmelding: String
+    val feilmelding: String,
 ) {
     fun isErrorInvalidEnhet(): Boolean {
         return (
             feilmelding.contains("NAVEnheten '") && feilmelding.contains("' er av typen oppgavebehandler") ||
                 feilmelding.contains("NAVEnheten '") && feilmelding.contains("' har status: 'Nedlagt'") ||
                 feilmelding.contains("Enheten med nummeret '") && feilmelding.contains("' eksisterer ikke")
-            )
+        )
     }
 
     fun isErrorInvalidOrgNr(): Boolean {
@@ -124,7 +137,7 @@ data class OppgaveErrorResponse(
 
 data class OppgaveSearchResponse(
     val antallTreffTotalt: Int = 0,
-    val oppgaver: List<Oppgave>? = null
+    val oppgaver: List<Oppgave>? = null,
 ) {
     fun harTilknyttetOppgave(): Boolean {
         return (antallTreffTotalt > 0 && !oppgaver.isNullOrEmpty() && oppgaver[0].id != null)
@@ -141,7 +154,7 @@ data class OppgaveRequest(
     val oppgavetype: String,
     var tildeltEnhetsnr: String? = null,
     val beskrivelse: String? = null,
-    private val frist: Int
+    private val frist: Int,
 ) {
     val prioritet = "NORM"
     val aktivDato = LocalDate.now().toString()

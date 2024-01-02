@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:max-line-length")
+
 import com.fasterxml.jackson.module.kotlin.readValue
 import mock.*
 import no.nav.helse.flex.journalpost.FerdigstillJournalpostRequest
@@ -14,8 +16,8 @@ class IntegrasjonTest : BaseTestClass() {
         kafkaProducer.send(
             ProducerRecord(
                 topic,
-                DigitalSoknadPerson.kafkaEvent
-            )
+                DigitalSoknadPerson.kafkaEvent,
+            ),
         ).get()
 
         oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS) shouldBeEqualTo null
@@ -26,8 +28,8 @@ class IntegrasjonTest : BaseTestClass() {
         kafkaProducer.send(
             ProducerRecord(
                 topic,
-                PapirSoknadPerson.kafkaEvent
-            )
+                PapirSoknadPerson.kafkaEvent,
+            ),
         ).get()
 
         val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
@@ -35,20 +37,20 @@ class IntegrasjonTest : BaseTestClass() {
         val requestOppdaterJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
         val requestFerdigstillJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
 
-        requestHarOppgave.requestLine shouldBeEqualTo "GET /api/v1/oppgaver?statuskategori=AAPEN&oppgavetype=JFR&oppgavetype=FDR&journalpostId=${PapirSoknadPerson.journalpostId} HTTP/1.1"
+        requestHarOppgave.requestLine shouldBeEqualTo "GET /api/v1/oppgaver?statuskategori=AAPEN&oppgavetype=JFR&oppgavetype=FDR&journalpostId=${PapirSoknadPerson.JOURNALPOST_ID} HTTP/1.1"
 
         requestOpprettOppgave.requestLine shouldBeEqualTo "POST /api/v1/oppgaver HTTP/1.1"
         val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
-        body.journalpostId shouldBeEqualTo PapirSoknadPerson.journalpostId
+        body.journalpostId shouldBeEqualTo PapirSoknadPerson.JOURNALPOST_ID
         body.tema shouldBeEqualTo "SYK"
         body.behandlingstema shouldBeEqualTo "ab0434"
         body.behandlingstype shouldBeEqualTo null
 
         requestOppdaterJournalpost.method shouldBeEqualTo "PUT"
-        requestOppdaterJournalpost.requestUrl?.encodedPath shouldBeEqualTo "/rest/journalpostapi/v1/journalpost/${PapirSoknadPerson.journalpostId}"
+        requestOppdaterJournalpost.requestUrl?.encodedPath shouldBeEqualTo "/rest/journalpostapi/v1/journalpost/${PapirSoknadPerson.JOURNALPOST_ID}"
 
         requestFerdigstillJournalpost.method shouldBeEqualTo "PATCH"
-        requestFerdigstillJournalpost.requestUrl?.encodedPath shouldBeEqualTo "/rest/journalpostapi/v1/journalpost/${PapirSoknadPerson.journalpostId}/ferdigstill"
+        requestFerdigstillJournalpost.requestUrl?.encodedPath shouldBeEqualTo "/rest/journalpostapi/v1/journalpost/${PapirSoknadPerson.JOURNALPOST_ID}/ferdigstill"
         objectMapper.readValue<FerdigstillJournalpostRequest>(requestFerdigstillJournalpost.body.readUtf8()).journalfoerendeEnhet shouldBeEqualTo "9999"
     }
 
@@ -57,8 +59,8 @@ class IntegrasjonTest : BaseTestClass() {
         kafkaProducer.send(
             ProducerRecord(
                 topic,
-                InntektsopplysningerPerson.kafkaEvent
-            )
+                InntektsopplysningerPerson.kafkaEvent,
+            ),
         ).get()
 
         val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
@@ -67,11 +69,11 @@ class IntegrasjonTest : BaseTestClass() {
 
         requestHarOppgave.method shouldBeEqualTo "GET"
         requestHarOppgave.requestUrl?.queryParameter("statuskategori") shouldBeEqualTo "AAPEN"
-        requestHarOppgave.requestUrl?.queryParameter("journalpostId") shouldBeEqualTo InntektsopplysningerPerson.journalpostId
+        requestHarOppgave.requestUrl?.queryParameter("journalpostId") shouldBeEqualTo InntektsopplysningerPerson.JOURNALPOST_ID
 
         requestOpprettOppgave.method shouldBeEqualTo "POST"
         val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
-        body.journalpostId shouldBeEqualTo InntektsopplysningerPerson.journalpostId
+        body.journalpostId shouldBeEqualTo InntektsopplysningerPerson.JOURNALPOST_ID
         body.tema shouldBeEqualTo "SYK"
         body.behandlingstema shouldBeEqualTo null
         body.behandlingstype shouldBeEqualTo "ae0004"
@@ -84,8 +86,8 @@ class IntegrasjonTest : BaseTestClass() {
         kafkaProducer.send(
             ProducerRecord(
                 topic,
-                KlagePerson.kafkaEvent
-            )
+                KlagePerson.kafkaEvent,
+            ),
         ).get()
 
         val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
@@ -94,11 +96,11 @@ class IntegrasjonTest : BaseTestClass() {
 
         requestHarOppgave.method shouldBeEqualTo "GET"
         requestHarOppgave.requestUrl?.queryParameter("statuskategori") shouldBeEqualTo "AAPEN"
-        requestHarOppgave.requestUrl?.queryParameter("journalpostId") shouldBeEqualTo KlagePerson.journalpostId
+        requestHarOppgave.requestUrl?.queryParameter("journalpostId") shouldBeEqualTo KlagePerson.JOURNALPOST_ID
 
         requestOpprettOppgave.method shouldBeEqualTo "POST"
         val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
-        body.journalpostId shouldBeEqualTo KlagePerson.journalpostId
+        body.journalpostId shouldBeEqualTo KlagePerson.JOURNALPOST_ID
         body.tema shouldBeEqualTo "SYK"
         body.behandlingstema shouldBeEqualTo null
         body.behandlingstype shouldBeEqualTo null
@@ -111,8 +113,8 @@ class IntegrasjonTest : BaseTestClass() {
         kafkaProducer.send(
             ProducerRecord(
                 topic,
-                UtlanskPerson.kafkaEvent
-            )
+                UtenlandskPerson.kafkaEvent,
+            ),
         ).get()
 
         val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
@@ -121,11 +123,11 @@ class IntegrasjonTest : BaseTestClass() {
 
         requestHarOppgave.method shouldBeEqualTo "GET"
         requestHarOppgave.requestUrl?.queryParameter("statuskategori") shouldBeEqualTo "AAPEN"
-        requestHarOppgave.requestUrl?.queryParameter("journalpostId") shouldBeEqualTo UtlanskPerson.journalpostId
+        requestHarOppgave.requestUrl?.queryParameter("journalpostId") shouldBeEqualTo UtenlandskPerson.JOURNALPOST_ID
 
         requestOpprettOppgave.method shouldBeEqualTo "POST"
         val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
-        body.journalpostId shouldBeEqualTo UtlanskPerson.journalpostId
+        body.journalpostId shouldBeEqualTo UtenlandskPerson.JOURNALPOST_ID
         body.tema shouldBeEqualTo "SYK"
         body.behandlingstema shouldBeEqualTo null
         body.behandlingstype shouldBeEqualTo "ae0106"
@@ -138,8 +140,8 @@ class IntegrasjonTest : BaseTestClass() {
         kafkaProducer.send(
             ProducerRecord(
                 topic,
-                BrevløsPerson.kafkaEvent
-            )
+                BrevløsPerson.kafkaEvent,
+            ),
         ).get()
 
         val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
@@ -148,11 +150,11 @@ class IntegrasjonTest : BaseTestClass() {
 
         requestHarOppgave.method shouldBeEqualTo "GET"
         requestHarOppgave.requestUrl?.queryParameter("statuskategori") shouldBeEqualTo "AAPEN"
-        requestHarOppgave.requestUrl?.queryParameter("journalpostId") shouldBeEqualTo BrevløsPerson.journalpostId
+        requestHarOppgave.requestUrl?.queryParameter("journalpostId") shouldBeEqualTo BrevløsPerson.JOURNALPOST_ID
 
         requestOpprettOppgave.method shouldBeEqualTo "POST"
         val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
-        body.journalpostId shouldBeEqualTo BrevløsPerson.journalpostId
+        body.journalpostId shouldBeEqualTo BrevløsPerson.JOURNALPOST_ID
         body.tema shouldBeEqualTo "SYK"
         body.behandlingstema shouldBeEqualTo null
         body.behandlingstype shouldBeEqualTo null
@@ -165,8 +167,8 @@ class IntegrasjonTest : BaseTestClass() {
         kafkaProducer.send(
             ProducerRecord(
                 topic,
-                UkjentBrevkodePerson.kafkaEvent
-            )
+                UkjentBrevkodePerson.kafkaEvent,
+            ),
         ).get()
 
         val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
@@ -175,11 +177,11 @@ class IntegrasjonTest : BaseTestClass() {
 
         requestHarOppgave.method shouldBeEqualTo "GET"
         requestHarOppgave.requestUrl?.queryParameter("statuskategori") shouldBeEqualTo "AAPEN"
-        requestHarOppgave.requestUrl?.queryParameter("journalpostId") shouldBeEqualTo UkjentBrevkodePerson.journalpostId
+        requestHarOppgave.requestUrl?.queryParameter("journalpostId") shouldBeEqualTo UkjentBrevkodePerson.JOURNALPOST_ID
 
         requestOpprettOppgave.method shouldBeEqualTo "POST"
         val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
-        body.journalpostId shouldBeEqualTo UkjentBrevkodePerson.journalpostId
+        body.journalpostId shouldBeEqualTo UkjentBrevkodePerson.JOURNALPOST_ID
         body.tema shouldBeEqualTo "SYK"
         body.behandlingstema shouldBeEqualTo null
         body.behandlingstype shouldBeEqualTo null
@@ -192,8 +194,8 @@ class IntegrasjonTest : BaseTestClass() {
         kafkaProducer.send(
             ProducerRecord(
                 topic,
-                JournalpostUtenPerson.kafkaEvent
-            )
+                JournalpostUtenPerson.kafkaEvent,
+            ),
         ).get()
 
         val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
@@ -202,11 +204,11 @@ class IntegrasjonTest : BaseTestClass() {
 
         requestHarOppgave.method shouldBeEqualTo "GET"
         requestHarOppgave.requestUrl?.queryParameter("statuskategori") shouldBeEqualTo "AAPEN"
-        requestHarOppgave.requestUrl?.queryParameter("journalpostId") shouldBeEqualTo JournalpostUtenPerson.journalpostId
+        requestHarOppgave.requestUrl?.queryParameter("journalpostId") shouldBeEqualTo JournalpostUtenPerson.JOURNALPOST_ID
 
         requestOpprettOppgave.method shouldBeEqualTo "POST"
         val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
-        body.journalpostId shouldBeEqualTo JournalpostUtenPerson.journalpostId
+        body.journalpostId shouldBeEqualTo JournalpostUtenPerson.JOURNALPOST_ID
         body.tema shouldBeEqualTo "SYK"
         body.behandlingstema shouldBeEqualTo null
         body.behandlingstype shouldBeEqualTo "ae0106"
@@ -219,8 +221,8 @@ class IntegrasjonTest : BaseTestClass() {
         kafkaProducer.send(
             ProducerRecord(
                 topic,
-                InntektsmeldingPerson.kafkaEvent
-            )
+                InntektsmeldingPerson.kafkaEvent,
+            ),
         ).get()
 
         val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)

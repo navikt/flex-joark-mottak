@@ -26,23 +26,23 @@ object SafMockDispatcher : QueueDispatcher() {
         val journalpostId = objectMapper.readValue<GraphQLRequest>(request.body.readByteArray()).variables["id"]
 
         return when (journalpostId) {
-            DigitalSoknadPerson.journalpostId -> response(DigitalSoknadPerson.journalpost)
+            DigitalSoknadPerson.JOURNALPOST_ID -> response(DigitalSoknadPerson.journalpost)
 
-            PapirSoknadPerson.journalpostId -> response(PapirSoknadPerson.journalpost)
+            PapirSoknadPerson.JOURNALPOST_ID -> response(PapirSoknadPerson.journalpost)
 
-            InntektsopplysningerPerson.journalpostId -> response(InntektsopplysningerPerson.journalpost)
+            InntektsopplysningerPerson.JOURNALPOST_ID -> response(InntektsopplysningerPerson.journalpost)
 
-            KlagePerson.journalpostId -> response(KlagePerson.journalpost)
+            KlagePerson.JOURNALPOST_ID -> response(KlagePerson.journalpost)
 
-            UtlanskPerson.journalpostId -> response(UtlanskPerson.journalpost)
+            UtenlandskPerson.JOURNALPOST_ID -> response(UtenlandskPerson.journalpost)
 
-            BrevløsPerson.journalpostId -> response(BrevløsPerson.journalpost)
+            BrevløsPerson.JOURNALPOST_ID -> response(BrevløsPerson.journalpost)
 
-            UkjentBrevkodePerson.journalpostId -> response(UkjentBrevkodePerson.journalpost)
+            UkjentBrevkodePerson.JOURNALPOST_ID -> response(UkjentBrevkodePerson.journalpost)
 
-            JournalpostUtenPerson.journalpostId -> response(JournalpostUtenPerson.journalpost)
+            JournalpostUtenPerson.JOURNALPOST_ID -> response(JournalpostUtenPerson.journalpost)
 
-            InntektsmeldingPerson.journalpostId -> response(InntektsmeldingPerson.journalpost)
+            InntektsmeldingPerson.JOURNALPOST_ID -> response(InntektsmeldingPerson.journalpost)
 
             else -> {
                 MockResponse().setResponseCode(404)
@@ -53,12 +53,13 @@ object SafMockDispatcher : QueueDispatcher() {
 
     private val objectMapperWithVisibility = objectMapper.copy().setVisibility(PropertyAccessor.FIELD, Visibility.ANY)
 
-    private fun response(journalpost: Journalpost) = MockResponse().setBody(
-        objectMapperWithVisibility.writeValueAsString(
-            GraphQLResponse(
-                data = SafClient.ResponseData(journalpost),
-                errors = null
-            )
+    private fun response(journalpost: Journalpost) =
+        MockResponse().setBody(
+            objectMapperWithVisibility.writeValueAsString(
+                GraphQLResponse(
+                    data = SafClient.ResponseData(journalpost),
+                    errors = null,
+                ),
+            ),
         )
-    )
 }

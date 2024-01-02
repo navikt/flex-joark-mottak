@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate
 class DokArkivClient(
     @Value("\${DOKARKIV_URL}")
     private val dokarkivUrl: String,
-    private val dokarkivRestTemplate: RestTemplate
+    private val dokarkivRestTemplate: RestTemplate,
 ) {
     fun ferdigstillJournalpost(journalpostId: String) {
         val headers = HttpHeaders()
@@ -24,7 +24,7 @@ class DokArkivClient(
             HttpMethod.PATCH,
             HttpEntity(FerdigstillJournalpostRequest().serialisertTilString(), headers),
             String::class.java,
-            mapOf("id" to journalpostId)
+            mapOf("id" to journalpostId),
         )
     }
 
@@ -37,12 +37,13 @@ class DokArkivClient(
             HttpMethod.PUT,
             HttpEntity(journalpost.serialisertTilString(), headers),
             String::class.java,
-            mapOf("id" to journalpost.journalpostId)
+            mapOf("id" to journalpost.journalpostId),
         )
     }
 }
 
 private const val CONTENT_TYPE_HEADER = "Content-Type"
+
 class FerdigstillJournalpostRequest {
     val journalfoerendeEnhet = "9999"
 }
