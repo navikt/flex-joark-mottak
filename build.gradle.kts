@@ -38,7 +38,7 @@ val logstashLogbackEncoderVersion = "7.4"
 val tokenSupportVersion = "3.2.0"
 val testContainersVersion = "1.19.4"
 val kluentVersion = "1.73"
-val jsonSchemaValidatorVersion = "1.1.0"
+val jsonSchemaValidatorVersion = "1.3.2"
 val httpclient5Version = "5.3.1"
 
 dependencies {
