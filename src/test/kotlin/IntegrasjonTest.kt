@@ -10,7 +10,7 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Test
 import java.util.concurrent.TimeUnit
 
-class IntegrasjonTest : BaseTestClass() {
+class IntegrasjonTest : FellesTestOppsett() {
     @Test
     fun `Mottar journalpost som allerede er ferdig arkivert i sykepengesoknad-arkivering-oppgave`() {
         kafkaProducer.send(

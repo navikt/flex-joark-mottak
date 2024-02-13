@@ -19,7 +19,7 @@ import kotlin.concurrent.thread
 @SpringBootTest(classes = [Application::class, KafkaConfig::class])
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE, printOnlyOnFailure = false)
 @AutoConfigureObservability
-abstract class BaseTestClass {
+abstract class FellesTestOppsett {
     companion object {
         val safMockWebserver: MockWebServer
         val dokarkivMockWebserver: MockWebServer

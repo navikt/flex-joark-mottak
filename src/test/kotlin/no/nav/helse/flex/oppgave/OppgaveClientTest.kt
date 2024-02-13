@@ -1,6 +1,6 @@
 package no.nav.helse.flex.oppgave
 
-import BaseTestClass
+import FellesTestOppsett
 import io.micrometer.core.instrument.Tag
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import no.nav.helse.flex.CORRELATION_ID
@@ -19,7 +19,7 @@ import org.springframework.web.client.HttpServerErrorException
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class OppgaveClientTest : BaseTestClass() {
+class OppgaveClientTest : FellesTestOppsett() {
     @Autowired
     private lateinit var oppgaveClient: OppgaveClient
 

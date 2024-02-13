@@ -1,6 +1,6 @@
 package no.nav.helse.flex.journalpost
 
-import BaseTestClass
+import FellesTestOppsett
 import io.micrometer.core.instrument.Tag
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import mock.DigitalSoknadPerson
@@ -19,7 +19,7 @@ import org.springframework.web.client.HttpServerErrorException
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class DokArkivClientTest : BaseTestClass() {
+class DokArkivClientTest : FellesTestOppsett() {
     @Autowired
     private lateinit var dokArkivClient: DokArkivClient
 
