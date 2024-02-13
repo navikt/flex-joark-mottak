@@ -1,6 +1,5 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("org.springframework.boot") version "3.2.2"
@@ -48,26 +47,24 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-cache")
-    implementation("org.springframework.kafka:spring-kafka")
-    implementation("org.apache.httpcomponents.client5:httpclient5:$httpclient5Version")
-    implementation("com.github.ben-manes.caffeine:caffeine:$caffeineVersion")
-    implementation("org.slf4j:slf4j-api")
+    implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("org.hibernate.validator:hibernate-validator")
+    implementation("org.springframework.kafka:spring-kafka")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.aspectj:aspectjrt")
     implementation("org.aspectj:aspectjweaver")
-    implementation("io.micrometer:micrometer-registry-prometheus")
+    implementation("org.apache.httpcomponents.client5:httpclient5:$httpclient5Version")
+    implementation("com.github.ben-manes.caffeine:caffeine:$caffeineVersion")
     implementation("io.confluent:kafka-connect-avro-converter:$confluentVersion")
     implementation("io.confluent:kafka-schema-registry-client:$confluentVersion")
-    implementation("org.apache.avro:avro:$avroVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashLogbackEncoderVersion")
     implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
+    implementation("org.apache.avro:avro:$avroVersion")
 
     testImplementation(platform("org.testcontainers:testcontainers-bom:$testContainersVersion"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.testcontainers:kafka")
-    testImplementation("org.mockito:mockito-core")
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.awaitility:awaitility")
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlinVersion")
@@ -76,25 +73,30 @@ dependencies {
     testImplementation("org.amshove.kluent:kluent:$kluentVersion")
 }
 
-tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
-    this.archiveFileName.set("app.jar")
-}
-
-tasks.withType<KotlinCompile> {
+kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_21)
         freeCompilerArgs.add("-Xjsr305=strict")
-
         if (System.getenv("CI") == "true") {
             allWarningsAsErrors.set(true)
         }
     }
 }
-tasks.withType<Test> {
-    useJUnitPlatform()
-    testLogging {
-        events("STARTED", "PASSED", "FAILED", "SKIPPED")
-        exceptionFormat = TestExceptionFormat.FULL
+
+tasks {
+    test {
+        useJUnitPlatform()
+        jvmArgs("-XX:+EnableDynamicAgentLoading")
+        testLogging {
+            events("PASSED", "FAILED", "SKIPPED")
+            exceptionFormat = TestExceptionFormat.FULL
+        }
+        failFast = false
     }
-    failFast = true
+}
+
+tasks {
+    bootJar {
+        archiveFileName = "app.jar"
+    }
 }
