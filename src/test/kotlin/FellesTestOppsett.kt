@@ -32,7 +32,7 @@ abstract class FellesTestOppsett {
             val threads = mutableListOf<Thread>()
 
             thread {
-                KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.4.0")).apply {
+                KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.5.3")).apply {
                     start()
                     System.setProperty("KAFKA_BROKERS", bootstrapServers)
                     System.setProperty("AIVEN_DOKUMENT_TOPIC", "test-topic")
