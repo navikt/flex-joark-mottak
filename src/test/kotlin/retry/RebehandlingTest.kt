@@ -2,7 +2,7 @@
 
 package retry
 
-import BaseTestClass
+import FellesTestOppsett
 import com.fasterxml.jackson.module.kotlin.readValue
 import mock.OppgaveMockDispatcher
 import mock.PapirSoknadPerson
@@ -14,7 +14,7 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.junit.jupiter.api.Test
 import java.util.concurrent.TimeUnit
 
-class RebehandlingTest : BaseTestClass() {
+class RebehandlingTest : FellesTestOppsett() {
     @Test
     fun `Papir sykepengesøknad legges over på retry topic, og blir rebehandlet`() {
         safMockWebserver.enqueue(MockResponse().setResponseCode(500))
