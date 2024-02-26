@@ -6,7 +6,7 @@ class KodeverkBrevkoder(
 ) {
     class TemaNode(
         val kode: String,
-        val undernoder: Map<String, BrevkodeNode>,
+        val undernoder: Map<String, BrevkodeNode> = emptyMap(),
     ) {
         class BrevkodeNode(
             val kode: String,
