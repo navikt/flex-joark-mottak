@@ -33,7 +33,7 @@ aiven-kafka:
 
 NAIS_CLUSTER_NAME: test
 
-FKV_URL: https://kodeverk.dev-fss-pub.nais.io
+FKV_URL: https://kodeverk-api.nav.no
 
 KAFKA-SCHEMA-REGISTRY: mock://localhost.nav
 KAFKA_TRUSTSTORE_PATH: ""
