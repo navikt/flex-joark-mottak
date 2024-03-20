@@ -4,7 +4,7 @@ external-host:
   - dokarkiv.dev-fss-pub.nais.io
   - pdl-api.dev-fss-pub.nais.io
   - oppgave-q1.dev-fss-pub.nais.io
-  - kodeverk.dev-fss-pub.nais.io
+  - kodeverk-api.nav.no
 env:
   AIVEN_DOKUMENT_TOPIC: teamdokumenthandtering.aapen-dok-journalfoering-q1
     # SAF
@@ -20,4 +20,4 @@ env:
   OPPGAVE_CLIENT_ID: dev-fss.oppgavehandtering.oppgave-q1
   OPPGAVE_URL: https://oppgave-q1.dev-fss-pub.nais.io
     # Felleskodeverk
-  FKV_URL: https://kodeverk.dev-fss-pub.nais.io
+  FKV_URL: https://kodeverk-api.nav.no
