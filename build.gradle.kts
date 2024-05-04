@@ -27,9 +27,7 @@ repositories {
 }
 
 val caffeineVersion = "3.1.8"
-val confluentVersion = "7.6.0"
-val syfoKafkaVersion = "2021.07.20-09.39-6be2c52c"
-val sykepengesoknadKafkaVersion = "2023.08.21-12.33-c161cca9"
+val confluentVersion = "7.6.1"
 val mockitoKotlinVersion = "2.2.0"
 val ojdbc8Version = "19.3.0.0"
 val avroVersion = "1.11.3"
@@ -71,6 +69,7 @@ dependencies {
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
     testImplementation("com.networknt:json-schema-validator:$jsonSchemaValidatorVersion")
     testImplementation("org.amshove.kluent:kluent:$kluentVersion")
+    testImplementation("commons-codec:commons-codec")
 }
 
 kotlin {
