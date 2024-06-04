@@ -64,7 +64,7 @@ class JournalpostBehandler(
     private fun hentJournalpost(journalpostId: String): Journalpost {
         val journalpost: Journalpost = safClient.hentJournalpost(journalpostId)
 
-        log.info("Hentet journalpost: $journalpost")
+        log.info("Hentet journalpost: $journalpostId")
 
         if (journalpost.invalidJournalpostStatus()) {
             log.info("Avslutter videre behandling da journalpost ${journalpost.journalpostId} har status ${journalpost.journalstatus}")
