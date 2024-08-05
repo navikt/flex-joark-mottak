@@ -2,7 +2,7 @@ package no.nav.helse.flex.journalpost
 
 import FellesTestOppsett
 import io.micrometer.core.instrument.Tag
-import io.micrometer.prometheus.PrometheusMeterRegistry
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import mock.DigitalSoknadPerson
 import no.nav.helse.flex.CORRELATION_ID
 import okhttp3.mockwebserver.MockResponse
