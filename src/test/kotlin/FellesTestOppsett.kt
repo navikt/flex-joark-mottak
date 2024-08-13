@@ -1,5 +1,9 @@
 import config.KafkaConfig
-import mock.*
+import mock.DokarkivMockDispatcher
+import mock.KodeverkMockDispatcher
+import mock.OppgaveMockDispatcher
+import mock.PdlMockDispatcher
+import mock.SafMockDispatcher
 import no.nav.helse.flex.Application
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import okhttp3.mockwebserver.MockWebServer
@@ -12,7 +16,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint
 import org.springframework.boot.test.context.SpringBootTest
 import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.utility.DockerImageName
-import kotlin.concurrent.thread
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @EnableMockOAuth2Server
@@ -21,57 +24,47 @@ import kotlin.concurrent.thread
 @AutoConfigureObservability
 abstract class FellesTestOppsett {
     companion object {
-        val safMockWebserver: MockWebServer
-        val dokarkivMockWebserver: MockWebServer
-        val pdlMockWebserver: MockWebServer
-        val oppgaveMockWebserver: MockWebServer
-        val kodeverkMockWebServer: MockWebServer
         val topic: String get() = System.getProperty("AIVEN_DOKUMENT_TOPIC")
 
         init {
-            val threads = mutableListOf<Thread>()
 
-            thread {
-                KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.6.1")).apply {
-                    start()
-                    System.setProperty("KAFKA_BROKERS", bootstrapServers)
-                    System.setProperty("AIVEN_DOKUMENT_TOPIC", "test-topic")
-                    System.setProperty("KAFKA_SCHEMA_REGISTRY", "mock://localhost.nav")
-                }
-            }.also { threads.add(it) }
-
-            safMockWebserver =
-                MockWebServer().apply {
-                    System.setProperty("SAF_URL", "http://localhost:$port")
-                    dispatcher = SafMockDispatcher
-                }
-
-            dokarkivMockWebserver =
-                MockWebServer().apply {
-                    System.setProperty("DOKARKIV_URL", "http://localhost:$port")
-                    dispatcher = DokarkivMockDispatcher
-                }
-
-            pdlMockWebserver =
-                MockWebServer().apply {
-                    System.setProperty("PDL_URL", "http://localhost:$port")
-                    dispatcher = PdlMockDispatcher
-                }
-
-            oppgaveMockWebserver =
-                MockWebServer().apply {
-                    System.setProperty("OPPGAVE_URL", "http://localhost:$port")
-                    dispatcher = OppgaveMockDispatcher
-                }
-
-            kodeverkMockWebServer =
-                MockWebServer().apply {
-                    System.setProperty("FKV_URL", "http://localhost:$port")
-                    dispatcher = KodeverkMockDispatcher
-                }
-
-            threads.forEach { it.join() }
+            KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.6.1")).apply {
+                start()
+                System.setProperty("KAFKA_BROKERS", bootstrapServers)
+                System.setProperty("AIVEN_DOKUMENT_TOPIC", "test-topic")
+                System.setProperty("KAFKA_SCHEMA_REGISTRY", "mock://localhost.nav")
+            }
         }
+
+        val safMockWebserver =
+            MockWebServer().apply {
+                System.setProperty("SAF_URL", "http://localhost:$port")
+                dispatcher = SafMockDispatcher
+            }
+
+        val dokarkivMockWebserver =
+            MockWebServer().apply {
+                System.setProperty("DOKARKIV_URL", "http://localhost:$port")
+                dispatcher = DokarkivMockDispatcher
+            }
+
+        val pdlMockWebserver =
+            MockWebServer().apply {
+                System.setProperty("PDL_URL", "http://localhost:$port")
+                dispatcher = PdlMockDispatcher
+            }
+
+        val oppgaveMockWebserver =
+            MockWebServer().apply {
+                System.setProperty("OPPGAVE_URL", "http://localhost:$port")
+                dispatcher = OppgaveMockDispatcher
+            }
+
+        val kodeverkMockWebServer =
+            MockWebServer().apply {
+                System.setProperty("FKV_URL", "http://localhost:$port")
+                dispatcher = KodeverkMockDispatcher
+            }
     }
 
     @Autowired
