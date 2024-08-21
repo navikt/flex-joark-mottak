@@ -39,8 +39,8 @@ class OppgaveClient(
                         }
 
                     if (oppgaveErrorResponse.isErrorInvalidEnhet()) {
-                        log.warn(
-                            "Klarte ikke opprette oppgave pga ugyldig enhet på journalpost ${requestData.journalpostId}",
+                        log.error(
+                            "Kunne ikke opprette oppgave på grunn av ugyldig enhet på journalpost: ${requestData.journalpostId}.",
                             oppgaveErrorResponse.feilmelding,
                         )
                         requestData.removeJournalforendeEnhet()
@@ -48,8 +48,8 @@ class OppgaveClient(
                     }
 
                     if (oppgaveErrorResponse.isErrorInvalidOrgNr()) {
-                        log.warn(
-                            "Klarte ikke opprette oppgave pga ugyldig OrgNr på journalpost ${requestData.journalpostId}",
+                        log.error(
+                            "Kunne ikke opprette oppgave på grunn av ugyldig OrgNr på journalpost: ${requestData.journalpostId}.",
                             oppgaveErrorResponse.feilmelding,
                         )
                         requestData.removeOrgNr()
@@ -61,8 +61,8 @@ class OppgaveClient(
 
         val oppgave = objectMapper.readValue<Oppgave>(response.body!!)
         log.info(
-            "Opprettet ${oppgave.oppgavetype}-oppgave: ${oppgave.id} på enhet ${oppgave.tildeltEnhetsnr} for " +
-                "journalpost: ${requestData.journalpostId}",
+            "Opprettet oppgave med type: ${oppgave.oppgavetype} og id: ${oppgave.id} på enhet: ${oppgave.tildeltEnhetsnr} for " +
+                "journalpost: ${requestData.journalpostId}.",
         )
 
         return oppgave

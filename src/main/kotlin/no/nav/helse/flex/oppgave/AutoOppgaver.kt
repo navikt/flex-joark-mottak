@@ -23,11 +23,6 @@ class AutoOppgaver(
         val oppgavetype = SkjemaMetadata.getOppgavetype(journalpost.tema, journalpost.brevkode)
         val frist = SkjemaMetadata.getFrist(journalpost.tema, journalpost.brevkode)
 
-        log.info(
-            "Setter følgende verdier behandlingstema: '${journalpost.behandlingstema}', behandlingstype: " +
-                "'${journalpost.behandlingstype}' og oppgavetype: '$oppgavetype' på journalpost ${journalpost.journalpostId}",
-        )
-
         val requestData =
             OppgaveRequest(
                 aktoerId = identer.first { it.gruppe == AKTORID }.ident,
@@ -42,13 +37,13 @@ class AutoOppgaver(
             requestData.tildeltEnhetsnr = journalpost.journalforendeEnhet
         }
 
-        log.info("Oppretter oppgave for journalpost: ${journalpost.journalpostId}")
+        log.info("Oppretter oppgave for journalpost: ${journalpost.journalpostId}.")
         oppgaveClient.opprettOppgave(requestData)
 
         journalpost = journalpost.copy(sak = Journalpost.Sak("GENERELL_SAK"))
 
         if (journalpost.avsenderMottaker?.id == null) {
-            log.info("Setter bruker som avsender på journalpost: ${journalpost.journalpostId}")
+            log.info("Setter bruker som avsender på journalpost: ${journalpost.journalpostId}.")
             journalpost =
                 journalpost.copy(
                     avsenderMottaker =

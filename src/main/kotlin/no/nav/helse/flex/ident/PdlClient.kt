@@ -40,22 +40,24 @@ class PdlClient(
                 String::class.java,
             )
 
+        if (!responseEntity.statusCode.is2xxSuccessful) {
+            throw Exception(
+                "Kall til PDL for journalpost: ${journalpost.journalpostId} feilet med " +
+                    "statuskode: ${responseEntity.statusCode.value()}.",
+            )
+        }
+
         if (responseEntity.body == null) {
             throw Exception(
-                "Mangler body i response fra pdl for journalpost ${journalpost.journalpostId}, statuskode: " +
-                    "${responseEntity.statusCode.value()}",
+                "Mangler body i response fra PDL for journalpost: ${journalpost.journalpostId} med " +
+                    "statuskode: ${responseEntity.statusCode.value()}.",
             )
         }
 
         val parsedResponse = responseEntity.body!!.let { objectMapper.readValue<GraphQLResponse<HentIdenterData>>(it) }
 
         parsedResponse.errors?.forEach {
-            log.error("Feil i response fra pdl for journalpost ${journalpost.journalpostId}", it.serialisertTilString())
-        }
-
-        if (!responseEntity.statusCode.is2xxSuccessful) {
-            // Tror denne aldri kan skje
-            throw Exception("Pdl response for journalpost ${journalpost.journalpostId} med statuskode ${responseEntity.statusCode.value()}")
+            log.error("Feilet ved parsing av fra PDL for journalpost: ${journalpost.journalpostId}.", it.serialisertTilString())
         }
 
         return parsedResponse.data.hentIdenter?.identer ?: throw FinnerIkkePersonException()

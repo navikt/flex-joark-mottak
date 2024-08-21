@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit
 class CacheConfig {
     @Bean
     fun caffeineConfig(): Caffeine<Any, Any> {
-        return Caffeine.newBuilder().expireAfterWrite(60, TimeUnit.MINUTES)
+        return Caffeine.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES)
     }
 
     @Bean

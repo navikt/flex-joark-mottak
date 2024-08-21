@@ -35,9 +35,17 @@ class SafClient(
                 String::class.java,
             )
 
+        if (!responseEntity.statusCode.is2xxSuccessful) {
+            throw Exception(
+                "Kall til SAK for journalpost: $journalpostId feilet med " +
+                    "statuskode ${responseEntity.statusCode.value()}.",
+            )
+        }
+
         if (responseEntity.body == null) {
             throw Exception(
-                "Mangler body i response fra saf for journalpost $journalpostId, statuskode: ${responseEntity.statusCode.value()}",
+                "Mangler body i response fra SAF for journalpost: $journalpostId med " +
+                    "statuskode: ${responseEntity.statusCode.value()}",
             )
         }
 
@@ -45,11 +53,6 @@ class SafClient(
 
         parsedResponse.errors?.forEach {
             log.error("Feil i response fra saf for journalpost $journalpostId", it.serialisertTilString())
-        }
-
-        if (!responseEntity.statusCode.is2xxSuccessful) {
-            // Tror denne aldri kan skje
-            throw Exception("Saf response for journalpost $journalpostId med statuskode ${responseEntity.statusCode.value()}")
         }
 
         return parsedResponse.data.journalpost
