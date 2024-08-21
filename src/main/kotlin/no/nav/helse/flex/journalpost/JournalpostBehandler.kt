@@ -31,27 +31,29 @@ class JournalpostBehandler(
             }
 
             if (oppgaveClient.finnesOppgaveForJournalpost(journalpost.journalpostId)) {
-                log.info("Det finnes oppgave på journalpost ${journalpost.journalpostId}, avslutt videre behandling")
+                log.info("Avslutter behandling da journalpost: ${journalpost.journalpostId} allerede har en oppgave.")
                 return
             }
 
             journalpost = autoOppgaver.opprettOppgave(journalpost)
 
             dokArkivClient.updateJournalpost(journalpost)
-            log.info("Oppdaterte journalpost: $journalpost")
+            log.info("Oppdaterte journalpost: $journalpost.")
 
             dokArkivClient.ferdigstillJournalpost(journalpost.journalpostId)
-            log.info("Ferdigstilt og fullført behandling av journalpost ${journalpost.journalpostId}")
+            log.info("Ferdigstilt og fullført behandling av journalpost: ${journalpost.journalpostId}.")
         }.recoverCatching { exception ->
             when (exception) {
                 is OpprettManuellOppgaveException -> {
                     manuelleOppgaver.opprettOppgave(kafkaEvent.journalpostId)
                     return
                 }
+
                 is InvalidJournalpostStatusException -> {
                     // OK - skal ikke journalføre disse
                     return
                 }
+
                 else -> {
                     throw exception
                 }
@@ -63,17 +65,18 @@ class JournalpostBehandler(
 
     private fun hentJournalpost(journalpostId: String): Journalpost {
         val journalpost: Journalpost = safClient.hentJournalpost(journalpostId)
-
-        log.info("Hentet journalpost: $journalpostId")
+        log.info("Hentet journalpost: $journalpostId.")
 
         if (journalpost.invalidJournalpostStatus()) {
-            log.info("Avslutter videre behandling da journalpost ${journalpost.journalpostId} har status ${journalpost.journalstatus}")
+            log.info(
+                "Avslutter behandling da journalpost: ${journalpost.journalpostId} har status: ${journalpost.journalstatus}.",
+            )
             throw InvalidJournalpostStatusException()
         }
         if (SkjemaMetadata.isIgnoreskjema(journalpost.tema, journalpost.brevkode)) {
             log.info(
-                "Avslutter videre behandling da journalpost ${journalpost.journalpostId} har brevkode " +
-                    "${journalpost.brevkode} på tema ${journalpost.tema} som eksplisitt skal ignoreres!",
+                "Avslutter behandling da journalpost: ${journalpost.journalpostId} har " +
+                    "brevkode ${journalpost.brevkode} på tema ${journalpost.tema} som eksplisitt skal ignoreres.",
             )
             throw InvalidJournalpostStatusException()
         }
@@ -85,8 +88,8 @@ class JournalpostBehandler(
         for (dokument in journalpost.dokumenter) {
             if (dokument.tittel.isNullOrEmpty()) {
                 log.info(
-                    "Avbryter automatisk behandling. Journalpost ${journalpost.journalpostId} har dokument " +
-                        "${dokument.dokumentInfoId} uten tittel",
+                    "Avslutter behandlinbg da ournalpost: ${journalpost.journalpostId} har " +
+                        "dokument ${dokument.dokumentInfoId} uten tittel.",
                 )
                 return false
             }

@@ -1,6 +1,5 @@
 package no.nav.helse.flex.config
 
-import no.nav.helse.flex.logger
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.ConsumerRecords
@@ -8,7 +7,6 @@ import org.springframework.kafka.listener.DefaultErrorHandler
 import org.springframework.kafka.listener.MessageListenerContainer
 import org.springframework.stereotype.Component
 import org.springframework.util.backoff.ExponentialBackOff
-import java.lang.Exception
 
 @Component
 class AivenKafkaErrorHandler : DefaultErrorHandler(
@@ -18,7 +16,7 @@ class AivenKafkaErrorHandler : DefaultErrorHandler(
         it.maxInterval = 60_000L * 8
     },
 ) {
-    private val log = logger()
+    private val log = this.logger()
 
     override fun handleRemaining(
         thrownException: Exception,
@@ -29,11 +27,11 @@ class AivenKafkaErrorHandler : DefaultErrorHandler(
         records.forEach { record ->
             log.error(
                 thrownException,
-                "Feil i prossesseringen av record med offset: ${record.offset()}, key: ${record.key()} på topic ${record.topic()}",
+                "Feil i prossesseringen av record med offset: ${record.offset()}, key: ${record.key()} på topic: ${record.topic()}.",
             )
         }
         if (records.isEmpty()) {
-            log.error(thrownException, "Feil i listener uten noen records")
+            log.error(thrownException, "Feil i listener uten noen records.")
         }
 
         super.handleRemaining(thrownException, records, consumer, container)
@@ -49,11 +47,11 @@ class AivenKafkaErrorHandler : DefaultErrorHandler(
         data.forEach { record ->
             log.error(
                 thrownException,
-                "Feil i prossesseringen av record med offset: ${record.offset()}, key: ${record.key()} på topic ${record.topic()}",
+                "Feil i prossesseringen av record med offset: ${record.offset()}, key: ${record.key()} på topic: ${record.topic()}.",
             )
         }
-        if (data.isEmpty()) {
-            log.error(thrownException, "Feil i listener uten noen records")
+        if (data.isEmpty) {
+            log.error(thrownException, "Feil i listener uten noen records.")
         }
         super.handleBatch(thrownException, data, consumer, container, invokeListener)
     }

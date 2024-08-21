@@ -47,7 +47,7 @@ class DokumentConsumer(
             MDC.put(CORRELATION_ID, UUID.randomUUID().toString())
             journalpostBehandler.behandleJournalpost(kafkaEvent)
         } catch (e: Exception) {
-            log.error("Feilet på journalpost ${kafkaEvent.journalpostId}, legger på retry-topic", e)
+            log.error("Konsumering av journalpost: ${kafkaEvent.journalpostId} feilet. Legger på retry-topic.", e)
             retryProducer.send(kafkaEvent, OffsetDateTime.now().plusSeconds(1))
         } finally {
             MDC.clear()

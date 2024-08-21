@@ -16,21 +16,23 @@ class Identer(
 
     fun hentIdenterFraPDL(journalpost: Journalpost): List<PdlIdent> {
         if (journalpost.bruker == null) {
-            log.info("Bruker er ikke satt på journalpost: ${journalpost.journalpostId}. Kan ikke hente fra PDL")
+            log.info("Bruker er ikke satt på journalpost: ${journalpost.journalpostId}. Kan ikke hente fra PDL.")
             throw OpprettManuellOppgaveException()
         }
 
         if (journalpost.bruker.isORGNR) {
-            log.info("Kaller ikke PDL da bruker på journalpost ${journalpost.journalpostId} er orgnummer")
+            log.info("Bruker på journalpost: ${journalpost.journalpostId} er orgnummer. Henter ikke fra PDL.")
             return emptyList()
         }
 
         try {
-            log.info("Henter alle identer for bruker på journalpost: ${journalpost.journalpostId} fra PDL")
             return pdlClient.hentIdenterForJournalpost(journalpost)
         } catch (e: FinnerIkkePersonException) {
             if (oppgaveClient.finnesOppgaveForJournalpost(journalpost.journalpostId)) {
-                log.info("Finner ikke person i PDL og journalpost ${journalpost.journalpostId} har oppgave.")
+                log.info(
+                    "Fant ikke person i PDL, men det finnes allerede en oppgave for " +
+                        "journalpost: ${journalpost.journalpostId}.",
+                )
                 throw OpprettManuellOppgaveException()
             } else {
                 throw e

@@ -48,8 +48,8 @@ class RetryListener(
             val sovetid = behandlingstidspunkt.sovetid()
             if (sovetid > 0) {
                 log.info(
-                    "Mottok rebehandling av journalpost ${kafkaEvent.journalpostId} med behandlingstidspunkt " +
-                        "${behandlingstidspunkt.tilOsloLocalDateTime()} sover i $sovetid millisekunder",
+                    "Mottok rebehandling av journalpost: ${kafkaEvent.journalpostId} med behandlingstidspunkt " +
+                        "${behandlingstidspunkt.tilOsloLocalDateTime()} sover i $sovetid millisekunder til.",
                 )
                 acknowledgment.nack(Duration.ofMillis(sovetid))
             } else {
@@ -58,7 +58,7 @@ class RetryListener(
                 acknowledgment.acknowledge()
             }
         } catch (e: Exception) {
-            log.error("Rebehandling feilet for journalpost ${kafkaEvent.journalpostId}, legger tilbake på retry-topic", e)
+            log.error("Rebehandling feilet for journalpost: ${kafkaEvent.journalpostId}.", e)
             retryProducer.send(kafkaEvent, OffsetDateTime.now().plusMinutes(10))
             acknowledgment.acknowledge()
         } finally {

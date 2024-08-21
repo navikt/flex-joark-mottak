@@ -27,7 +27,7 @@ class ManuelleOppgaver(
 
     fun opprettOppgave(journalpostId: String) {
         if (oppgaveClient.finnesOppgaveForJournalpost(journalpostId)) {
-            log.info("Det finnes oppgave på journalpost $journalpostId, avslutt videre behandling")
+            log.info("Avslutter behandling da journalpost: $journalpostId allerede har en oppgave.")
             return
         }
 
@@ -49,11 +49,11 @@ class ManuelleOppgaver(
     private fun isJournalpostToFordeling(journalpost: Journalpost): Boolean {
         if (journalpost.tema != "SYK") {
             log.error(
-                "Journalpost ${journalpost.journalpostId} har tema ${journalpost.tema} og skal ikke skje, oppretter fordelingsoppgave",
+                "Journalpost ${journalpost.journalpostId} har tema ${journalpost.tema}. Denne applikasjonen støtter " +
+                    "bare tema: SYK. Oppretter fordelingsoppgave",
             )
             return true
         }
-
         return false
     }
 
@@ -85,32 +85,27 @@ class ManuelleOppgaver(
     }
 
     private fun createManuellJournalfoeringsoppgave(
-        jp: Journalpost,
+        journalpost: Journalpost,
         identer: List<PdlIdent>,
     ) {
-        val journalpost =
+        val mappetJournalpost =
             runCatching {
-                val jpMedBehandlingsverdier = brevkodeMapper.mapBrevkodeTilTemaOgType(jp)
-                log.info(
-                    "Setter følgende verdier behandlingstema: '${jpMedBehandlingsverdier.behandlingstema}', " +
-                        "behandlingstype: '${jpMedBehandlingsverdier.behandlingstype}' på " +
-                        "journalpost ${jpMedBehandlingsverdier.journalpostId}",
-                )
-                return@runCatching jpMedBehandlingsverdier
+                return@runCatching brevkodeMapper.mapBrevkodeTilTemaOgType(journalpost)
             }.recover {
                 if (it is IllegalArgumentException) {
-                    if (jp.journalforendeEnhet.isNullOrEmpty()) {
+                    if (journalpost.journalforendeEnhet.isNullOrEmpty()) {
                         log.info(
-                            "Klarte ikke finne behandlingsverdier for journalpost ${jp.journalpostId} med tema " +
-                                "${jp.tema} og brevkode ${jp.brevkode}",
+                            "Fant ikke behandlingsverdier for journalpost: ${journalpost.journalpostId} med " +
+                                "tema: ${journalpost.tema} og brevkode: ${journalpost.brevkode}.",
                         )
-                        return@recover jp
+                        return@recover journalpost
                     } else {
                         log.info(
-                            "Klarte ikke finne behandlingsverdier for journalpost ${jp.journalpostId} med tema " +
-                                "${jp.tema} og brevkode ${jp.brevkode}, bruker journalforendeEnhet ${jp.journalforendeEnhet}",
+                            "Fant ikke behandlingsverdier for journalpost: ${journalpost.journalpostId} med " +
+                                "tema: ${journalpost.tema} og brevkode: ${journalpost.brevkode} i resultat fra " +
+                                "journalforendeEnhet: ${journalpost.journalforendeEnhet}.",
                         )
-                        return@recover jp
+                        return@recover journalpost
                     }
                 }
                 throw it
@@ -118,19 +113,19 @@ class ManuelleOppgaver(
 
         val requestData =
             OppgaveRequest(
-                journalpostId = journalpost.journalpostId,
-                tema = journalpost.tema,
-                behandlingstema = journalpost.behandlingstema,
-                behandlingstype = journalpost.behandlingstype,
+                journalpostId = mappetJournalpost.journalpostId,
+                tema = mappetJournalpost.tema,
+                behandlingstema = mappetJournalpost.behandlingstema,
+                behandlingstype = mappetJournalpost.behandlingstype,
                 oppgavetype = JOURNALORINGSOPPGAVE,
-                tildeltEnhetsnr = journalpost.journalforendeEnhet,
-                beskrivelse = journalpost.tittel,
+                tildeltEnhetsnr = mappetJournalpost.journalforendeEnhet,
+                beskrivelse = mappetJournalpost.tittel,
                 frist = 1,
             ).apply {
-                if (journalpost.bruker?.isAktoerId == true || journalpost.bruker?.isFNR == true) {
+                if (mappetJournalpost.bruker?.isAktoerId == true || mappetJournalpost.bruker?.isFNR == true) {
                     aktoerId = identer.first { it.gruppe == AKTORID }.ident
-                } else if (journalpost.bruker?.isORGNR == true) {
-                    orgnr = journalpost.bruker.id
+                } else if (mappetJournalpost.bruker?.isORGNR == true) {
+                    orgnr = mappetJournalpost.bruker.id
                 }
             }
 

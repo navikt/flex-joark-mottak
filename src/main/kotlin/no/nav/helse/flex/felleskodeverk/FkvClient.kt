@@ -22,7 +22,7 @@ class FkvClient(
 
     @Cacheable("krutkoder")
     fun hentKrutkoder(): KodeverkBrevkoder {
-        log.info("Henter og cacher [krutkoder]")
+        log.info("Henter og cacher [krutkoder].")
 
         val headers = HttpHeaders()
         headers[CORRELATION_HEADER] = "flex-joark-mottak"
@@ -43,9 +43,10 @@ class FkvClient(
                 String::class.java,
             )
 
+        log.info("Hentet KodeverkBrevkoder: ${response.body}.")
         return objectMapper.readValue<KodeverkBrevkoder>(response.body!!)
     }
 }
 
-private val CORRELATION_HEADER = "Nav-Call-Id"
-private val NAV_CONSUMER_ID = "Nav-Consumer-Id"
+private const val CORRELATION_HEADER = "Nav-Call-Id"
+private const val NAV_CONSUMER_ID = "Nav-Consumer-Id"

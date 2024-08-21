@@ -15,11 +15,11 @@ class ApplicationHealth(
 
     @EventListener
     fun onLivenessEvent(event: AvailabilityChangeEvent<LivenessState>) {
-        log.info("LivenessState ${event.state} source ${event.source.javaClass.name}")
+        log.info("LivenessState: ${event.state} for event source: ${event.source.javaClass.name}.")
     }
 
     @EventListener
     fun onReadinessEvent(event: AvailabilityChangeEvent<ReadinessState>) {
-        log.info("ReadinessState ${event.state} source ${event.source.javaClass.name}")
+        log.info("ReadinessState: ${event.state} for event source: ${event.source.javaClass.name}.")
     }
 }
