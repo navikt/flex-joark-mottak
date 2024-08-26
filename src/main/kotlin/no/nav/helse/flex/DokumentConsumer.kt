@@ -1,6 +1,7 @@
 package no.nav.helse.flex
 
 import com.fasterxml.jackson.module.kotlin.readValue
+import no.nav.helse.flex.config.EnvironmentToggles
 import no.nav.helse.flex.journalpost.JournalpostBehandler
 import no.nav.helse.flex.retry.RetryProducer
 import org.apache.avro.generic.GenericRecord
@@ -16,6 +17,7 @@ import java.util.*
 class DokumentConsumer(
     private val journalpostBehandler: JournalpostBehandler,
     private val retryProducer: RetryProducer,
+    private val environmentToggles: EnvironmentToggles,
 ) {
     private val log = logger()
 
@@ -34,10 +36,18 @@ class DokumentConsumer(
         val genericRecord = cr.value()
 
         if (genericRecord["temaNytt"].toString() != "SYK") {
+            acknowledgment.acknowledge()
             return
         }
 
-        if (genericRecord["hendelsesType"].toString() !in listOf("MidlertidigJournalført", "Mottatt", "JournalpostMottatt")) {
+        if (genericRecord["hendelsesType"].toString() !in
+            listOf(
+                "MidlertidigJournalført",
+                "Mottatt",
+                "JournalpostMottatt",
+            )
+        ) {
+            acknowledgment.acknowledge()
             return
         }
 

@@ -57,6 +57,19 @@ class AadRestTemplateConfig {
         )
 
     @Bean
+    fun kodeverkRestTemplate(
+        restTemplateBuilder: RestTemplateBuilder,
+        clientConfigurationProperties: ClientConfigurationProperties,
+        oAuth2AccessTokenService: OAuth2AccessTokenService,
+    ): RestTemplate =
+        downstreamRestTemplate(
+            registrationName = "kodeverk-client-credentials",
+            restTemplateBuilder = restTemplateBuilder,
+            clientConfigurationProperties = clientConfigurationProperties,
+            oAuth2AccessTokenService = oAuth2AccessTokenService,
+        )
+
+    @Bean
     fun dokarkivRestTemplate(
         restTemplateBuilder: RestTemplateBuilder,
         clientConfigurationProperties: ClientConfigurationProperties,

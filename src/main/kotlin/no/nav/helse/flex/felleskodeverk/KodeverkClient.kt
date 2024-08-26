@@ -13,37 +13,35 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 
 @Component
-class FkvClient(
-    @Value("\${FKV_URL}")
-    private val fkvUrl: String,
-    private val plainRestTemplate: RestTemplate,
+class KodeverkClient(
+    @Value("\${KODEVERK_URL}")
+    private val kodeverkUrl: String,
+    private val kodeverkRestTemplate: RestTemplate,
 ) {
     private val log = logger()
 
     @Cacheable("krutkoder")
     fun hentKrutkoder(): KodeverkBrevkoder {
-        log.info("Henter og cacher [krutkoder].")
-
         val headers = HttpHeaders()
         headers[CORRELATION_HEADER] = "flex-joark-mottak"
         headers[NAV_CONSUMER_ID] = "flex-joark-mottak"
 
         val uri =
-            UriComponentsBuilder.fromHttpUrl(fkvUrl)
+            UriComponentsBuilder.fromHttpUrl(kodeverkUrl)
                 .path("/api/v1/hierarki/TemaSkjemaGjelder/noder")
                 .queryParam("spraak", "nb")
                 .encode()
                 .toUriString()
 
         val response =
-            plainRestTemplate.exchange(
+            kodeverkRestTemplate.exchange(
                 uri,
                 HttpMethod.GET,
                 HttpEntity<Any>(headers),
                 String::class.java,
             )
 
-        log.info("Hentet KodeverkBrevkoder: ${response.body}.")
+        log.info("Hentet og cachet brevkoder fra Felles Kodeverk.")
         return objectMapper.readValue<KodeverkBrevkoder>(response.body!!)
     }
 }

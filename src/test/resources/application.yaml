@@ -33,7 +33,7 @@ aiven-kafka:
 
 NAIS_CLUSTER_NAME: test
 
-FKV_URL: https://kodeverk-api.nav.no
+KODEVERK_URL: https://kodeverk-api.nav.no
 
 KAFKA-SCHEMA-REGISTRY: mock://localhost.nav
 KAFKA_TRUSTSTORE_PATH: ""
@@ -79,6 +79,14 @@ no.nav.security.jwt:
         token-endpoint-url: http://localhost:${mock-oauth2-server.port}/azureator/token
         grant-type: client_credentials
         scope: oppgave-client
+        authentication:
+          client-id: client-id
+          client-secret: secretzz
+          client-auth-method: client_secret_basic
+      kodeverk-client-credentials:
+        token-endpoint-url: http://localhost:${mock-oauth2-server.port}/azureator/token
+        grant-type: client_credentials
+        scope: kodeverk-client
         authentication:
           client-id: client-id
           client-secret: secretzz
