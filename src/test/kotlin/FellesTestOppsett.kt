@@ -62,7 +62,7 @@ abstract class FellesTestOppsett {
 
         val kodeverkMockWebServer =
             MockWebServer().apply {
-                System.setProperty("FKV_URL", "http://localhost:$port")
+                System.setProperty("KODEVERK_URL", "http://localhost:$port")
                 dispatcher = KodeverkMockDispatcher
             }
     }

@@ -7,17 +7,25 @@ external-host:
   - kodeverk-api.nav.no
 env:
   AIVEN_DOKUMENT_TOPIC: teamdokumenthandtering.aapen-dok-journalfoering
-    # SAF
+
+  # SAF
   SAF_CLIENT_ID: feb9588b-a3d6-4d2f-8809-97284046ae72
   SAF_URL: https://saf.prod-fss-pub.nais.io
-    # Dokarkiv / JournlapostAPI
+
+  # Journalpost API (Dokarkiv)
   DOKARKIV_CLIENT_ID: prod-fss.teamdokumenthandtering.dokarkiv
   DOKARKIV_URL: https://dokarkiv.prod-fss-pub.nais.io
-    # PDL
+
+  # PDL
   PDL_CLIENT_ID: 5f3603e0-a590-4778-9d92-3ee220d95830
   PDL_URL: https://pdl-api.prod-fss-pub.nais.io
-    # Oppgave
+
+  # Gosys Oppgave
   OPPGAVE_CLIENT_ID: 50346823-61a0-49e7-ad89-ea2b1a0e90f8
   OPPGAVE_URL: https://oppgave.prod-fss-pub.nais.io
-    # Felleskodeverk
-  FKV_URL: https://kodeverk-api.nav.no
+
+  # Felles Kodeverk API
+  KODEVERK_CLIENT_ID: prod-gcp.team-rocket.kodeverk-api
+  KODEVERK_URL: https://kodeverk-api.nav.no
+
+
