@@ -9,7 +9,7 @@ env:
   AIVEN_DOKUMENT_TOPIC: teamdokumenthandtering.aapen-dok-journalfoering
 
   # SAF
-  SAF_CLIENT_ID: feb9588b-a3d6-4d2f-8809-97284046ae72
+  SAF_CLIENT_ID: prod-fss.teamdokumenthandtering.saf
   SAF_URL: https://saf.prod-fss-pub.nais.io
 
   # Journalpost API (Dokarkiv)
@@ -17,7 +17,7 @@ env:
   DOKARKIV_URL: https://dokarkiv.prod-fss-pub.nais.io
 
   # PDL
-  PDL_CLIENT_ID: 5f3603e0-a590-4778-9d92-3ee220d95830
+  PDL_CLIENT_ID: prod-fss.pdl.pdl-api
   PDL_URL: https://pdl-api.prod-fss-pub.nais.io
 
   # Gosys Oppgave
