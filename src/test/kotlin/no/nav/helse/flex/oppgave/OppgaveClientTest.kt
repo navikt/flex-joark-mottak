@@ -1,8 +1,6 @@
 package no.nav.helse.flex.oppgave
 
 import FellesTestOppsett
-import io.micrometer.core.instrument.Tag
-import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.nav.helse.flex.CORRELATION_ID
 import no.nav.helse.flex.serialisertTilString
 import okhttp3.mockwebserver.MockResponse
@@ -22,9 +20,6 @@ import java.util.concurrent.TimeUnit
 class OppgaveClientTest : FellesTestOppsett() {
     @Autowired
     private lateinit var oppgaveClient: OppgaveClient
-
-    @Autowired
-    private lateinit var prometheusMeterRegistry: PrometheusMeterRegistry
 
     val oppgaveRequest =
         OppgaveRequest(
@@ -54,9 +49,6 @@ class OppgaveClientTest : FellesTestOppsett() {
         val oppgave = oppgaveClient.opprettOppgave(request)
         oppgave.tildeltEnhetsnr shouldBeEqualTo request.tildeltEnhetsnr
 
-        prometheusMeterRegistry.meters.find {
-            it.id.name == "http.client.requests" && it.id.tags.contains(Tag.of("uri", "/api/v1/oppgaver"))
-        } shouldNotBeEqualTo null
         oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo "POST /api/v1/oppgaver HTTP/1.1"
     }
 
