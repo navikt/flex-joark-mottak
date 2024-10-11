@@ -36,7 +36,6 @@ val tokenSupportVersion = "5.0.5"
 val testContainersVersion = "1.20.2"
 val kluentVersion = "1.73"
 val jsonSchemaValidatorVersion = "1.5.2"
-val httpclient5Version = "5.3.1"
 
 dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
@@ -51,7 +50,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.aspectj:aspectjrt")
     implementation("org.aspectj:aspectjweaver")
-    implementation("org.apache.httpcomponents.client5:httpclient5:$httpclient5Version")
+    implementation("org.apache.httpcomponents.client5:httpclient5")
     implementation("com.github.ben-manes.caffeine:caffeine:$caffeineVersion")
     implementation("io.confluent:kafka-connect-avro-converter:$confluentVersion")
     implementation("io.confluent:kafka-schema-registry-client:$confluentVersion")
