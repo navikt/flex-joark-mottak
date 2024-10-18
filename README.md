@@ -23,7 +23,7 @@ Logg inn med felles syfo Z992389 bruker, eller opprett egen i [IDA](https://conf
 ## Felles kodeverk - krutkoder
 Består av `<brevkode>:<tema>` = `<tittel>;<brevkode>;<behandlingstema>;<behandlingstype>;` og det er 49 forskjellige som gjelder for tema SYK
 
-Listen finnes [her](https://kodeverk-web.dev.intern.nav.no/kodeverksoversikt/kodeverk/Krutkoder) hvis man logger inn med Z-bruker og her kan man filtrerer på `:SYK`
+Listen finnes [her](https://kodeverk.ansatt.dev.nav.no/kodeverk/Krutkoder) hvis man logger inn med Z-bruker og her kan man filtrerer på `:SYK`
 
 
 ## Kontakt 
