@@ -23,19 +23,6 @@ class AutoOppgaver(
         val oppgavetype = SkjemaMetadata.getOppgavetype(journalpost.tema, journalpost.brevkode)
         val frist = SkjemaMetadata.getFrist(journalpost.tema, journalpost.brevkode)
 
-        if (journalpost.journalpostId == "683052595") {
-            val aktorId = identer.filter { it.gruppe == AKTORID }
-            val folkeregisterIdent = identer.filter { it.gruppe == FOLKEREGISTERIDENT }
-            log.info(
-                "Tema for journalpost: ${journalpost.journalpostId} - " +
-                    "folkeregisterIdent: ${folkeregisterIdent.size}, " +
-                    "tema: ${journalpost.tema}, " +
-                    "brevkode: ${journalpost.brevkode}, " +
-                    "behandlingstema: ${journalpost.behandlingstema}, " +
-                    "behandlingstype: ${journalpost.behandlingstype}.",
-            )
-        }
-
         val requestData =
             OppgaveRequest(
                 aktoerId = identer.first { it.gruppe == AKTORID }.ident,
