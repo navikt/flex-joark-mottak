@@ -35,7 +35,7 @@ class ManuelleOppgaver(
         val identer =
             try {
                 identerService.hentIdenterFraPDL(journalpost)
-            } catch (e: OpprettManuellOppgaveException) {
+            } catch (_: OpprettManuellOppgaveException) {
                 emptyList()
             }
 

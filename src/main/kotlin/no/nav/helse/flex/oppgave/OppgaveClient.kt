@@ -34,7 +34,7 @@ class OppgaveClient(
                     val oppgaveErrorResponse =
                         try {
                             objectMapper.readValue<OppgaveErrorResponse>(httpException.responseBodyAsByteArray)
-                        } catch (e: Exception) {
+                        } catch (_: Exception) {
                             throw httpException
                         }
 
