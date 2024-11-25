@@ -22,6 +22,7 @@ class Identer(
 
         if (journalpost.bruker.isORGNR) {
             log.info("Bruker på journalpost: ${journalpost.journalpostId} er orgnummer. Henter ikke fra PDL.")
+            // TODO: Kast OpprettManuellOppgaveException sånn at oppgaven ikke blir liggende i retry.
             return emptyList()
         }
 

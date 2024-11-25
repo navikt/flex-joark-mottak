@@ -18,6 +18,8 @@ import kotlin.math.min
 const val RETRY_TOPIC = "flex." + "flex-joark-mottak-retry"
 const val BEHANDLINGSTIDSPUNKT = "behandlingstidspunkt"
 
+private const val MAX_SOVETID = 10L
+
 @Component
 class RetryListener(
     private val journalpostBehandler: JournalpostBehandler,
@@ -47,10 +49,6 @@ class RetryListener(
         try {
             val sovetid = behandlingstidspunkt.sovetid()
             if (sovetid > 0) {
-                log.info(
-                    "Mottok rebehandling av journalpost: ${kafkaEvent.journalpostId} med behandlingstidspunkt " +
-                        "${behandlingstidspunkt.tilOsloLocalDateTime()} sover i $sovetid millisekunder til.",
-                )
                 acknowledgment.nack(Duration.ofMillis(sovetid))
             } else {
                 MDC.put(CORRELATION_ID, UUID.randomUUID().toString())
@@ -58,8 +56,8 @@ class RetryListener(
                 acknowledgment.acknowledge()
             }
         } catch (e: Exception) {
-            log.error("Rebehandling feilet for journalpost: ${kafkaEvent.journalpostId}.", e)
-            retryProducer.send(kafkaEvent, OffsetDateTime.now().plusMinutes(10))
+            log.error("Rebehandling feilet for journalpost: ${kafkaEvent.journalpostId}. Prøver igjen om $MAX_SOVETID minutter.", e)
+            retryProducer.send(kafkaEvent, OffsetDateTime.now().plusMinutes(MAX_SOVETID))
             acknowledgment.acknowledge()
         } finally {
             MDC.clear()
@@ -68,7 +66,7 @@ class RetryListener(
 
     private fun Instant.sovetid(): Long {
         val sovetid = this.toEpochMilli() - Instant.now().toEpochMilli()
-        val maxSovetid = 1000L * 60 * 1 // Skjer en rebalansering hvis den sover i mer enn 5 min
+        val maxSovetid = 1000L * 60 // Sjekker hvert minutt om sovetid er over.
         return min(sovetid, maxSovetid)
     }
 }

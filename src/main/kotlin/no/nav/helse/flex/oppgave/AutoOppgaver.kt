@@ -27,8 +27,12 @@ class AutoOppgaver(
             val aktorId = identer.filter { it.gruppe == AKTORID }
             val folkeregisterIdent = identer.filter { it.gruppe == FOLKEREGISTERIDENT }
             log.info(
-                "Identer for journalpost: ${journalpost.journalpostId} - aktorId: ${aktorId.size}, " +
-                    "folkeregisterIdent: ${folkeregisterIdent.size}",
+                "Tema for journalpost: ${journalpost.journalpostId} - " +
+                    "folkeregisterIdent: ${folkeregisterIdent.size}, " +
+                    "tema: ${journalpost.tema}, " +
+                    "brevkode: ${journalpost.brevkode}, " +
+                    "behandlingstema: ${journalpost.behandlingstema}, " +
+                    "behandlingstype: ${journalpost.behandlingstype}.",
             )
         }
 
@@ -46,8 +50,8 @@ class AutoOppgaver(
             requestData.tildeltEnhetsnr = journalpost.journalforendeEnhet
         }
 
-        log.info("Oppretter oppgave for journalpost: ${journalpost.journalpostId}.")
         oppgaveClient.opprettOppgave(requestData)
+        log.info("Opprettet oppgave for journalpost: ${journalpost.journalpostId}.")
 
         journalpost = journalpost.copy(sak = Journalpost.Sak("GENERELL_SAK"))
 
@@ -57,7 +61,6 @@ class AutoOppgaver(
                 journalpost.copy(
                     avsenderMottaker =
                         Journalpost.AvsenderMottaker(
-                            // TODO firstOrNull
                             identer.first {
                                 it.gruppe == FOLKEREGISTERIDENT
                             }.ident,
@@ -66,7 +69,6 @@ class AutoOppgaver(
                 )
         }
 
-        // TODO: Kast exception hvis journalpost mangler avsenderMottaker med faktisk folkeregisterIdent
         return journalpost
     }
 }
