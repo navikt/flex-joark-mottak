@@ -23,6 +23,15 @@ class AutoOppgaver(
         val oppgavetype = SkjemaMetadata.getOppgavetype(journalpost.tema, journalpost.brevkode)
         val frist = SkjemaMetadata.getFrist(journalpost.tema, journalpost.brevkode)
 
+        if (journalpost.journalpostId == "683052595") {
+            val aktorId = identer.filter { it.gruppe == AKTORID }
+            val folkeregisterIdent = identer.filter { it.gruppe == FOLKEREGISTERIDENT }
+            log.info(
+                "Identer for journalpost: ${journalpost.journalpostId} - aktorId: ${aktorId.size}, " +
+                    "folkeregisterIdent: ${folkeregisterIdent.size}",
+            )
+        }
+
         val requestData =
             OppgaveRequest(
                 aktoerId = identer.first { it.gruppe == AKTORID }.ident,
@@ -48,6 +57,7 @@ class AutoOppgaver(
                 journalpost.copy(
                     avsenderMottaker =
                         Journalpost.AvsenderMottaker(
+                            // TODO firstOrNull
                             identer.first {
                                 it.gruppe == FOLKEREGISTERIDENT
                             }.ident,
@@ -56,6 +66,7 @@ class AutoOppgaver(
                 )
         }
 
+        // TODO: Kast exception hvis journalpost mangler avsenderMottaker med faktisk folkeregisterIdent
         return journalpost
     }
 }
