@@ -44,6 +44,8 @@ object SafMockDispatcher : QueueDispatcher() {
 
             InntektsmeldingPerson.JOURNALPOST_ID -> response(InntektsmeldingPerson.journalpost)
 
+            PapirSoknadMedOrgNrPerson.JOURNALPOST_ID -> response(PapirSoknadMedOrgNrPerson.journalpost)
+
             else -> {
                 MockResponse().setResponseCode(404)
                     .setBody("Har ikke implemetert saf mock api for journalpostId $journalpostId")

@@ -5,6 +5,10 @@ Applikasjonen tar over for [jfr-generell](https://github.com/navikt/jfr-generell
 Lytter på journalpost dokumenter som legges på topicet `teamdokumenthandtering.aapen-dok-journalfoering`. 
 Oppretter enten SOK oppgaver for sykepengesøknader sendt på papir eller JFR oppgaver for de fleste andre journalposter på tema SYK.
 
+Om applikasjonen ikke klarer å opprette oppgave, vil den legge journalposten på en feil-kø som prøver igjen hvert 10. minutt.
+Om det allikevel ikke går, vil det etter hvert opprettes en manuell 
+oppgave av [doksikkerhetsnett](https://confluence.adeo.no/display/BOA/doksikkerhetsnett).
+
 ## Testing i dev
 Her kan man opprette journalpost [flex-testdata-generator](https://flex-testdata-generator.intern.dev.nav.no/papir-dokument)
 > Bruk denne testdataen:

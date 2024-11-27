@@ -14,16 +14,16 @@ class Identer(
 ) {
     private val log = logger()
 
+    // TODO: Ikke bruk exception for å styre flyten. Bruk heller en annen type returnverdi.
     fun hentIdenterFraPDL(journalpost: Journalpost): List<PdlIdent> {
         if (journalpost.bruker == null) {
-            log.info("Bruker er ikke satt på journalpost: ${journalpost.journalpostId}. Kan ikke hente fra PDL.")
+            log.info("Bruker er ikke satt på journalpost: ${journalpost.journalpostId}. Oppretter manuell oppgave.")
             throw OpprettManuellOppgaveException()
         }
 
         if (journalpost.bruker.isORGNR) {
-            log.info("Bruker på journalpost: ${journalpost.journalpostId} er orgnummer. Henter ikke fra PDL.")
-            // TODO: Kast OpprettManuellOppgaveException sånn at oppgaven ikke blir liggende i retry.
-            return emptyList()
+            log.info("Bruker på journalpost: ${journalpost.journalpostId} er orgnummer. Oppretter manuell oppgave.")
+            throw OpprettManuellOppgaveException()
         }
 
         try {

@@ -3,10 +3,9 @@ package mock
 import no.nav.helse.flex.KafkaEvent
 import no.nav.helse.flex.journalpost.Journalpost
 import util.fromKClassToGenericRecord
-import java.lang.Exception
 import java.util.*
 
-// Dette er vanlige/digitale søknader som er blitt arkivert av sykepengesoknad-arkivering-oppgave
+// Digital som har blitt arkivert av sykepengesoknad-arkivering-oppgave.
 object DigitalSoknadPerson {
     const val JOURNALPOST_ID = "11111111111"
     const val FNR = "11111111111"
@@ -32,7 +31,7 @@ object DigitalSoknadPerson {
     val kafkaEvent = journalpost.tilAvroKafkaEvent()
 }
 
-// Dette er de fleste dokumentene vi mottar og skal gjøre noe med
+// Papirsykepengesøkadn som dokument vi skal gjøre noe med.
 object PapirSoknadPerson {
     const val JOURNALPOST_ID = "22222222222"
     const val FNR = "22222222222"
@@ -58,7 +57,7 @@ object PapirSoknadPerson {
     val kafkaEvent = journalpost.tilAvroKafkaEvent()
 }
 
-// Dette er inntektsopplysninger for selvstendig næringsdrivende som skal ha JFR oppgave
+// Inntektsopplysninger for selvstendig næringsdrivende som skal ha JFR-oppgave.
 object InntektsopplysningerPerson {
     const val JOURNALPOST_ID = "33333333333"
     const val FNR = "33333333333"
@@ -88,7 +87,7 @@ object InntektsopplysningerPerson {
     val kafkaEvent = journalpost.tilAvroKafkaEvent()
 }
 
-// Dette er en klage som skal ha JFR oppgave
+// Klage som skal ha JFR-oppgave.
 object KlagePerson {
     const val JOURNALPOST_ID = "928374927834"
     const val FNR = "33333333333"
@@ -114,7 +113,7 @@ object KlagePerson {
     val kafkaEvent = journalpost.tilAvroKafkaEvent()
 }
 
-// Egenerklæring for utenlandske sykemeldinger som skal ha JFR oppgave
+// Egenerklæring for utenlandske sykemeldinger som skal ha JFR-oppgave.
 object UtenlandskPerson {
     const val JOURNALPOST_ID = "90384593875"
     const val FNR = "33333333333"
@@ -140,7 +139,7 @@ object UtenlandskPerson {
     val kafkaEvent = journalpost.tilAvroKafkaEvent()
 }
 
-// Journalpost som ikke har en brevkode skal ha JFR oppgave
+// Journalpost som ikke har en brevkode skal ha JFR-oppgave.
 object BrevløsPerson {
     const val JOURNALPOST_ID = "029834982"
     const val FNR = "33333333333"
@@ -166,7 +165,33 @@ object BrevløsPerson {
     val kafkaEvent = journalpost.tilAvroKafkaEvent()
 }
 
-// Journalpost hvor vi ikke finner behandlings-tema og -type skal ha JFR oppgave
+// Papirsøknad hvor det er oppgitt org.nr i stedet for personnummer skal ha JFR-oppgave.
+object PapirSoknadMedOrgNrPerson {
+    const val JOURNALPOST_ID = "000000001"
+    const val ORGNR = "000999000"
+
+    val journalpost =
+        Journalpost(
+            journalpostId = JOURNALPOST_ID,
+            tittel = "Sykmelding del D",
+            journalstatus = "MOTTATT",
+            bruker = Journalpost.Bruker(ORGNR, "ORGNR"),
+            dokumenter =
+                listOf(
+                    Journalpost.Dokument("NAV 08-07.04 D", "Sykmelding del D", "123"),
+                ),
+            tema = "SYK",
+            journalforendeEnhet = "9999",
+            relevanteDatoer = null,
+            sak = null,
+            avsenderMottaker = null,
+            behandlingstema = null,
+            behandlingstype = null,
+        )
+    val kafkaEvent = journalpost.tilAvroKafkaEvent()
+}
+
+// Journalpost hvor vi ikke finner behandlings-tema og -type skal ha JFR oppgave.
 object UkjentBrevkodePerson {
     const val JOURNALPOST_ID = "984561332"
     const val FNR = "33333333333"
@@ -192,7 +217,7 @@ object UkjentBrevkodePerson {
     val kafkaEvent = journalpost.tilAvroKafkaEvent()
 }
 
-// Journalpost som ikke er knyttet til en person
+// Journalpost som ikke er knyttet til en person.
 object JournalpostUtenPerson {
     const val JOURNALPOST_ID = "787359875"
 
@@ -217,7 +242,7 @@ object JournalpostUtenPerson {
     val kafkaEvent = journalpost.tilAvroKafkaEvent()
 }
 
-// Dette er inntektsmelding som vi ikke skal gjøre noe med
+// Inntektsmelding vi ikke skal gjøre noe med.
 object InntektsmeldingPerson {
     const val JOURNALPOST_ID = "44444444444"
     const val FNR = "44444444444"
