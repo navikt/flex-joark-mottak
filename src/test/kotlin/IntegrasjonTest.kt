@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit
 
 class IntegrasjonTest : FellesTestOppsett() {
     @Test
-    fun `Mottar journalpost som allerede er ferdig arkivert i sykepengesoknad-arkivering-oppgave`() {
+    fun `Journalpost som allerede er ferdig arkivert i sykepengesoknad-arkivering-oppgave`() {
         kafkaProducer.send(
             ProducerRecord(
                 topic,
@@ -25,7 +25,7 @@ class IntegrasjonTest : FellesTestOppsett() {
     }
 
     @Test
-    fun `Papir sykepengesøknad som skal journalføres`() {
+    fun `Papirsykepengesøknad skal journalføres`() {
         kafkaProducer.send(
             ProducerRecord(
                 topic,
@@ -56,7 +56,7 @@ class IntegrasjonTest : FellesTestOppsett() {
     }
 
     @Test
-    fun `Inntektsopplysninger journalpost som skal ha JFR oppgave`() {
+    fun `Inntektsopplysninger journalpost skal ha JFR oppgave`() {
         kafkaProducer.send(
             ProducerRecord(
                 topic,
@@ -83,7 +83,7 @@ class IntegrasjonTest : FellesTestOppsett() {
     }
 
     @Test
-    fun `Klage journalpost som skal ha JFR oppgave`() {
+    fun `Journalpost med klage skal ha JFR oppgave`() {
         kafkaProducer.send(
             ProducerRecord(
                 topic,
@@ -110,7 +110,7 @@ class IntegrasjonTest : FellesTestOppsett() {
     }
 
     @Test
-    fun `Utlansk søknad om sykepenger som skal ha JFR oppgave`() {
+    fun `Utenlandsk søknad om sykepenger skal ha JFR oppgave`() {
         kafkaProducer.send(
             ProducerRecord(
                 topic,
@@ -218,7 +218,7 @@ class IntegrasjonTest : FellesTestOppsett() {
     }
 
     @Test
-    fun `Mottar journalpost som vi skal ignorere`() {
+    fun `Journalpost som skal ignoreres`() {
         kafkaProducer.send(
             ProducerRecord(
                 topic,

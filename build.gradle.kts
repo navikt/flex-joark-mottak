@@ -2,7 +2,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    id("org.springframework.boot") version "3.3.5"
+    id("org.springframework.boot") version "3.4.0"
     id("io.spring.dependency-management") version "1.1.6"
     id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
     kotlin("jvm") version "2.0.21"
@@ -29,7 +29,6 @@ repositories {
 val caffeineVersion = "3.1.8"
 val confluentVersion = "7.7.1"
 val mockitoKotlinVersion = "2.2.0"
-val ojdbc8Version = "19.3.0.0"
 val avroVersion = "1.12.0"
 val logstashLogbackEncoderVersion = "8.0"
 val tokenSupportVersion = "5.0.5"

@@ -14,7 +14,7 @@ import org.springframework.boot.test.autoconfigure.actuate.observability.AutoCon
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint
 import org.springframework.boot.test.context.SpringBootTest
-import org.testcontainers.containers.KafkaContainer
+import org.testcontainers.kafka.KafkaContainer
 import org.testcontainers.utility.DockerImageName
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -28,7 +28,7 @@ abstract class FellesTestOppsett {
 
         init {
 
-            KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.6.1")).apply {
+            KafkaContainer(DockerImageName.parse("apache/kafka-native")).apply {
                 start()
                 System.setProperty("KAFKA_BROKERS", bootstrapServers)
                 System.setProperty("AIVEN_DOKUMENT_TOPIC", "test-topic")

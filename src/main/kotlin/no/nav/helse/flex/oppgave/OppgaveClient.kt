@@ -85,7 +85,7 @@ class OppgaveClient(
         headers[CONTENT_TYPE_HEADER] = MediaType.APPLICATION_JSON_VALUE
 
         val uri =
-            UriComponentsBuilder.fromHttpUrl(oppgaveUrl)
+            UriComponentsBuilder.fromUriString(oppgaveUrl)
                 .path("/api/v1/oppgaver")
                 .queryParam("statuskategori", PARAM_STATUSKATEGORI_AAPEN)
                 .queryParam("oppgavetype", PARAM_OPPGAVETYPE_JFR)
