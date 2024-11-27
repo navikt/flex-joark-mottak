@@ -102,7 +102,7 @@ class AadRestTemplateConfig {
     ): ClientHttpRequestInterceptor {
         return ClientHttpRequestInterceptor { request: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution ->
             val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
-            response.accessToken?.let { request.headers.setBearerAuth(it) }
+            response.access_token?.let { request.headers.setBearerAuth(it) }
             runCatching { request.headers.set("X-Correlation-ID", MDC.get(CORRELATION_ID)!!) }
             execution.execute(request, body)
         }
