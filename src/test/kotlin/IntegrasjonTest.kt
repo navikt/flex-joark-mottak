@@ -4,6 +4,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import mock.*
 import no.nav.helse.flex.journalpost.FerdigstillJournalpostRequest
 import no.nav.helse.flex.objectMapper
+import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.junit.jupiter.api.AfterAll
@@ -217,7 +218,7 @@ class IntegrasjonTest : FellesTestOppsett() {
     }
 
     @Test
-    fun `Mottar journalpost som vi skal ingnorere`() {
+    fun `Mottar journalpost som vi skal ignorere`() {
         kafkaProducer.send(
             ProducerRecord(
                 topic,
@@ -230,6 +231,38 @@ class IntegrasjonTest : FellesTestOppsett() {
 
         val requestFerdigstillJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)
         requestFerdigstillJournalpost shouldBeEqualTo null
+    }
+
+    @Test
+    fun `Det opprettes JFR oppgave for papirsykepengesoknad med organisasjonsnummer som identifikator`() {
+        kafkaProducer.send(
+            ProducerRecord(
+                topic,
+                PapirSoknadMedOrgNrPerson.kafkaEvent,
+            ),
+        ).get()
+
+        // Har oppgave kalles først når oppgave oppretted, og deretter når det opprettes en manuell oppgave.
+        repeat(2) {
+            val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
+            requestHarOppgave.method shouldBeEqualTo "GET"
+            requestHarOppgave.requestUrl?.queryParameter("statuskategori") shouldBeEqualTo "AAPEN"
+            requestHarOppgave.requestUrl?.queryParameter("journalpostId") shouldBeEqualTo PapirSoknadMedOrgNrPerson.JOURNALPOST_ID
+        }
+
+        val requestOpprettOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
+        requestOpprettOppgave.method shouldBeEqualTo "POST"
+
+        val requestFerdigstillJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)
+        requestFerdigstillJournalpost shouldBe null
+
+        val oppgaveRequestBody = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
+        oppgaveRequestBody.journalpostId shouldBeEqualTo PapirSoknadMedOrgNrPerson.JOURNALPOST_ID
+        oppgaveRequestBody.orgnr shouldBeEqualTo PapirSoknadMedOrgNrPerson.ORGNR
+        oppgaveRequestBody.aktoerId shouldBe null
+        oppgaveRequestBody.tema shouldBeEqualTo "SYK"
+        oppgaveRequestBody.behandlingstema shouldBeEqualTo "ab0434"
+        oppgaveRequestBody.behandlingstype shouldBe null
     }
 
     @AfterAll
