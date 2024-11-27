@@ -35,8 +35,8 @@ spec:
     limits:
       memory: 1000Mi
     requests:
-      cpu: 200m
-      memory: 1000Mi
+      cpu: 50m
+      memory: 800Mi
   kafka:
     pool: {{kafkaPool}}
   azure:
