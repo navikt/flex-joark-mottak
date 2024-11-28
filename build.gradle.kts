@@ -27,7 +27,7 @@ repositories {
 }
 
 val caffeineVersion = "3.1.8"
-val confluentVersion = "7.7.1"
+val confluentVersion = "7.7.2"
 val mockitoKotlinVersion = "2.2.0"
 val avroVersion = "1.12.0"
 val logstashLogbackEncoderVersion = "8.0"
