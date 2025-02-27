@@ -34,7 +34,7 @@ val logstashLogbackEncoderVersion = "8.0"
 val tokenSupportVersion = "5.0.16"
 val testContainersVersion = "1.20.4"
 val kluentVersion = "1.73"
-val jsonSchemaValidatorVersion = "1.5.5"
+val jsonSchemaValidatorVersion = "1.5.6"
 
 dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
