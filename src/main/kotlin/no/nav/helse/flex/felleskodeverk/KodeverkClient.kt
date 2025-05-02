@@ -27,7 +27,8 @@ class KodeverkClient(
         headers[NAV_CONSUMER_ID] = "flex-joark-mottak"
 
         val uri =
-            UriComponentsBuilder.fromUriString(kodeverkUrl)
+            UriComponentsBuilder
+                .fromUriString(kodeverkUrl)
                 .path("/api/v1/hierarki/TemaSkjemaGjelder/noder")
                 .queryParam("spraak", "nb")
                 .encode()

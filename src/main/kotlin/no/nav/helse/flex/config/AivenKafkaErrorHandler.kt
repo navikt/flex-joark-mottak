@@ -9,13 +9,14 @@ import org.springframework.stereotype.Component
 import org.springframework.util.backoff.ExponentialBackOff
 
 @Component
-class AivenKafkaErrorHandler : DefaultErrorHandler(
-    null,
-    ExponentialBackOff(1000L, 1.5).also {
-        // 8 minutter, som er mindre enn max.poll.interval.ms på 10 minutter.
-        it.maxInterval = 60_000L * 8
-    },
-) {
+class AivenKafkaErrorHandler :
+    DefaultErrorHandler(
+        null,
+        ExponentialBackOff(1000L, 1.5).also {
+            // 8 minutter, som er mindre enn max.poll.interval.ms på 10 minutter.
+            it.maxInterval = 60_000L * 8
+        },
+    ) {
     private val log = this.logger()
 
     override fun handleRemaining(

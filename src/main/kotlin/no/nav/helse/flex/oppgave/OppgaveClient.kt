@@ -85,7 +85,8 @@ class OppgaveClient(
         headers[CONTENT_TYPE_HEADER] = MediaType.APPLICATION_JSON_VALUE
 
         val uri =
-            UriComponentsBuilder.fromUriString(oppgaveUrl)
+            UriComponentsBuilder
+                .fromUriString(oppgaveUrl)
                 .path("/api/v1/oppgaver")
                 .queryParam("statuskategori", PARAM_STATUSKATEGORI_AAPEN)
                 .queryParam("oppgavetype", PARAM_OPPGAVETYPE_JFR)
@@ -122,26 +123,24 @@ data class OppgaveErrorResponse(
     val uuid: String,
     val feilmelding: String,
 ) {
-    fun isErrorInvalidEnhet(): Boolean {
-        return (
-            feilmelding.contains("NAVEnheten '") && feilmelding.contains("' er av typen oppgavebehandler") ||
-                feilmelding.contains("NAVEnheten '") && feilmelding.contains("' har status: 'Nedlagt'") ||
-                feilmelding.contains("Enheten med nummeret '") && feilmelding.contains("' eksisterer ikke")
+    fun isErrorInvalidEnhet(): Boolean =
+        (
+            feilmelding.contains("NAVEnheten '") &&
+                feilmelding.contains("' er av typen oppgavebehandler") ||
+                feilmelding.contains("NAVEnheten '") &&
+                feilmelding.contains("' har status: 'Nedlagt'") ||
+                feilmelding.contains("Enheten med nummeret '") &&
+                feilmelding.contains("' eksisterer ikke")
         )
-    }
 
-    fun isErrorInvalidOrgNr(): Boolean {
-        return (feilmelding.contains("Organisasjonsnummer er ugyldig"))
-    }
+    fun isErrorInvalidOrgNr(): Boolean = (feilmelding.contains("Organisasjonsnummer er ugyldig"))
 }
 
 data class OppgaveSearchResponse(
     val antallTreffTotalt: Int = 0,
     val oppgaver: List<Oppgave>? = null,
 ) {
-    fun harTilknyttetOppgave(): Boolean {
-        return (antallTreffTotalt > 0 && !oppgaver.isNullOrEmpty() && oppgaver[0].id != null)
-    }
+    fun harTilknyttetOppgave(): Boolean = (antallTreffTotalt > 0 && !oppgaver.isNullOrEmpty() && oppgaver[0].id != null)
 }
 
 data class OppgaveRequest(
@@ -182,11 +181,10 @@ data class OppgaveRequest(
         return oppgaveFrist.toLocalDate().toString()
     }
 
-    private fun ZonedDateTime.nesteUkedag(): ZonedDateTime {
-        return when (dayOfWeek) {
+    private fun ZonedDateTime.nesteUkedag(): ZonedDateTime =
+        when (dayOfWeek) {
             DayOfWeek.FRIDAY -> plusDays(3)
             DayOfWeek.SATURDAY -> plusDays(2)
             else -> plusDays(1)
         }
-    }
 }

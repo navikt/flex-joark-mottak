@@ -17,7 +17,8 @@ object DokarkivMockDispatcher : QueueDispatcher() {
                 )
 
             else ->
-                MockResponse().setResponseCode(404)
+                MockResponse()
+                    .setResponseCode(404)
                     .setBody("Har ikke implemetert dokarkiv mock api for ${request.requestUrl}")
         }
     }

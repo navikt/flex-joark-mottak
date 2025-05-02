@@ -19,19 +19,24 @@ class RetryProducer(
         kafkaEvent: KafkaEvent,
         behandlingstidspunkt: OffsetDateTime,
     ) {
-        kafkaStringProducer.send(
-            ProducerRecord(
-                RETRY_TOPIC,
-                null,
-                kafkaEvent.journalpostId,
-                kafkaEvent.serialisertTilString(),
-                listOf(
-                    RecordHeader(
-                        BEHANDLINGSTIDSPUNKT,
-                        behandlingstidspunkt.toInstant().toEpochMilli().toString().toByteArray(),
+        kafkaStringProducer
+            .send(
+                ProducerRecord(
+                    RETRY_TOPIC,
+                    null,
+                    kafkaEvent.journalpostId,
+                    kafkaEvent.serialisertTilString(),
+                    listOf(
+                        RecordHeader(
+                            BEHANDLINGSTIDSPUNKT,
+                            behandlingstidspunkt
+                                .toInstant()
+                                .toEpochMilli()
+                                .toString()
+                                .toByteArray(),
+                        ),
                     ),
                 ),
-            ),
-        ).get()
+            ).get()
     }
 }

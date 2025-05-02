@@ -26,7 +26,8 @@ class RebehandlingTest : FellesTestOppsett() {
         val requestOppdaterJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
         val requestFerdigstillJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
 
-        requestHarOppgave.requestLine shouldBeEqualTo "GET /api/v1/oppgaver?statuskategori=AAPEN&oppgavetype=JFR&oppgavetype=FDR&journalpostId=${PapirSoknadPerson.JOURNALPOST_ID} HTTP/1.1"
+        requestHarOppgave.requestLine shouldBeEqualTo
+            "GET /api/v1/oppgaver?statuskategori=AAPEN&oppgavetype=JFR&oppgavetype=FDR&journalpostId=${PapirSoknadPerson.JOURNALPOST_ID} HTTP/1.1"
 
         requestOpprettOppgave.requestLine shouldBeEqualTo "POST /api/v1/oppgaver HTTP/1.1"
         val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
@@ -36,10 +37,16 @@ class RebehandlingTest : FellesTestOppsett() {
         body.behandlingstype shouldBeEqualTo null
 
         requestOppdaterJournalpost.method shouldBeEqualTo "PUT"
-        requestOppdaterJournalpost.requestUrl?.encodedPath shouldBeEqualTo "/rest/journalpostapi/v1/journalpost/${PapirSoknadPerson.JOURNALPOST_ID}"
+        requestOppdaterJournalpost.requestUrl?.encodedPath shouldBeEqualTo
+            "/rest/journalpostapi/v1/journalpost/${PapirSoknadPerson.JOURNALPOST_ID}"
 
         requestFerdigstillJournalpost.method shouldBeEqualTo "PATCH"
-        requestFerdigstillJournalpost.requestUrl?.encodedPath shouldBeEqualTo "/rest/journalpostapi/v1/journalpost/${PapirSoknadPerson.JOURNALPOST_ID}/ferdigstill"
-        objectMapper.readValue<FerdigstillJournalpostRequest>(requestFerdigstillJournalpost.body.readUtf8()).journalfoerendeEnhet shouldBeEqualTo "9999"
+        requestFerdigstillJournalpost.requestUrl?.encodedPath shouldBeEqualTo
+            "/rest/journalpostapi/v1/journalpost/${PapirSoknadPerson.JOURNALPOST_ID}/ferdigstill"
+        objectMapper
+            .readValue<FerdigstillJournalpostRequest>(
+                requestFerdigstillJournalpost.body.readUtf8(),
+            ).journalfoerendeEnhet shouldBeEqualTo
+            "9999"
     }
 }

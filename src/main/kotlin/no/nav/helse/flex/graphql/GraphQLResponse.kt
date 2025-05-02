@@ -4,9 +4,7 @@ data class GraphQLResponse<T>(
     val data: T,
     val errors: List<ResponseError>?,
 ) {
-    fun hentErrors(): String? {
-        return errors?.map { it.message }?.joinToString(" - ")
-    }
+    fun hentErrors(): String? = errors?.map { it.message }?.joinToString(" - ")
 }
 
 data class ResponseError(

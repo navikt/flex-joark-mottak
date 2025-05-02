@@ -29,30 +29,22 @@ object SkjemaMetadata {
     fun inAutoList(
         tema: String,
         skjema: String?,
-    ): Boolean {
-        return temaMap[tema]?.skjemaer?.containsKey(skjema) ?: false
-    }
+    ): Boolean = temaMap[tema]?.skjemaer?.containsKey(skjema) ?: false
 
     fun getFrist(
         tema: String,
         skjema: String?,
-    ): Int {
-        return temaMap[tema]!!.skjemaer[skjema]!!.frist
-    }
+    ): Int = temaMap[tema]!!.skjemaer[skjema]!!.frist
 
     fun getOppgavetype(
         tema: String,
         skjema: String?,
-    ): String {
-        return temaMap[tema]!!.skjemaer[skjema]!!.oppgavetype
-    }
+    ): String = temaMap[tema]!!.skjemaer[skjema]!!.oppgavetype
 
     fun isIgnoreskjema(
         tema: String,
         skjema: String?,
-    ): Boolean {
-        return temaMap[tema]?.ignoreSkjema?.contains(skjema) ?: false
-    }
+    ): Boolean = temaMap[tema]?.ignoreSkjema?.contains(skjema) ?: false
 }
 
 private class TemaKodeverk(
