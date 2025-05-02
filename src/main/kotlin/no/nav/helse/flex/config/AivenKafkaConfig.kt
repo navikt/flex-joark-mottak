@@ -55,8 +55,8 @@ class AivenKafkaConfig(
         )
 
     @Bean
-    fun aivenSchemaRegistryClient(): SchemaRegistryClient {
-        return CachedSchemaRegistryClient(
+    fun aivenSchemaRegistryClient(): SchemaRegistryClient =
+        CachedSchemaRegistryClient(
             kafkaSchemaRegistryUrl,
             20,
             mapOf(
@@ -64,7 +64,6 @@ class AivenKafkaConfig(
                 KafkaAvroDeserializerConfig.USER_INFO_CONFIG to "$schemaRegistryUsername:$schemaRegistryPassword",
             ),
         )
-    }
 
     @Bean
     fun kafkaAvroListenerContainerFactory(

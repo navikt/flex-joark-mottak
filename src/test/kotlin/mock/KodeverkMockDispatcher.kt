@@ -9,8 +9,8 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
 
 object KodeverkMockDispatcher : Dispatcher() {
-    override fun dispatch(request: RecordedRequest): MockResponse {
-        return when (request.requestUrl?.encodedPath) {
+    override fun dispatch(request: RecordedRequest): MockResponse =
+        when (request.requestUrl?.encodedPath) {
             "/api/v1/hierarki/TemaSkjemaGjelder/noder" ->
                 MockResponse().setBody(
                     KodeverkBrevkoder(
@@ -138,8 +138,8 @@ object KodeverkMockDispatcher : Dispatcher() {
                     ).serialisertTilString(),
                 )
             else ->
-                MockResponse().setResponseCode(404)
+                MockResponse()
+                    .setResponseCode(404)
                     .setBody("Har ikke implemetert kodeverk mock api for ${request.requestUrl}")
         }
-    }
 }

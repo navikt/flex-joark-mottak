@@ -16,7 +16,8 @@ object OppgaveMockDispatcher : QueueDispatcher() {
 
     override fun dispatch(request: RecordedRequest): MockResponse {
         if (request.requestUrl?.encodedPath != "/api/v1/oppgaver") {
-            return MockResponse().setResponseCode(404)
+            return MockResponse()
+                .setResponseCode(404)
                 .setBody("Har ikke implemetert oppgave mock api for ${request.requestUrl}")
         }
 
@@ -47,7 +48,8 @@ object OppgaveMockDispatcher : QueueDispatcher() {
                     MockResponse().setBody(oppgave.serialisertTilString()).setResponseCode(201)
                 }
             }
-            else -> return MockResponse().setResponseCode(404)
+            else -> return MockResponse()
+                .setResponseCode(404)
                 .setBody("Har ikke implemetert oppgave mock api for metode ${request.method}")
         }
     }

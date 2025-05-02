@@ -14,31 +14,34 @@ import java.util.concurrent.TimeUnit
 class IntegrasjonTest : FellesTestOppsett() {
     @Test
     fun `Journalpost som allerede er ferdig arkivert i sykepengesoknad-arkivering-oppgave`() {
-        kafkaProducer.send(
-            ProducerRecord(
-                topic,
-                DigitalSoknadPerson.kafkaEvent,
-            ),
-        ).get()
+        kafkaProducer
+            .send(
+                ProducerRecord(
+                    topic,
+                    DigitalSoknadPerson.kafkaEvent,
+                ),
+            ).get()
 
         oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS) shouldBeEqualTo null
     }
 
     @Test
     fun `Papirsykepengesøknad skal journalføres`() {
-        kafkaProducer.send(
-            ProducerRecord(
-                topic,
-                PapirSoknadPerson.kafkaEvent,
-            ),
-        ).get()
+        kafkaProducer
+            .send(
+                ProducerRecord(
+                    topic,
+                    PapirSoknadPerson.kafkaEvent,
+                ),
+            ).get()
 
         val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
         val requestOpprettOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
         val requestOppdaterJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
         val requestFerdigstillJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
 
-        requestHarOppgave.requestLine shouldBeEqualTo "GET /api/v1/oppgaver?statuskategori=AAPEN&oppgavetype=JFR&oppgavetype=FDR&journalpostId=${PapirSoknadPerson.JOURNALPOST_ID} HTTP/1.1"
+        requestHarOppgave.requestLine shouldBeEqualTo
+            "GET /api/v1/oppgaver?statuskategori=AAPEN&oppgavetype=JFR&oppgavetype=FDR&journalpostId=${PapirSoknadPerson.JOURNALPOST_ID} HTTP/1.1"
 
         requestOpprettOppgave.requestLine shouldBeEqualTo "POST /api/v1/oppgaver HTTP/1.1"
         val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
@@ -48,21 +51,28 @@ class IntegrasjonTest : FellesTestOppsett() {
         body.behandlingstype shouldBeEqualTo null
 
         requestOppdaterJournalpost.method shouldBeEqualTo "PUT"
-        requestOppdaterJournalpost.requestUrl?.encodedPath shouldBeEqualTo "/rest/journalpostapi/v1/journalpost/${PapirSoknadPerson.JOURNALPOST_ID}"
+        requestOppdaterJournalpost.requestUrl?.encodedPath shouldBeEqualTo
+            "/rest/journalpostapi/v1/journalpost/${PapirSoknadPerson.JOURNALPOST_ID}"
 
         requestFerdigstillJournalpost.method shouldBeEqualTo "PATCH"
-        requestFerdigstillJournalpost.requestUrl?.encodedPath shouldBeEqualTo "/rest/journalpostapi/v1/journalpost/${PapirSoknadPerson.JOURNALPOST_ID}/ferdigstill"
-        objectMapper.readValue<FerdigstillJournalpostRequest>(requestFerdigstillJournalpost.body.readUtf8()).journalfoerendeEnhet shouldBeEqualTo "9999"
+        requestFerdigstillJournalpost.requestUrl?.encodedPath shouldBeEqualTo
+            "/rest/journalpostapi/v1/journalpost/${PapirSoknadPerson.JOURNALPOST_ID}/ferdigstill"
+        objectMapper
+            .readValue<FerdigstillJournalpostRequest>(
+                requestFerdigstillJournalpost.body.readUtf8(),
+            ).journalfoerendeEnhet shouldBeEqualTo
+            "9999"
     }
 
     @Test
     fun `Inntektsopplysninger journalpost skal ha JFR oppgave`() {
-        kafkaProducer.send(
-            ProducerRecord(
-                topic,
-                InntektsopplysningerPerson.kafkaEvent,
-            ),
-        ).get()
+        kafkaProducer
+            .send(
+                ProducerRecord(
+                    topic,
+                    InntektsopplysningerPerson.kafkaEvent,
+                ),
+            ).get()
 
         val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
         val requestOpprettOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
@@ -84,12 +94,13 @@ class IntegrasjonTest : FellesTestOppsett() {
 
     @Test
     fun `Journalpost med klage skal ha JFR oppgave`() {
-        kafkaProducer.send(
-            ProducerRecord(
-                topic,
-                KlagePerson.kafkaEvent,
-            ),
-        ).get()
+        kafkaProducer
+            .send(
+                ProducerRecord(
+                    topic,
+                    KlagePerson.kafkaEvent,
+                ),
+            ).get()
 
         val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
         val requestOpprettOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
@@ -111,12 +122,13 @@ class IntegrasjonTest : FellesTestOppsett() {
 
     @Test
     fun `Utenlandsk søknad om sykepenger skal ha JFR oppgave`() {
-        kafkaProducer.send(
-            ProducerRecord(
-                topic,
-                UtenlandskPerson.kafkaEvent,
-            ),
-        ).get()
+        kafkaProducer
+            .send(
+                ProducerRecord(
+                    topic,
+                    UtenlandskPerson.kafkaEvent,
+                ),
+            ).get()
 
         val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
         val requestOpprettOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
@@ -138,12 +150,13 @@ class IntegrasjonTest : FellesTestOppsett() {
 
     @Test
     fun `Journalpost uten brevkode skal ha JFR oppgave`() {
-        kafkaProducer.send(
-            ProducerRecord(
-                topic,
-                BrevløsPerson.kafkaEvent,
-            ),
-        ).get()
+        kafkaProducer
+            .send(
+                ProducerRecord(
+                    topic,
+                    BrevløsPerson.kafkaEvent,
+                ),
+            ).get()
 
         val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
         val requestOpprettOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
@@ -165,12 +178,13 @@ class IntegrasjonTest : FellesTestOppsett() {
 
     @Test
     fun `Journalpost med ukjent brevkode skal ha JFR oppgave`() {
-        kafkaProducer.send(
-            ProducerRecord(
-                topic,
-                UkjentBrevkodePerson.kafkaEvent,
-            ),
-        ).get()
+        kafkaProducer
+            .send(
+                ProducerRecord(
+                    topic,
+                    UkjentBrevkodePerson.kafkaEvent,
+                ),
+            ).get()
 
         val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
         val requestOpprettOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
@@ -192,12 +206,13 @@ class IntegrasjonTest : FellesTestOppsett() {
 
     @Test
     fun `Journalpost uten person skal ha JFR oppgave`() {
-        kafkaProducer.send(
-            ProducerRecord(
-                topic,
-                JournalpostUtenPerson.kafkaEvent,
-            ),
-        ).get()
+        kafkaProducer
+            .send(
+                ProducerRecord(
+                    topic,
+                    JournalpostUtenPerson.kafkaEvent,
+                ),
+            ).get()
 
         val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
         val requestOpprettOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
@@ -219,12 +234,13 @@ class IntegrasjonTest : FellesTestOppsett() {
 
     @Test
     fun `Journalpost som skal ignoreres`() {
-        kafkaProducer.send(
-            ProducerRecord(
-                topic,
-                InntektsmeldingPerson.kafkaEvent,
-            ),
-        ).get()
+        kafkaProducer
+            .send(
+                ProducerRecord(
+                    topic,
+                    InntektsmeldingPerson.kafkaEvent,
+                ),
+            ).get()
 
         val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)
         requestHarOppgave shouldBeEqualTo null
@@ -235,12 +251,13 @@ class IntegrasjonTest : FellesTestOppsett() {
 
     @Test
     fun `Det opprettes JFR oppgave for papirsykepengesoknad med organisasjonsnummer som identifikator`() {
-        kafkaProducer.send(
-            ProducerRecord(
-                topic,
-                PapirSoknadMedOrgNrPerson.kafkaEvent,
-            ),
-        ).get()
+        kafkaProducer
+            .send(
+                ProducerRecord(
+                    topic,
+                    PapirSoknadMedOrgNrPerson.kafkaEvent,
+                ),
+            ).get()
 
         // Har oppgave kalles først når oppgave oppretted, og deretter når det opprettes en manuell oppgave.
         repeat(2) {

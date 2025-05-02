@@ -16,7 +16,8 @@ object SafMockDispatcher : QueueDispatcher() {
     override fun dispatch(request: RecordedRequest): MockResponse {
         if (request.method != "POST") return MockResponse().setResponseCode(400).setBody("Ingen saf")
         if (request.requestUrl?.encodedPath != "/graphql") {
-            return MockResponse().setResponseCode(404)
+            return MockResponse()
+                .setResponseCode(404)
                 .setBody("Har ikke implemetert saf mock api for ${request.requestUrl}")
         }
         if (responseQueue.peek() != null) {
@@ -47,7 +48,8 @@ object SafMockDispatcher : QueueDispatcher() {
             PapirSoknadMedOrgNrPerson.JOURNALPOST_ID -> response(PapirSoknadMedOrgNrPerson.journalpost)
 
             else -> {
-                MockResponse().setResponseCode(404)
+                MockResponse()
+                    .setResponseCode(404)
                     .setBody("Har ikke implemetert saf mock api for journalpostId $journalpostId")
             }
         }

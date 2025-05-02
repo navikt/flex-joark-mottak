@@ -17,15 +17,13 @@ data class Journalpost(
     val brevkode: String?
         get() = if (dokumenter.isNotEmpty()) dokumenter[0].brevkode else null
 
-    fun invalidJournalpostStatus(): Boolean {
-        return !(JOURNALSTATUS_MOTTATT == journalstatus || JOURNALSTATUS_MIDLERTIDIG_JOURNALFOERT == journalstatus)
-    }
+    fun invalidJournalpostStatus(): Boolean =
+        !(JOURNALSTATUS_MOTTATT == journalstatus || JOURNALSTATUS_MIDLERTIDIG_JOURNALFOERT == journalstatus)
 
-    override fun toString(): String {
-        return "[id=$journalpostId, tema=$tema, skjema=$brevkode, tittel=$tittel, " +
+    override fun toString(): String =
+        "[id=$journalpostId, tema=$tema, skjema=$brevkode, tittel=$tittel, " +
             "journalforendeEnhet=$journalforendeEnhet, journalstatus=$journalstatus, " +
             "behandlingstema=$behandlingstema, behandlingstype=$behandlingstype]"
-    }
 
     class Bruker(
         val id: String,
@@ -48,9 +46,14 @@ data class Journalpost(
         }
     }
 
-    class RelevanteDatoer(val dato: String, val datotype: String)
+    class RelevanteDatoer(
+        val dato: String,
+        val datotype: String,
+    )
 
-    class Sak(val sakstype: String)
+    class Sak(
+        val sakstype: String,
+    )
 
     class AvsenderMottaker(
         var id: String?,
@@ -61,7 +64,11 @@ data class Journalpost(
         val idType: String = type
     }
 
-    class Dokument(val brevkode: String?, val tittel: String? = null, val dokumentInfoId: String)
+    class Dokument(
+        val brevkode: String?,
+        val tittel: String? = null,
+        val dokumentInfoId: String,
+    )
 
     companion object {
         private const val JOURNALSTATUS_MIDLERTIDIG_JOURNALFOERT = "M"

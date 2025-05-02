@@ -10,9 +10,7 @@ import java.util.concurrent.TimeUnit
 @Configuration
 class CacheConfig {
     @Bean
-    fun caffeineConfig(): Caffeine<Any, Any> {
-        return Caffeine.newBuilder().expireAfterWrite(60, TimeUnit.MINUTES)
-    }
+    fun caffeineConfig(): Caffeine<Any, Any> = Caffeine.newBuilder().expireAfterWrite(60, TimeUnit.MINUTES)
 
     @Bean
     fun cacheManager(caffeine: Caffeine<Any, Any>): CacheManager {

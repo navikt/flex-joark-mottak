@@ -72,7 +72,10 @@ data class HentIdenter(
     val identer: List<PdlIdent>,
 )
 
-data class PdlIdent(val gruppe: String, val ident: String)
+data class PdlIdent(
+    val gruppe: String,
+    val ident: String,
+)
 
 private const val CONTENT_TYPE_HEADER = "Content-Type"
 private const val TEMA = "Tema"

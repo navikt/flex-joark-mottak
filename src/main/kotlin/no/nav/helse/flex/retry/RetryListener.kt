@@ -40,7 +40,9 @@ class RetryListener(
     ) {
         val kafkaEvent = objectMapper.readValue<KafkaEvent>(cr.value())
         val behandlingstidspunkt =
-            cr.headers().lastHeader(BEHANDLINGSTIDSPUNKT)
+            cr
+                .headers()
+                .lastHeader(BEHANDLINGSTIDSPUNKT)
                 ?.value()
                 ?.let { String(it, StandardCharsets.UTF_8) }
                 ?.let { Instant.ofEpochMilli(it.toLong()) }

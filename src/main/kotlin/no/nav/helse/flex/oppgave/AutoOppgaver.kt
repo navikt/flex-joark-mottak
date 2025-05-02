@@ -48,9 +48,10 @@ class AutoOppgaver(
                 journalpost.copy(
                     avsenderMottaker =
                         Journalpost.AvsenderMottaker(
-                            identer.first {
-                                it.gruppe == FOLKEREGISTERIDENT
-                            }.ident,
+                            identer
+                                .first {
+                                    it.gruppe == FOLKEREGISTERIDENT
+                                }.ident,
                             "FNR",
                         ),
                 )

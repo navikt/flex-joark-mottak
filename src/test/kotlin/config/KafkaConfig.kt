@@ -19,20 +19,17 @@ class KafkaConfig(
 ) {
     @Bean
     @Primary
-    fun aivenSchemaRegistryClient(): SchemaRegistryClient {
-        return MockSchemaRegistryClient()
-    }
+    fun aivenSchemaRegistryClient(): SchemaRegistryClient = MockSchemaRegistryClient()
 
     @Bean
-    fun kafkaAvroSerializer(aivenSchemaRegistryClient: SchemaRegistryClient): KafkaAvroSerializer {
-        return KafkaAvroSerializer(
+    fun kafkaAvroSerializer(aivenSchemaRegistryClient: SchemaRegistryClient): KafkaAvroSerializer =
+        KafkaAvroSerializer(
             aivenSchemaRegistryClient,
             mapOf(
                 KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG to "mock://localhost.nav",
                 KafkaAvroSerializerConfig.AUTO_REGISTER_SCHEMAS to true,
             ),
         )
-    }
 
     @Bean
     fun kafkaProducer(kafkaAvroSerializer: KafkaAvroSerializer): KafkaProducer<String, Any> {
