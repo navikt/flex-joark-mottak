@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate
 
 @Component
 class DokArkivClient(
-    @Value("\${DOKARKIV_URL}")
+    @param:Value("\${DOKARKIV_URL}")
     private val dokarkivUrl: String,
     private val dokarkivRestTemplate: RestTemplate,
 ) {

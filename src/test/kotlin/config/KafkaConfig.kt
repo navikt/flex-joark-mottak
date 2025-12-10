@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Primary
 
 @Configuration
 class KafkaConfig(
-    @Value("\${KAFKA_BROKERS}") private val kafkaBrokers: String,
+    @param:Value("\${KAFKA_BROKERS}") private val kafkaBrokers: String,
 ) {
     @Bean
     @Primary

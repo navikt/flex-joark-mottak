@@ -14,7 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder
 
 @Component
 class KodeverkClient(
-    @Value("\${KODEVERK_URL}")
+    @param:Value("\${KODEVERK_URL}")
     private val kodeverkUrl: String,
     private val kodeverkRestTemplate: RestTemplate,
 ) {
