@@ -19,7 +19,7 @@ private const val PARAM_OPPGAVETYPE_FDR = "FDR"
 
 @Component
 class OppgaveClient(
-    @Value("\${OPPGAVE_URL}")
+    @param:Value("\${OPPGAVE_URL}")
     private val oppgaveUrl: String,
     private val oppgaveRestTemplate: RestTemplate,
 ) {

@@ -14,7 +14,7 @@ import java.lang.Exception
 
 @Component
 class SafClient(
-    @Value("\${SAF_URL}")
+    @param:Value("\${SAF_URL}")
     private val safApiUrl: String,
     private val safRestTemplate: RestTemplate,
 ) {

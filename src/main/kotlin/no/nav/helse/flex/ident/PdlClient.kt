@@ -17,7 +17,7 @@ import java.lang.Exception
 
 @Component
 class PdlClient(
-    @Value("\${PDL_URL}")
+    @param:Value("\${PDL_URL}")
     private val pdlApiUrl: String,
     private val pdlRestTemplate: RestTemplate,
 ) {
