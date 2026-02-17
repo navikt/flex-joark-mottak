@@ -8,7 +8,7 @@ external-host:
   - oppgave.dev-fss-pub.nais.io
   - kodeverk-api.nav.no
 env:
-  AIVEN_DOKUMENT_TOPIC: teamdokumenthandtering.aapen-dok-journalfoering-q1
+  AIVEN_DOKUMENT_TOPIC: teamdokumenthandtering.aapen-dok-journalfoering
 
   # SAF
   SAF_CLIENT_ID: dev-fss.teamdokumenthandtering.saf
