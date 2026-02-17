@@ -2,7 +2,7 @@ kafkaPool: nav-dev
 cpu: 50m
 memory: 600Mi
 external-host:
-  - saf.dev-fss-pub.nais.io
+  - saf-q2.dev-fss-pub.nais.io
   - dokarkiv.dev-fss-pub.nais.io
   - pdl-api.dev-fss-pub.nais.io
   - oppgave-q1.dev-fss-pub.nais.io
@@ -11,8 +11,8 @@ env:
   AIVEN_DOKUMENT_TOPIC: teamdokumenthandtering.aapen-dok-journalfoering-q1
 
   # SAF
-  SAF_CLIENT_ID: dev-fss.teamdokumenthandtering.saf-q1
-  SAF_URL: https://saf.dev-fss-pub.nais.io
+  SAF_CLIENT_ID: dev-fss.teamdokumenthandtering.saf
+  SAF_URL: https://saf-q2.dev-fss-pub.nais.io
 
   # Journalpost API (Dokarkiv)
   DOKARKIV_CLIENT_ID: dev-fss.teamdokumenthandtering.dokarkiv
