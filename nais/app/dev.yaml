@@ -5,7 +5,7 @@ external-host:
   - saf-q2.dev-fss-pub.nais.io
   - dokarkiv.dev-fss-pub.nais.io
   - pdl-api.dev-fss-pub.nais.io
-  - oppgave-q1.dev-fss-pub.nais.io
+  - oppgave.dev-fss-pub.nais.io
   - kodeverk-api.nav.no
 env:
   AIVEN_DOKUMENT_TOPIC: teamdokumenthandtering.aapen-dok-journalfoering-q1
@@ -23,8 +23,8 @@ env:
   PDL_URL: https://pdl-api.dev-fss-pub.nais.io
 
   # Gosys Oppgave
-  OPPGAVE_CLIENT_ID: dev-fss.oppgavehandtering.oppgave-q1
-  OPPGAVE_URL: https://oppgave-q1.dev-fss-pub.nais.io
+  OPPGAVE_CLIENT_ID: dev-fss.oppgavehandtering.oppgave
+  OPPGAVE_URL: https://oppgave.dev-fss-pub.nais.io
 
   # Felles Kodeverk API
   KODEVERK_CLIENT_ID: dev-gcp.team-rocket.kodeverk-api
