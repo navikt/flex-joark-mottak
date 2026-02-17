@@ -15,7 +15,7 @@ env:
   SAF_URL: https://saf.dev-fss-pub.nais.io
 
   # Journalpost API (Dokarkiv)
-  DOKARKIV_CLIENT_ID: dev-fss.teamdokumenthandtering.dokarkiv-q1
+  DOKARKIV_CLIENT_ID: dev-fss.teamdokumenthandtering.dokarkiv
   DOKARKIV_URL: https://dokarkiv.dev-fss-pub.nais.io
 
   # PDL
