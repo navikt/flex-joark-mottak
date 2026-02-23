@@ -3,29 +3,19 @@ cpu: 50m
 memory: 600Mi
 external-host:
   - saf-q2.dev-fss-pub.nais.io
-  - dokarkiv.dev-fss-pub.nais.io
+  - dokarkiv-q2.dev-fss-pub.nais.io
   - pdl-api.dev-fss-pub.nais.io
   - oppgave.dev-fss-pub.nais.io
   - kodeverk-api.nav.no
 env:
   AIVEN_DOKUMENT_TOPIC: teamdokumenthandtering.aapen-dok-journalfoering
-
-  # SAF
   SAF_CLIENT_ID: dev-fss.teamdokumenthandtering.saf
   SAF_URL: https://saf-q2.dev-fss-pub.nais.io
-
-  # Journalpost API (Dokarkiv)
   DOKARKIV_CLIENT_ID: dev-fss.teamdokumenthandtering.dokarkiv
-  DOKARKIV_URL: https://dokarkiv.dev-fss-pub.nais.io
-
-  # PDL
+  DOKARKIV_URL: https://dokarkiv-q2.dev-fss-pub.nais.io
   PDL_CLIENT_ID: dev-fss.pdl.pdl-api
   PDL_URL: https://pdl-api.dev-fss-pub.nais.io
-
-  # Gosys Oppgave
   OPPGAVE_CLIENT_ID: dev-fss.oppgavehandtering.oppgave
   OPPGAVE_URL: https://oppgave.dev-fss-pub.nais.io
-
-  # Felles Kodeverk API
   KODEVERK_CLIENT_ID: dev-gcp.team-rocket.kodeverk-api
   KODEVERK_URL: https://kodeverk-api.nav.no
