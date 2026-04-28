@@ -32,7 +32,7 @@ val mockitoKotlinVersion = "2.2.0"
 val avroVersion = "1.12.1"
 val logstashLogbackEncoderVersion = "9.0"
 val tokenSupportVersion = "5.0.37"
-val testContainersVersion = "2.0.4"
+val testContainersVersion = "2.0.5"
 val kluentVersion = "1.73"
 val jsonSchemaValidatorVersion = "3.0.2"
 
