@@ -23,12 +23,18 @@ class JournalpostBehandler(
             var journalpost = hentJournalpost(kafkaEvent.journalpostId)
 
             if (kafkaEvent.journalpostId == "755763339") {
-                val original = journalpost.copy()
-                journalpost = journalpost.copy(journalforendeEnhet = null)
                 log.info(
-                    "Endret journalforendeEnhet fra ${original.journalforendeEnhet} til null på journalpost: ${journalpost.journalpostId}.",
+                    "Journalpost: ${journalpost.journalpostId}, har tema: ${journalpost.tema}, behandlingstema: ${journalpost.behandlingstema}, brevkode: ${journalpost.brevkode}, journalforendeEnhet: ${journalpost.journalforendeEnhet}, avsenderMottaker: ${journalpost.avsenderMottaker}",
                 )
             }
+
+//            if (kafkaEvent.journalpostId == "755763339") {
+//                val original = journalpost.copy()
+//                journalpost = journalpost.copy(journalforendeEnhet = null)
+//                log.info(
+//                    "Endret journalforendeEnhet fra ${original.journalforendeEnhet} til null på journalpost: ${journalpost.journalpostId}.",
+//                )
+//            }
 
             if (!SkjemaMetadata.inAutoList(journalpost.tema, journalpost.brevkode)) {
                 throw OpprettManuellOppgaveException()
