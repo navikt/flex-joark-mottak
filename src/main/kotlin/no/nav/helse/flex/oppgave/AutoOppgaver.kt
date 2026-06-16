@@ -37,7 +37,7 @@ class AutoOppgaver(
             requestData.tildeltEnhetsnr = journalpost.journalforendeEnhet
         }
 
-        if (journalpost.journalforendeEnhet == "755763339") {
+        if (journalpost.journalpostId == "755763339") {
             requestData.tildeltEnhetsnr = null
             "Satt tildeltEnhetsnr til null for journalpostId: ${journalpost.journalpostId}."
         }
