@@ -26,11 +26,6 @@ class OppgaveClient(
     private val log = logger()
 
     fun opprettOppgave(requestData: OppgaveRequest): Oppgave {
-        if (requestData.journalpostId == "755763339") {
-            requestData.tildeltEnhetsnr = null
-            log.info("Satt tildeltEnhetsnr til null for journalpostId: ${requestData.journalpostId}.")
-        }
-
         val response =
             runCatching {
                 opprettOppgaveKall(requestData)
