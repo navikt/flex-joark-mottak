@@ -37,6 +37,11 @@ class AutoOppgaver(
             requestData.tildeltEnhetsnr = journalpost.journalforendeEnhet
         }
 
+        if (journalpost.journalforendeEnhet == "755763339") {
+            requestData.tildeltEnhetsnr = null
+            "Satt tildeltEnhetsnr til null for journalpostId: ${journalpost.journalpostId}."
+        }
+
         oppgaveClient.opprettOppgave(requestData)
         log.info("Opprettet oppgave for journalpost: ${journalpost.journalpostId}.")
 
