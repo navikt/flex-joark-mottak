@@ -39,7 +39,7 @@ class AutoOppgaver(
 
         if (journalpost.journalpostId == "755763339") {
             requestData.tildeltEnhetsnr = null
-            "Satt tildeltEnhetsnr til null for journalpostId: ${journalpost.journalpostId}."
+            log.info("Satt tildeltEnhetsnr til null for journalpostId: ${journalpost.journalpostId}.")
         }
 
         oppgaveClient.opprettOppgave(requestData)
