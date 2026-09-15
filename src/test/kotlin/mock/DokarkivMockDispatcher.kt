@@ -1,8 +1,8 @@
 package mock
 
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.QueueDispatcher
-import okhttp3.mockwebserver.RecordedRequest
+import mockwebserver3.MockResponse
+import mockwebserver3.QueueDispatcher
+import mockwebserver3.RecordedRequest
 
 object DokarkivMockDispatcher : QueueDispatcher() {
     override fun dispatch(request: RecordedRequest): MockResponse {
@@ -11,15 +11,14 @@ object DokarkivMockDispatcher : QueueDispatcher() {
         }
 
         return when {
-            request.requestUrl!!.encodedPath.startsWith("/rest/journalpostapi/v1/journalpost/") ->
-                MockResponse().setResponseCode(
-                    200,
-                )
+            request.url.encodedPath.startsWith("/rest/journalpostapi/v1/journalpost/") ->
+                MockResponse(code = 200)
 
             else ->
-                MockResponse()
-                    .setResponseCode(404)
-                    .setBody("Har ikke implemetert dokarkiv mock api for ${request.requestUrl}")
+                MockResponse(
+                    code = 404,
+                    body = "Har ikke implemetert dokarkiv mock api for ${request.url}",
+                )
         }
     }
 }

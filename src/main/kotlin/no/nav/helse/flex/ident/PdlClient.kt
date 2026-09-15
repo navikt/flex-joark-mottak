@@ -1,6 +1,5 @@
 package no.nav.helse.flex.ident
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.helse.flex.graphql.GraphQLRequest
 import no.nav.helse.flex.graphql.GraphQLResponse
 import no.nav.helse.flex.journalpost.FinnerIkkePersonException
@@ -10,9 +9,10 @@ import no.nav.helse.flex.objectMapper
 import no.nav.helse.flex.serialisertTilString
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.*
-import org.springframework.retry.annotation.Retryable
+import org.springframework.resilience.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
+import tools.jackson.module.kotlin.readValue
 import java.lang.Exception
 
 @Component
@@ -23,7 +23,7 @@ class PdlClient(
 ) {
     private val log = logger()
 
-    @Retryable(exclude = [FinnerIkkePersonException::class])
+    @Retryable(excludes = [FinnerIkkePersonException::class])
     fun hentIdenterForJournalpost(journalpost: Journalpost): List<PdlIdent> {
         val headers = HttpHeaders()
         headers[CONTENT_TYPE_HEADER] = MediaType.APPLICATION_JSON_VALUE

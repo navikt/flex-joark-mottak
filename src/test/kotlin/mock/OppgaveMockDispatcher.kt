@@ -1,28 +1,29 @@
 package mock
 
-import com.fasterxml.jackson.module.kotlin.readValue
+import mockwebserver3.MockResponse
+import mockwebserver3.QueueDispatcher
+import mockwebserver3.RecordedRequest
 import no.nav.helse.flex.objectMapper
 import no.nav.helse.flex.oppgave.Oppgave
 import no.nav.helse.flex.oppgave.OppgaveRequest
 import no.nav.helse.flex.oppgave.OppgaveSearchResponse
 import no.nav.helse.flex.serialisertTilString
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.QueueDispatcher
-import okhttp3.mockwebserver.RecordedRequest
+import tools.jackson.module.kotlin.readValue
 
 object OppgaveMockDispatcher : QueueDispatcher() {
     // Vi leser oppgaveRequest og må lagre den unna for å kunne lese den igjen
     val oppgaveRequestBodyListe = mutableListOf<OppgaveRequest>()
 
     override fun dispatch(request: RecordedRequest): MockResponse {
-        if (request.requestUrl?.encodedPath != "/api/v1/oppgaver") {
-            return MockResponse()
-                .setResponseCode(404)
-                .setBody("Har ikke implemetert oppgave mock api for ${request.requestUrl}")
+        if (request.url.encodedPath != "/api/v1/oppgaver") {
+            return MockResponse(
+                code = 404,
+                body = "Har ikke implemetert oppgave mock api for ${request.url}",
+            )
         }
 
         if (request.headers["X-Correlation-ID"] == null) {
-            return MockResponse().setResponseCode(400).setBody("Påkrevd header mangler: X-Correlation-ID")
+            return MockResponse(code = 400, body = "Påkrevd header mangler: X-Correlation-ID")
         }
 
         if (responseQueue.peek() != null) {
@@ -31,10 +32,10 @@ object OppgaveMockDispatcher : QueueDispatcher() {
 
         when (request.method) {
             "GET" -> return withContentTypeApplicationJson {
-                MockResponse().setBody(OppgaveSearchResponse().serialisertTilString())
+                MockResponse(body = OppgaveSearchResponse().serialisertTilString())
             }
             "POST" -> {
-                oppgaveRequestBodyListe.add(objectMapper.readValue<OppgaveRequest>(request.body.readByteArray()))
+                oppgaveRequestBodyListe.add(objectMapper.readValue<OppgaveRequest>(request.body!!.toByteArray()))
                 val requestBody = oppgaveRequestBodyListe.last()
                 val oppgave =
                     Oppgave(
@@ -45,12 +46,13 @@ object OppgaveMockDispatcher : QueueDispatcher() {
                         tildeltEnhetsnr = requestBody.tildeltEnhetsnr ?: "4488",
                     )
                 return withContentTypeApplicationJson {
-                    MockResponse().setBody(oppgave.serialisertTilString()).setResponseCode(201)
+                    MockResponse(code = 201, body = oppgave.serialisertTilString())
                 }
             }
-            else -> return MockResponse()
-                .setResponseCode(404)
-                .setBody("Har ikke implemetert oppgave mock api for metode ${request.method}")
+            else -> return MockResponse(
+                code = 404,
+                body = "Har ikke implemetert oppgave mock api for metode ${request.method}",
+            )
         }
     }
 }
