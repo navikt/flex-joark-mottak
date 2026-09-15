@@ -82,18 +82,16 @@ class AivenKafkaConfig(
                     ConsumerConfig.MAX_POLL_RECORDS_CONFIG to "1",
                     ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG to "600000",
                 )
-
-        val consumerFactory =
+        val factory = ConcurrentKafkaListenerContainerFactory<String, GenericRecord>()
+        factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
+        factory.setCommonErrorHandler(aivenKafkaErrorHandler)
+        factory.setConsumerFactory(
             DefaultKafkaConsumerFactory(
                 genericAvroConsumerConfig,
                 StringDeserializer(),
                 KafkaAvroDeserializer(aivenSchemaRegistryClient),
-            )
-
-        val factory = ConcurrentKafkaListenerContainerFactory<String, GenericRecord>()
-        factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
-        factory.setCommonErrorHandler(aivenKafkaErrorHandler)
-        factory.consumerFactory = consumerFactory
+            ),
+        )
         return factory
     }
 
@@ -111,10 +109,9 @@ class AivenKafkaConfig(
                 ConsumerConfig.MAX_POLL_RECORDS_CONFIG to "1",
                 ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG to "600000",
             ) + commonConfig()
-        val consumerFactory = DefaultKafkaConsumerFactory<String, String>(config)
 
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
-        factory.consumerFactory = consumerFactory
+        factory.setConsumerFactory(DefaultKafkaConsumerFactory(config))
         factory.setCommonErrorHandler(aivenKafkaErrorHandler)
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
         return factory

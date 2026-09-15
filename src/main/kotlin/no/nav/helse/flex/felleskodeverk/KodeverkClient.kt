@@ -1,6 +1,5 @@
 package no.nav.helse.flex.felleskodeverk
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.helse.flex.logger
 import no.nav.helse.flex.objectMapper
 import org.springframework.beans.factory.annotation.Value
@@ -11,6 +10,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
+import tools.jackson.module.kotlin.readValue
 
 @Component
 class KodeverkClient(
