@@ -1,7 +1,10 @@
 package mock
 
-import okhttp3.mockwebserver.MockResponse
+import mockwebserver3.MockResponse
 import org.springframework.http.MediaType
 
 fun withContentTypeApplicationJson(createMockResponse: () -> MockResponse): MockResponse =
-    createMockResponse().addHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+    createMockResponse()
+        .newBuilder()
+        .addHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+        .build()
