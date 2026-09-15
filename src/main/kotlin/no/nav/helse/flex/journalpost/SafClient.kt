@@ -1,6 +1,5 @@
 package no.nav.helse.flex.journalpost
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.helse.flex.graphql.GraphQLRequest
 import no.nav.helse.flex.graphql.GraphQLResponse
 import no.nav.helse.flex.logger
@@ -10,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.*
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
+import tools.jackson.module.kotlin.readValue
 import java.lang.Exception
 
 @Component

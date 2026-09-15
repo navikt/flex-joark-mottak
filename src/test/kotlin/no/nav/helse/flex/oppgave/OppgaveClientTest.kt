@@ -1,9 +1,9 @@
 package no.nav.helse.flex.oppgave
 
 import FellesTestOppsett
+import mockwebserver3.MockResponse
 import no.nav.helse.flex.CORRELATION_ID
 import no.nav.helse.flex.serialisertTilString
-import okhttp3.mockwebserver.MockResponse
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldNotBeEqualTo
 import org.junit.jupiter.api.AfterEach
@@ -56,11 +56,13 @@ class OppgaveClientTest : FellesTestOppsett() {
     fun `opprett oppgave returnerer 400 med nedlagt enhet`() {
         val request = oppgaveRequest.copy(journalpostId = "2")
         oppgaveMockWebserver.enqueue(
-            MockResponse().setResponseCode(400).setBody(
-                OppgaveErrorResponse(
-                    UUID.randomUUID().toString(),
-                    "NAVEnheten 'xxxx' har status: 'Nedlagt'",
-                ).serialisertTilString(),
+            MockResponse(
+                code = 400,
+                body =
+                    OppgaveErrorResponse(
+                        UUID.randomUUID().toString(),
+                        "NAVEnheten 'xxxx' har status: 'Nedlagt'",
+                    ).serialisertTilString(),
             ),
         )
         val oppgave = oppgaveClient.opprettOppgave(request)
@@ -73,11 +75,13 @@ class OppgaveClientTest : FellesTestOppsett() {
     fun `opprett oppgave returnerer 400 med ugyldig orgnummer`() {
         val request = oppgaveRequest.copy(journalpostId = "3")
         oppgaveMockWebserver.enqueue(
-            MockResponse().setResponseCode(400).setBody(
-                OppgaveErrorResponse(
-                    UUID.randomUUID().toString(),
-                    "Organisasjonsnummer er ugyldig",
-                ).serialisertTilString(),
+            MockResponse(
+                code = 400,
+                body =
+                    OppgaveErrorResponse(
+                        UUID.randomUUID().toString(),
+                        "Organisasjonsnummer er ugyldig",
+                    ).serialisertTilString(),
             ),
         )
         oppgaveClient.opprettOppgave(request)
@@ -89,7 +93,7 @@ class OppgaveClientTest : FellesTestOppsett() {
     fun `opprett oppgave returnerer 400 med uleselig response, kaster da http exception`() {
         val request = oppgaveRequest.copy(journalpostId = "4")
         oppgaveMockWebserver.enqueue(
-            MockResponse().setResponseCode(400).setBody("Dette er en uleselig response"),
+            MockResponse(code = 400, body = "Dette er en uleselig response"),
         )
         assertThrows<HttpClientErrorException> {
             oppgaveClient.opprettOppgave(request)
@@ -100,7 +104,7 @@ class OppgaveClientTest : FellesTestOppsett() {
     @Test
     fun `opprett oppgave returnerer 4xx`() {
         val request = oppgaveRequest.copy(journalpostId = "5")
-        oppgaveMockWebserver.enqueue(MockResponse().setResponseCode(404))
+        oppgaveMockWebserver.enqueue(MockResponse(code = 404))
         assertThrows<HttpClientErrorException> {
             oppgaveClient.opprettOppgave(request)
         }
@@ -110,7 +114,7 @@ class OppgaveClientTest : FellesTestOppsett() {
     @Test
     fun `opprett oppgave returnerer 5xx`() {
         val request = oppgaveRequest.copy(journalpostId = "6")
-        oppgaveMockWebserver.enqueue(MockResponse().setResponseCode(500))
+        oppgaveMockWebserver.enqueue(MockResponse(code = 500))
         assertThrows<HttpServerErrorException> {
             oppgaveClient.opprettOppgave(request)
         }

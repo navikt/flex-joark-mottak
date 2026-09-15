@@ -1,6 +1,5 @@
 package no.nav.helse.flex.retry
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.helse.flex.*
 import no.nav.helse.flex.journalpost.JournalpostBehandler
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -8,6 +7,7 @@ import org.slf4j.MDC
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Component
+import tools.jackson.module.kotlin.readValue
 import java.nio.charset.StandardCharsets
 import java.time.Duration
 import java.time.Instant

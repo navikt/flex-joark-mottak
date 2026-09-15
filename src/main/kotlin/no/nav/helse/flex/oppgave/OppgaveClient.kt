@@ -1,6 +1,5 @@
 package no.nav.helse.flex.oppgave
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.helse.flex.logger
 import no.nav.helse.flex.objectMapper
 import no.nav.helse.flex.serialisertTilString
@@ -10,6 +9,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
+import tools.jackson.module.kotlin.readValue
 import java.time.*
 
 private const val CONTENT_TYPE_HEADER = "Content-Type"
@@ -153,7 +153,7 @@ data class OppgaveRequest(
     val oppgavetype: String,
     var tildeltEnhetsnr: String? = null,
     val beskrivelse: String? = null,
-    private val frist: Int,
+    private val frist: Int = 0,
 ) {
     val prioritet = "NORM"
     val aktivDato = LocalDate.now().toString()
