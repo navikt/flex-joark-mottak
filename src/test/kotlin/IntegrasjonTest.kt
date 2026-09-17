@@ -2,8 +2,12 @@
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import mock.*
+import no.nav.helse.flex.graphql.GraphQLResponse
 import no.nav.helse.flex.journalpost.FerdigstillJournalpostRequest
+import no.nav.helse.flex.journalpost.Journalpost
+import no.nav.helse.flex.journalpost.SafClient
 import no.nav.helse.flex.objectMapper
+import okhttp3.mockwebserver.MockResponse
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -22,6 +26,23 @@ class IntegrasjonTest : FellesTestOppsett() {
                 ),
             ).get()
 
+        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS) shouldBeEqualTo null
+    }
+
+    @Test
+    fun `Oppretter ikke Gosys-oppgave nar journalpost blir journalfort for manuell behandling`() {
+        safMockWebserver.enqueue(safResponse(UkjentBrevkodePerson.journalpost))
+        safMockWebserver.enqueue(safResponse(UkjentBrevkodePerson.journalpost.copy(journalstatus = "JOURNALFOERT")))
+
+        kafkaProducer
+            .send(
+                ProducerRecord(
+                    topic,
+                    UkjentBrevkodePerson.kafkaEvent,
+                ),
+            ).get()
+
+        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)?.method shouldBeEqualTo "GET"
         oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS) shouldBeEqualTo null
     }
 
@@ -289,4 +310,14 @@ class IntegrasjonTest : FellesTestOppsett() {
 
         kodeverkMockWebServer.requestCount shouldBeEqualTo 1
     }
+
+    private fun safResponse(journalpost: Journalpost): MockResponse =
+        MockResponse().setBody(
+            objectMapper.writeValueAsString(
+                GraphQLResponse(
+                    data = SafClient.ResponseData(journalpost),
+                    errors = null,
+                ),
+            ),
+        )
 }

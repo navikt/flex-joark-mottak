@@ -32,6 +32,12 @@ class ManuelleOppgaver(
         }
 
         val journalpost = safClient.hentJournalpost(journalpostId)
+        if (journalpost.invalidJournalpostStatus()) {
+            log.info(
+                "Avslutter behandling da journalpost: ${journalpost.journalpostId} har status: ${journalpost.journalstatus}.",
+            )
+            return
+        }
         val identer =
             try {
                 identerService.hentIdenterFraPDL(journalpost)
