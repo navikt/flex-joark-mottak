@@ -32,7 +32,6 @@ class RetryListener(
         id = "flex-joark-mottak-retry",
         idIsGroup = true,
         containerFactory = "aivenKafkaListenerContainerFactory",
-        properties = [ "auto.offset.reset=earliest" ],
     )
     fun listen(
         cr: ConsumerRecord<String, String>,

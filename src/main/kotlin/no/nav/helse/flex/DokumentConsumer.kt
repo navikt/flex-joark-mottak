@@ -27,7 +27,6 @@ class DokumentConsumer(
         idIsGroup = true,
         concurrency = "3",
         containerFactory = "kafkaAvroListenerContainerFactory",
-        properties = ["auto.offset.reset = earliest"],
     )
     fun listen(
         cr: ConsumerRecord<String, GenericRecord>,
@@ -52,6 +51,9 @@ class DokumentConsumer(
         }
 
         val kafkaEvent = objectMapper.readValue<KafkaEvent>(genericRecord.toString())
+
+        log.trace("genericRecord: {}", genericRecord)
+        log.trace("kafkaEvent: {}", kafkaEvent)
 
         try {
             MDC.put(CORRELATION_ID, UUID.randomUUID().toString())
