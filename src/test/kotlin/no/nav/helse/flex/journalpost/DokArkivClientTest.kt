@@ -2,8 +2,8 @@ package no.nav.helse.flex.journalpost
 
 import FellesTestOppsett
 import mock.DigitalSoknadPerson
+import mockwebserver3.MockResponse
 import no.nav.helse.flex.CORRELATION_ID
-import okhttp3.mockwebserver.MockResponse
 import org.amshove.kluent.shouldBeEqualTo
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -39,7 +39,7 @@ class DokArkivClientTest : FellesTestOppsett() {
 
     @Test
     fun `update journalpost returnerer 4xx`() {
-        dokarkivMockWebserver.enqueue(MockResponse().setResponseCode(404))
+        dokarkivMockWebserver.enqueue(MockResponse(code = 404))
         assertThrows<HttpClientErrorException> {
             dokArkivClient.updateJournalpost(DigitalSoknadPerson.journalpost)
         }
@@ -49,7 +49,7 @@ class DokArkivClientTest : FellesTestOppsett() {
 
     @Test
     fun `update journalpost returnerer 5xx`() {
-        dokarkivMockWebserver.enqueue(MockResponse().setResponseCode(500))
+        dokarkivMockWebserver.enqueue(MockResponse(code = 500))
         assertThrows<HttpServerErrorException> {
             dokArkivClient.updateJournalpost(DigitalSoknadPerson.journalpost)
         }

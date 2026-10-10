@@ -23,11 +23,10 @@ spring:
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       group-id: flex-joark-mottak
       max-poll-records: 1
-      auto-offset-reset: none
       enable-auto-commit: false
 
 aiven-kafka:
-  auto-offset-reset: latest
+  auto-offset-reset: none
 
 no.nav.security.jwt:
   issuer:

@@ -2,7 +2,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    id("org.springframework.boot") version "3.5.15"
+    id("org.springframework.boot") version "4.1.1"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
     kotlin("jvm") version "2.4.10"
@@ -31,25 +31,24 @@ val confluentVersion = "8.2.0"
 val mockitoKotlinVersion = "2.2.0"
 val avroVersion = "1.12.2"
 val logstashLogbackEncoderVersion = "9.0"
-val tokenSupportVersion = "5.0.37"
+val tokenSupportVersion = "6.0.12"
 val testContainersVersion = "2.0.5"
 val kluentVersion = "1.73"
 val jsonSchemaValidatorVersion = "3.0.7"
+val mockwebserverVersion = "5.5.0"
 
 dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
-    implementation(kotlin("stdlib"))
-    implementation(kotlin("reflect"))
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-kafka")
     implementation("org.springframework.boot:spring-boot-starter-cache")
-    implementation("org.hibernate.validator:hibernate-validator")
     implementation("io.micrometer:micrometer-registry-prometheus")
-    implementation("org.springframework.kafka:spring-kafka")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("org.hibernate.validator:hibernate-validator")
+    implementation("org.springframework.boot:spring-boot-restclient")
+    implementation("tools.jackson.module:jackson-module-kotlin")
     implementation("org.aspectj:aspectjrt")
     implementation("org.aspectj:aspectjweaver")
-    implementation("org.apache.httpcomponents.client5:httpclient5")
     implementation("com.github.ben-manes.caffeine:caffeine:$caffeineVersion")
     implementation("io.confluent:kafka-connect-avro-converter:$confluentVersion")
     implementation("io.confluent:kafka-schema-registry-client:$confluentVersion")
@@ -58,7 +57,9 @@ dependencies {
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
     implementation("org.apache.avro:avro:$avroVersion")
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation("org.springframework.boot:spring-boot-micrometer-metrics-test")
+    testImplementation("org.springframework.boot:spring-boot-micrometer-tracing-test")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:testcontainers-kafka:$testContainersVersion")
     testImplementation("org.assertj:assertj-core")
@@ -68,10 +69,7 @@ dependencies {
     testImplementation("com.networknt:json-schema-validator:$jsonSchemaValidatorVersion")
     testImplementation("org.amshove.kluent:kluent:$kluentVersion")
     testImplementation("commons-codec:commons-codec")
-}
-
-ktlint {
-    version.set("1.5.0")
+    testImplementation("com.squareup.okhttp3:mockwebserver3:$mockwebserverVersion")
 }
 
 kotlin {

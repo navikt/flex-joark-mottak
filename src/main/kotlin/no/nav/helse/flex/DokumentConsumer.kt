@@ -1,6 +1,5 @@
 package no.nav.helse.flex
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.helse.flex.config.EnvironmentToggles
 import no.nav.helse.flex.journalpost.JournalpostBehandler
 import no.nav.helse.flex.retry.RetryProducer
@@ -10,6 +9,7 @@ import org.slf4j.MDC
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Component
+import tools.jackson.module.kotlin.readValue
 import java.time.OffsetDateTime
 import java.util.*
 
@@ -27,7 +27,6 @@ class DokumentConsumer(
         idIsGroup = true,
         concurrency = "3",
         containerFactory = "kafkaAvroListenerContainerFactory",
-        properties = ["auto.offset.reset = earliest"],
     )
     fun listen(
         cr: ConsumerRecord<String, GenericRecord>,
@@ -52,6 +51,9 @@ class DokumentConsumer(
         }
 
         val kafkaEvent = objectMapper.readValue<KafkaEvent>(genericRecord.toString())
+
+        log.trace("genericRecord: {}", genericRecord)
+        log.trace("kafkaEvent: {}", kafkaEvent)
 
         try {
             MDC.put(CORRELATION_ID, UUID.randomUUID().toString())

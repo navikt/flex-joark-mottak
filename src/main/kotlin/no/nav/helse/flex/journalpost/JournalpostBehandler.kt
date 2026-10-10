@@ -76,7 +76,7 @@ class JournalpostBehandler(
         if (SkjemaMetadata.isIgnoreskjema(journalpost.tema, journalpost.brevkode)) {
             log.info(
                 "Avslutter behandling da journalpost: ${journalpost.journalpostId} har " +
-                    "brevkode ${journalpost.brevkode} på tema ${journalpost.tema} som eksplisitt skal ignoreres.",
+                    "brevkode: ${journalpost.brevkode} på tema: ${journalpost.tema} som eksplisitt skal ignoreres.",
             )
             throw InvalidJournalpostStatusException()
         }
@@ -88,8 +88,8 @@ class JournalpostBehandler(
         for (dokument in journalpost.dokumenter) {
             if (dokument.tittel.isNullOrEmpty()) {
                 log.info(
-                    "Avslutter behandlinbg da ournalpost: ${journalpost.journalpostId} har " +
-                        "dokument ${dokument.dokumentInfoId} uten tittel.",
+                    "Avslutter behandling da journalpost: ${journalpost.journalpostId} har " +
+                        "dokument: ${dokument.dokumentInfoId} uten tittel.",
                 )
                 return false
             }
