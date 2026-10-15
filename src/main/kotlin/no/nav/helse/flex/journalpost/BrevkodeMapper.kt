@@ -13,6 +13,10 @@ class BrevkodeMapper(
     fun mapBrevkodeTilTemaOgType(journalpost: Journalpost): Journalpost {
         val behandlingstema =
             if (journalpost.behandlingstema.isNullOrEmpty()) {
+                log.debug(
+                    "Debug: Behandlingstema for journalpost: ${journalpost.journalpostId} med brevkode: ${journalpost.brevkode} " +
+                        "og tema: ${journalpost.tema} er null eller tom, mapper til behandlingstema fra kodeverk.",
+                )
                 kodeverkClient.hentKrutkoder().getBehandlingstema(journalpost.tema, journalpost.brevkode)
             } else {
                 journalpost.behandlingstema

@@ -1,9 +1,13 @@
 package no.nav.helse.flex.felleskodeverk
 
+import no.nav.helse.flex.logger
+
 class KodeverkBrevkoder(
     val hierarkinivaaer: List<String>,
     val noder: Map<String, TemaNode>,
 ) {
+    private val log = logger()
+
     class TemaNode(
         val kode: String,
         val undernoder: Map<String, BrevkodeNode> = emptyMap(),
@@ -21,7 +25,9 @@ class KodeverkBrevkoder(
         journalpostTema: String,
         journalpostBrevkode: String?,
     ): String? {
+        log.info("Debug: journalpostTema=$journalpostTema, journalpostBrevkode=$journalpostBrevkode")
         val brevkodeNode = noder[journalpostTema]?.undernoder?.get(journalpostBrevkode) ?: return null
+        log.info("Debug: brevkodeNode=$brevkodeNode")
         return brevkodeNode.behandlingstema.takeUnless { it.isNullOrBlank() }
     }
 
