@@ -30,7 +30,7 @@ abstract class FellesTestOppsett {
 
         init {
 
-            KafkaContainer(DockerImageName.parse("apache/kafka-native:3.9.1")).apply {
+            KafkaContainer(DockerImageName.parse("apache/kafka-native:4.3.1")).apply {
                 start()
                 System.setProperty("KAFKA_BROKERS", bootstrapServers)
                 System.setProperty("AIVEN_DOKUMENT_TOPIC", "test-topic")
