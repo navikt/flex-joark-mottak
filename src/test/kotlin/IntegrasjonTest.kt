@@ -1,10 +1,9 @@
 @file:Suppress("ktlint:standard:max-line-length")
 
+import io.kotest.matchers.shouldBe
 import mock.*
 import no.nav.helse.flex.journalpost.FerdigstillJournalpostRequest
 import no.nav.helse.flex.objectMapper
-import org.amshove.kluent.shouldBe
-import org.amshove.kluent.shouldBeEqualTo
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Test
@@ -22,7 +21,7 @@ class IntegrasjonTest : FellesTestOppsett() {
                 ),
             ).get()
 
-        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS) shouldBeEqualTo null
+        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS) shouldBe null
     }
 
     @Test
@@ -40,27 +39,27 @@ class IntegrasjonTest : FellesTestOppsett() {
         val requestOppdaterJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
         val requestFerdigstillJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
 
-        requestHarOppgave.requestLine shouldBeEqualTo
+        requestHarOppgave.requestLine shouldBe
             "GET /api/v1/oppgaver?statuskategori=AAPEN&oppgavetype=JFR&oppgavetype=FDR&journalpostId=${PapirSoknadPerson.JOURNALPOST_ID} HTTP/1.1"
 
-        requestOpprettOppgave.requestLine shouldBeEqualTo "POST /api/v1/oppgaver HTTP/1.1"
+        requestOpprettOppgave.requestLine shouldBe "POST /api/v1/oppgaver HTTP/1.1"
         val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
-        body.journalpostId shouldBeEqualTo PapirSoknadPerson.JOURNALPOST_ID
-        body.tema shouldBeEqualTo "SYK"
-        body.behandlingstema shouldBeEqualTo "ab0434"
-        body.behandlingstype shouldBeEqualTo null
+        body.journalpostId shouldBe PapirSoknadPerson.JOURNALPOST_ID
+        body.tema shouldBe "SYK"
+        body.behandlingstema shouldBe "ab0434"
+        body.behandlingstype shouldBe null
 
-        requestOppdaterJournalpost.method shouldBeEqualTo "PUT"
-        requestOppdaterJournalpost.url.encodedPath shouldBeEqualTo
+        requestOppdaterJournalpost.method shouldBe "PUT"
+        requestOppdaterJournalpost.url.encodedPath shouldBe
             "/rest/journalpostapi/v1/journalpost/${PapirSoknadPerson.JOURNALPOST_ID}"
 
-        requestFerdigstillJournalpost.method shouldBeEqualTo "PATCH"
-        requestFerdigstillJournalpost.url.encodedPath shouldBeEqualTo
+        requestFerdigstillJournalpost.method shouldBe "PATCH"
+        requestFerdigstillJournalpost.url.encodedPath shouldBe
             "/rest/journalpostapi/v1/journalpost/${PapirSoknadPerson.JOURNALPOST_ID}/ferdigstill"
         objectMapper
             .readValue<FerdigstillJournalpostRequest>(
                 requestFerdigstillJournalpost.body!!.utf8(),
-            ).journalfoerendeEnhet shouldBeEqualTo
+            ).journalfoerendeEnhet shouldBe
             "9999"
     }
 
@@ -78,18 +77,18 @@ class IntegrasjonTest : FellesTestOppsett() {
         val requestOpprettOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
         val requestFerdigstillJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)
 
-        requestHarOppgave.method shouldBeEqualTo "GET"
-        requestHarOppgave.url.queryParameter("statuskategori") shouldBeEqualTo "AAPEN"
-        requestHarOppgave.url.queryParameter("journalpostId") shouldBeEqualTo InntektsopplysningerPerson.JOURNALPOST_ID
+        requestHarOppgave.method shouldBe "GET"
+        requestHarOppgave.url.queryParameter("statuskategori") shouldBe "AAPEN"
+        requestHarOppgave.url.queryParameter("journalpostId") shouldBe InntektsopplysningerPerson.JOURNALPOST_ID
 
-        requestOpprettOppgave.method shouldBeEqualTo "POST"
+        requestOpprettOppgave.method shouldBe "POST"
         val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
-        body.journalpostId shouldBeEqualTo InntektsopplysningerPerson.JOURNALPOST_ID
-        body.tema shouldBeEqualTo "SYK"
-        body.behandlingstema shouldBeEqualTo null
-        body.behandlingstype shouldBeEqualTo "ae0004"
+        body.journalpostId shouldBe InntektsopplysningerPerson.JOURNALPOST_ID
+        body.tema shouldBe "SYK"
+        body.behandlingstema shouldBe null
+        body.behandlingstype shouldBe "ae0004"
 
-        requestFerdigstillJournalpost shouldBeEqualTo null
+        requestFerdigstillJournalpost shouldBe null
     }
 
     @Test
@@ -106,18 +105,18 @@ class IntegrasjonTest : FellesTestOppsett() {
         val requestOpprettOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
         val requestFerdigstillJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)
 
-        requestHarOppgave.method shouldBeEqualTo "GET"
-        requestHarOppgave.url.queryParameter("statuskategori") shouldBeEqualTo "AAPEN"
-        requestHarOppgave.url.queryParameter("journalpostId") shouldBeEqualTo KlagePerson.JOURNALPOST_ID
+        requestHarOppgave.method shouldBe "GET"
+        requestHarOppgave.url.queryParameter("statuskategori") shouldBe "AAPEN"
+        requestHarOppgave.url.queryParameter("journalpostId") shouldBe KlagePerson.JOURNALPOST_ID
 
-        requestOpprettOppgave.method shouldBeEqualTo "POST"
+        requestOpprettOppgave.method shouldBe "POST"
         val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
-        body.journalpostId shouldBeEqualTo KlagePerson.JOURNALPOST_ID
-        body.tema shouldBeEqualTo "SYK"
-        body.behandlingstema shouldBeEqualTo null
-        body.behandlingstype shouldBeEqualTo null
+        body.journalpostId shouldBe KlagePerson.JOURNALPOST_ID
+        body.tema shouldBe "SYK"
+        body.behandlingstema shouldBe null
+        body.behandlingstype shouldBe null
 
-        requestFerdigstillJournalpost shouldBeEqualTo null
+        requestFerdigstillJournalpost shouldBe null
     }
 
     @Test
@@ -134,18 +133,18 @@ class IntegrasjonTest : FellesTestOppsett() {
         val requestOpprettOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
         val requestFerdigstillJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)
 
-        requestHarOppgave.method shouldBeEqualTo "GET"
-        requestHarOppgave.url.queryParameter("statuskategori") shouldBeEqualTo "AAPEN"
-        requestHarOppgave.url.queryParameter("journalpostId") shouldBeEqualTo UtenlandskPerson.JOURNALPOST_ID
+        requestHarOppgave.method shouldBe "GET"
+        requestHarOppgave.url.queryParameter("statuskategori") shouldBe "AAPEN"
+        requestHarOppgave.url.queryParameter("journalpostId") shouldBe UtenlandskPerson.JOURNALPOST_ID
 
-        requestOpprettOppgave.method shouldBeEqualTo "POST"
+        requestOpprettOppgave.method shouldBe "POST"
         val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
-        body.journalpostId shouldBeEqualTo UtenlandskPerson.JOURNALPOST_ID
-        body.tema shouldBeEqualTo "SYK"
-        body.behandlingstema shouldBeEqualTo null
-        body.behandlingstype shouldBeEqualTo "ae0106"
+        body.journalpostId shouldBe UtenlandskPerson.JOURNALPOST_ID
+        body.tema shouldBe "SYK"
+        body.behandlingstema shouldBe null
+        body.behandlingstype shouldBe "ae0106"
 
-        requestFerdigstillJournalpost shouldBeEqualTo null
+        requestFerdigstillJournalpost shouldBe null
     }
 
     @Test
@@ -162,18 +161,18 @@ class IntegrasjonTest : FellesTestOppsett() {
         val requestOpprettOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
         val requestFerdigstillJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)
 
-        requestHarOppgave.method shouldBeEqualTo "GET"
-        requestHarOppgave.url.queryParameter("statuskategori") shouldBeEqualTo "AAPEN"
-        requestHarOppgave.url.queryParameter("journalpostId") shouldBeEqualTo BrevløsPerson.JOURNALPOST_ID
+        requestHarOppgave.method shouldBe "GET"
+        requestHarOppgave.url.queryParameter("statuskategori") shouldBe "AAPEN"
+        requestHarOppgave.url.queryParameter("journalpostId") shouldBe BrevløsPerson.JOURNALPOST_ID
 
-        requestOpprettOppgave.method shouldBeEqualTo "POST"
+        requestOpprettOppgave.method shouldBe "POST"
         val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
-        body.journalpostId shouldBeEqualTo BrevløsPerson.JOURNALPOST_ID
-        body.tema shouldBeEqualTo "SYK"
-        body.behandlingstema shouldBeEqualTo null
-        body.behandlingstype shouldBeEqualTo null
+        body.journalpostId shouldBe BrevløsPerson.JOURNALPOST_ID
+        body.tema shouldBe "SYK"
+        body.behandlingstema shouldBe null
+        body.behandlingstype shouldBe null
 
-        requestFerdigstillJournalpost shouldBeEqualTo null
+        requestFerdigstillJournalpost shouldBe null
     }
 
     @Test
@@ -190,18 +189,18 @@ class IntegrasjonTest : FellesTestOppsett() {
         val requestOpprettOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
         val requestFerdigstillJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)
 
-        requestHarOppgave.method shouldBeEqualTo "GET"
-        requestHarOppgave.url.queryParameter("statuskategori") shouldBeEqualTo "AAPEN"
-        requestHarOppgave.url.queryParameter("journalpostId") shouldBeEqualTo UkjentBrevkodePerson.JOURNALPOST_ID
+        requestHarOppgave.method shouldBe "GET"
+        requestHarOppgave.url.queryParameter("statuskategori") shouldBe "AAPEN"
+        requestHarOppgave.url.queryParameter("journalpostId") shouldBe UkjentBrevkodePerson.JOURNALPOST_ID
 
-        requestOpprettOppgave.method shouldBeEqualTo "POST"
+        requestOpprettOppgave.method shouldBe "POST"
         val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
-        body.journalpostId shouldBeEqualTo UkjentBrevkodePerson.JOURNALPOST_ID
-        body.tema shouldBeEqualTo "SYK"
-        body.behandlingstema shouldBeEqualTo null
-        body.behandlingstype shouldBeEqualTo null
+        body.journalpostId shouldBe UkjentBrevkodePerson.JOURNALPOST_ID
+        body.tema shouldBe "SYK"
+        body.behandlingstema shouldBe null
+        body.behandlingstype shouldBe null
 
-        requestFerdigstillJournalpost shouldBeEqualTo null
+        requestFerdigstillJournalpost shouldBe null
     }
 
     @Test
@@ -218,18 +217,18 @@ class IntegrasjonTest : FellesTestOppsett() {
         val requestOpprettOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
         val requestFerdigstillJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)
 
-        requestHarOppgave.method shouldBeEqualTo "GET"
-        requestHarOppgave.url.queryParameter("statuskategori") shouldBeEqualTo "AAPEN"
-        requestHarOppgave.url.queryParameter("journalpostId") shouldBeEqualTo JournalpostUtenPerson.JOURNALPOST_ID
+        requestHarOppgave.method shouldBe "GET"
+        requestHarOppgave.url.queryParameter("statuskategori") shouldBe "AAPEN"
+        requestHarOppgave.url.queryParameter("journalpostId") shouldBe JournalpostUtenPerson.JOURNALPOST_ID
 
-        requestOpprettOppgave.method shouldBeEqualTo "POST"
+        requestOpprettOppgave.method shouldBe "POST"
         val body = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
-        body.journalpostId shouldBeEqualTo JournalpostUtenPerson.JOURNALPOST_ID
-        body.tema shouldBeEqualTo "SYK"
-        body.behandlingstema shouldBeEqualTo null
-        body.behandlingstype shouldBeEqualTo "ae0106"
+        body.journalpostId shouldBe JournalpostUtenPerson.JOURNALPOST_ID
+        body.tema shouldBe "SYK"
+        body.behandlingstema shouldBe null
+        body.behandlingstype shouldBe "ae0106"
 
-        requestFerdigstillJournalpost shouldBeEqualTo null
+        requestFerdigstillJournalpost shouldBe null
     }
 
     @Test
@@ -243,10 +242,10 @@ class IntegrasjonTest : FellesTestOppsett() {
             ).get()
 
         val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)
-        requestHarOppgave shouldBeEqualTo null
+        requestHarOppgave shouldBe null
 
         val requestFerdigstillJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)
-        requestFerdigstillJournalpost shouldBeEqualTo null
+        requestFerdigstillJournalpost shouldBe null
     }
 
     @Test
@@ -262,31 +261,31 @@ class IntegrasjonTest : FellesTestOppsett() {
         // Har oppgave kalles først når oppgave oppretted, og deretter når det opprettes en manuell oppgave.
         repeat(2) {
             val requestHarOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
-            requestHarOppgave.method shouldBeEqualTo "GET"
-            requestHarOppgave.url.queryParameter("statuskategori") shouldBeEqualTo "AAPEN"
-            requestHarOppgave.url.queryParameter("journalpostId") shouldBeEqualTo PapirSoknadMedOrgNrPerson.JOURNALPOST_ID
+            requestHarOppgave.method shouldBe "GET"
+            requestHarOppgave.url.queryParameter("statuskategori") shouldBe "AAPEN"
+            requestHarOppgave.url.queryParameter("journalpostId") shouldBe PapirSoknadMedOrgNrPerson.JOURNALPOST_ID
         }
 
         val requestOpprettOppgave = oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!
-        requestOpprettOppgave.method shouldBeEqualTo "POST"
+        requestOpprettOppgave.method shouldBe "POST"
 
         val requestFerdigstillJournalpost = dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)
         requestFerdigstillJournalpost shouldBe null
 
         val oppgaveRequestBody = OppgaveMockDispatcher.oppgaveRequestBodyListe.last()
-        oppgaveRequestBody.journalpostId shouldBeEqualTo PapirSoknadMedOrgNrPerson.JOURNALPOST_ID
-        oppgaveRequestBody.orgnr shouldBeEqualTo PapirSoknadMedOrgNrPerson.ORGNR
+        oppgaveRequestBody.journalpostId shouldBe PapirSoknadMedOrgNrPerson.JOURNALPOST_ID
+        oppgaveRequestBody.orgnr shouldBe PapirSoknadMedOrgNrPerson.ORGNR
         oppgaveRequestBody.aktoerId shouldBe null
-        oppgaveRequestBody.tema shouldBeEqualTo "SYK"
-        oppgaveRequestBody.behandlingstema shouldBeEqualTo "ab0434"
+        oppgaveRequestBody.tema shouldBe "SYK"
+        oppgaveRequestBody.behandlingstema shouldBe "ab0434"
         oppgaveRequestBody.behandlingstype shouldBe null
     }
 
     @AfterAll
     fun `Kodeverket ble bare kalt en gang og resultatet ble chacet`() {
         val request = kodeverkMockWebServer.takeRequest(1, TimeUnit.SECONDS)!!
-        request.url.encodedPath shouldBeEqualTo "/api/v1/hierarki/TemaSkjemaGjelder/noder"
+        request.url.encodedPath shouldBe "/api/v1/hierarki/TemaSkjemaGjelder/noder"
 
-        kodeverkMockWebServer.requestCount shouldBeEqualTo 1
+        kodeverkMockWebServer.requestCount shouldBe 1
     }
 }
