@@ -1,10 +1,10 @@
 package no.nav.helse.flex.journalpost
 
 import FellesTestOppsett
+import io.kotest.matchers.shouldBe
 import mock.DigitalSoknadPerson
 import mockwebserver3.MockResponse
 import no.nav.helse.flex.CORRELATION_ID
-import org.amshove.kluent.shouldBeEqualTo
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -33,7 +33,7 @@ class DokArkivClientTest : FellesTestOppsett() {
     @Test
     fun `update journalpost happycase`() {
         dokArkivClient.updateJournalpost(DigitalSoknadPerson.journalpost)
-        dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo
+        dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBe
             "PUT /rest/journalpostapi/v1/journalpost/${DigitalSoknadPerson.JOURNALPOST_ID} HTTP/1.1"
     }
 
@@ -43,7 +43,7 @@ class DokArkivClientTest : FellesTestOppsett() {
         assertThrows<HttpClientErrorException> {
             dokArkivClient.updateJournalpost(DigitalSoknadPerson.journalpost)
         }
-        dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo
+        dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBe
             "PUT /rest/journalpostapi/v1/journalpost/${DigitalSoknadPerson.JOURNALPOST_ID} HTTP/1.1"
     }
 
@@ -53,7 +53,7 @@ class DokArkivClientTest : FellesTestOppsett() {
         assertThrows<HttpServerErrorException> {
             dokArkivClient.updateJournalpost(DigitalSoknadPerson.journalpost)
         }
-        dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo
+        dokarkivMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBe
             "PUT /rest/journalpostapi/v1/journalpost/${DigitalSoknadPerson.JOURNALPOST_ID} HTTP/1.1"
     }
 }

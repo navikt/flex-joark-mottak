@@ -1,11 +1,11 @@
 package no.nav.helse.flex.oppgave
 
 import FellesTestOppsett
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import mockwebserver3.MockResponse
 import no.nav.helse.flex.CORRELATION_ID
 import no.nav.helse.flex.serialisertTilString
-import org.amshove.kluent.shouldBeEqualTo
-import org.amshove.kluent.shouldNotBeEqualTo
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -47,9 +47,9 @@ class OppgaveClientTest : FellesTestOppsett() {
     fun `opprett oppgave happycase`() {
         val request = oppgaveRequest.copy(journalpostId = "1")
         val oppgave = oppgaveClient.opprettOppgave(request)
-        oppgave.tildeltEnhetsnr shouldBeEqualTo request.tildeltEnhetsnr
+        oppgave.tildeltEnhetsnr shouldBe request.tildeltEnhetsnr
 
-        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo "POST /api/v1/oppgaver HTTP/1.1"
+        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBe "POST /api/v1/oppgaver HTTP/1.1"
     }
 
     @Test
@@ -66,9 +66,9 @@ class OppgaveClientTest : FellesTestOppsett() {
             ),
         )
         val oppgave = oppgaveClient.opprettOppgave(request)
-        oppgave.tildeltEnhetsnr shouldNotBeEqualTo request.tildeltEnhetsnr
-        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo "POST /api/v1/oppgaver HTTP/1.1"
-        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo "POST /api/v1/oppgaver HTTP/1.1"
+        oppgave.tildeltEnhetsnr shouldNotBe request.tildeltEnhetsnr
+        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBe "POST /api/v1/oppgaver HTTP/1.1"
+        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBe "POST /api/v1/oppgaver HTTP/1.1"
     }
 
     @Test
@@ -85,8 +85,8 @@ class OppgaveClientTest : FellesTestOppsett() {
             ),
         )
         oppgaveClient.opprettOppgave(request)
-        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo "POST /api/v1/oppgaver HTTP/1.1"
-        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo "POST /api/v1/oppgaver HTTP/1.1"
+        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBe "POST /api/v1/oppgaver HTTP/1.1"
+        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBe "POST /api/v1/oppgaver HTTP/1.1"
     }
 
     @Test
@@ -98,7 +98,7 @@ class OppgaveClientTest : FellesTestOppsett() {
         assertThrows<HttpClientErrorException> {
             oppgaveClient.opprettOppgave(request)
         }
-        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo "POST /api/v1/oppgaver HTTP/1.1"
+        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBe "POST /api/v1/oppgaver HTTP/1.1"
     }
 
     @Test
@@ -108,7 +108,7 @@ class OppgaveClientTest : FellesTestOppsett() {
         assertThrows<HttpClientErrorException> {
             oppgaveClient.opprettOppgave(request)
         }
-        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo "POST /api/v1/oppgaver HTTP/1.1"
+        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBe "POST /api/v1/oppgaver HTTP/1.1"
     }
 
     @Test
@@ -118,6 +118,6 @@ class OppgaveClientTest : FellesTestOppsett() {
         assertThrows<HttpServerErrorException> {
             oppgaveClient.opprettOppgave(request)
         }
-        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBeEqualTo "POST /api/v1/oppgaver HTTP/1.1"
+        oppgaveMockWebserver.takeRequest(1, TimeUnit.SECONDS)!!.requestLine shouldBe "POST /api/v1/oppgaver HTTP/1.1"
     }
 }

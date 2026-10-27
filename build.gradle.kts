@@ -33,7 +33,7 @@ val avroVersion = "1.12.2"
 val logstashLogbackEncoderVersion = "9.0"
 val tokenSupportVersion = "6.0.12"
 val testContainersVersion = "2.0.5"
-val kluentVersion = "1.73"
+val kotestVersion = "5.9.1"
 val jsonSchemaValidatorVersion = "3.0.8"
 val mockwebserverVersion = "5.5.0"
 
@@ -62,12 +62,11 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-micrometer-tracing-test")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:testcontainers-kafka:$testContainersVersion")
-    testImplementation("org.assertj:assertj-core")
     testImplementation("org.awaitility:awaitility")
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlinVersion")
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
     testImplementation("com.networknt:json-schema-validator:$jsonSchemaValidatorVersion")
-    testImplementation("org.amshove.kluent:kluent:$kluentVersion")
+    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
     testImplementation("commons-codec:commons-codec")
     testImplementation("com.squareup.okhttp3:mockwebserver3:$mockwebserverVersion")
 }
