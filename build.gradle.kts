@@ -33,7 +33,7 @@ val avroVersion = "1.12.2"
 val logstashLogbackEncoderVersion = "9.0"
 val tokenSupportVersion = "6.0.12"
 val testContainersVersion = "2.0.5"
-val kotestVersion = "5.9.1"
+val kotestVersion = "6.2.6"
 val jsonSchemaValidatorVersion = "3.0.8"
 val mockwebserverVersion = "5.5.0"
 
