@@ -35,7 +35,7 @@ val tokenSupportVersion = "6.0.12"
 val testContainersVersion = "2.0.5"
 val kotestVersion = "5.9.1"
 val jsonSchemaValidatorVersion = "3.0.8"
-val mockwebserverVersion = "5.5.0"
+val mockwebserverVersion = "5.5.1"
 
 dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
